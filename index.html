@@ -1160,7 +1160,38 @@ function updateClock() {
 // ═══════════════════════════════
 // TWITTER SHARE
 // ═══════════════════════════════
-function shareTwitter() {
+
+// Renders cert (reuses existing canvas if already drawn), then:
+//   1. Web Share API with image file  (mobile / Chrome desktop)
+//   2. Clipboard image copy + open Twitter  (other desktop)
+//   3. Plain text tweet fallback
+async function openXWithCert(text) {
+  const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
+  try {
+    let canvas = document.getElementById('certCanvas');
+    if (!canvas || canvas.width !== 1400) {
+      showToast('generating certificate...');
+      canvas = document.createElement('canvas');
+      await renderCertificate(canvas);
+    }
+    const blob = await new Promise(res => canvas.toBlob(res, 'image/png', 0.95));
+    const file = new File([blob], 'nut-certificate.png', {type: 'image/png'});
+    // Try native share sheet (works on mobile, Chrome on Windows with right flags)
+    if (navigator.canShare && navigator.canShare({files: [file]})) {
+      await navigator.share({files: [file], title: '$NUT', text});
+      return;
+    }
+    // Clipboard copy then open Twitter so user can paste
+    await navigator.clipboard.write([new ClipboardItem({'image/png': blob})]);
+    showToast('📋 certificate copied — paste into tweet with Ctrl+V');
+    setTimeout(() => window.open(twitterUrl, '_blank'), 700);
+  } catch(e) {
+    // Any failure: just open Twitter with text
+    window.open(twitterUrl, '_blank');
+  }
+}
+
+async function shareTwitter() {
   const s = currentStreak || 0;
   const pool = [];
 
@@ -1222,10 +1253,10 @@ function shareTwitter() {
   );
 
   const pick = pool[Math.floor(Math.random()*pool.length)];
-  window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(pick)}`,'_blank');
+  openXWithCert(pick);
 }
 
-function shareCertTweet() {
+async function shareCertTweet() {
   const s = currentStreak || 0;
   const badges = typeof earnedBadges !== 'undefined' ? earnedBadges.size : 0;
   const pool = [
@@ -1236,7 +1267,7 @@ function shareCertTweet() {
     `just got my official $NUT Certificate\n\nsome people collect NFTs\ni collect proof of something else\n\n${SITE_URL} #NUT #Solana`,
   ];
   const pick = pool[Math.floor(Math.random()*pool.length)];
-  window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(pick)}`,'_blank');
+  openXWithCert(pick);
 }
 
 // ═══════════════════════════════
