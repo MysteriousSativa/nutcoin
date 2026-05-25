@@ -503,7 +503,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
     <!-- 2: Timeline -->
     <div class="panel" id="panel-2">
       <div class="panel-title">Today's Sacred Timeline</div>
-      <div class="tl-empty" id="tlEmpty">The day is young, dear scholar. The timeline awaits thy first nut.</div>
+      <div class="tl-empty" id="tlEmpty">nothing yet. what are you waiting for. go nut.</div>
       <div id="timelineList"></div>
     </div>
 
@@ -563,7 +563,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
         <div style="text-align:center;">
           <div class="chrono-peak" id="chronoPeak">—</div>
           <div class="chrono-peak-label">Sacred Hour of Peak Activity</div>
-          <div class="chrono-archetype" id="chronoArchetype">Complete a nut to reveal thy daily pattern.</div>
+          <div class="chrono-archetype" id="chronoArchetype">go nut first. then we will judge what time of day you do this.</div>
         </div>
       </div>
     </div>
@@ -584,7 +584,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
       <div class="prophecy-wrap">
         <span class="prophecy-eye">🔮</span>
         <div class="prophecy-heading">The Oracle Speaks</div>
-        <div class="prophecy-text" id="prophecyText">Nut for the first time to receive a reading.</div>
+        <div class="prophecy-text" id="prophecyText">go nut first. then the oracle will talk to you.</div>
         <div class="prophecy-omen" id="prophecyOmen"></div>
       </div>
     </div>
@@ -592,7 +592,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
     <!-- 10: Sacred Aura -->
     <div class="panel" id="panel-10">
       <div class="panel-title">The Sacred Aura</div>
-      <div id="auraContent"><div class="aura-empty">No mood data yet. After each nut, rate thy emotional state.</div></div>
+      <div id="auraContent"><div class="aura-empty">no data yet. go nut and tell us how bad you feel about it.</div></div>
       <div class="aura-insight" id="auraInsight"></div>
     </div>
 
@@ -601,7 +601,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
   <!-- ACTIVITY LOG -->
   <div class="log-section">
     <div class="section-title">Activity Log</div>
-    <div class="log-empty" id="logEmpty">No activity yet. Go nut.</div>
+    <div class="log-empty" id="logEmpty">nothing logged yet. go nut and come back.</div>
     <div id="logList"></div>
   </div>
 
@@ -656,7 +656,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
   <div class="nick-modal-box">
     <span class="modal-emoji">🏆</span>
     <div class="modal-title" style="color:var(--gold);font-size:18px;margin-bottom:6px;">Join the Leaderboard</div>
-    <div style="font-family:'Crimson Text',serif;font-size:16px;color:var(--muted);font-style:italic;">Pick a name. Your nut count appears publicly.</div>
+    <div style="font-family:'Crimson Text',serif;font-size:16px;color:var(--muted);font-style:italic;">pick a name. everyone on the leaderboard can see how many times you nutted. choose wisely.</div>
     <input class="nick-input" id="nickInput" type="text" maxlength="20" placeholder="Your name..."/>
     <button class="nick-submit" onclick="submitNick()">Claim My Name</button>
     <span class="nick-skip" onclick="closeNickModal()">No thanks, stay anonymous</span>
@@ -678,7 +678,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
   <div class="cert-inner">
     <div class="cert-modal-hdr">
       <div class="cert-modal-title">Your Sacred Nut Certificate</div>
-      <div class="cert-modal-sub">Official record of today's nuts — shareable and downloadable</div>
+      <div class="cert-modal-sub">proof you nutted today. downloadable. shareable. not advisable.</div>
     </div>
     <div class="cert-canvas-wrap">
       <canvas id="certCanvas"></canvas>
@@ -696,7 +696,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 <div class="mood-overlay" id="moodOverlay">
   <div class="mood-box">
     <div class="mood-title">The Oracle Asks</div>
-    <div class="mood-sub">How dost thou feel after thy sacred nut?</div>
+    <div class="mood-sub">ok be honest. how do you feel right now.</div>
     <div class="mood-options">
       <button class="mood-btn" onclick="logMood('😵','Wrecked')"><span class="mood-e">😵</span><span class="mood-l">Wrecked</span></button>
       <button class="mood-btn" onclick="logMood('😮‍💨','Drained')"><span class="mood-e">😮‍💨</span><span class="mood-l">Drained</span></button>
@@ -817,32 +817,32 @@ const FACTS = [
 ];
 
 const SPAM_JOKES = [
-  {emoji:'🛑',text:'Error 429: Too Many Nuts. The rate limit is one per 10 minutes. Your enthusiasm has been flagged by the IT department.'},
-  {emoji:'🤝',text:'Your wrist has filed a formal grievance. HR has scheduled a meeting. Please bring documentation.'},
-  {emoji:'📋',text:'OSHA Section 42-B: Mandatory cooldown between heavy repetitive motion tasks. This is not optional, champ.'},
-  {emoji:'🚦',text:'Speed limit exceeded. A school zone for your hormones is now in effect. Slow down, son.'},
-  {emoji:'⚖️',text:'The Geneva Convention has entered the chat. Your dominant hand has invoked the right to remain still.'},
-  {emoji:'🍔',text:'Sir, this is a Wendy\'s. Also, please wait 10 minutes. Also, please leave.'},
-  {emoji:'🧾',text:'Your hand called. It left a voicemail. The subject: "We Need to Talk About Work-Life Balance."'},
-  {emoji:'🔬',text:'Nutritionists recommend spacing your nuts at least 10 minutes apart for optimal metabolic processing. Trust the science.'},
-  {emoji:'💻',text:'Even your browser needs to clear cache between sessions. You are not better than a browser.'},
-  {emoji:'📞',text:'Your wrist has requested a union rep. Collective bargaining is underway. Please standby.'},
-  {emoji:'🌡️',text:'System temperature: critical. Cooldown protocol engaged. Rebooting in 10 minutes.'},
-  {emoji:'🏃',text:'Even marathon runners take water breaks. Your elbow is formally requesting one.'},
-  {emoji:'🎓',text:'A therapist would call this healthy self-reliance. A doctor would say pace yourself. A timer says 10 minutes.'},
-  {emoji:'🚀',text:'We have liftoff — oh wait, no. Cooldown still active. Stand down, mission control.'},
+  {emoji:'🛑',text:'dude. you literally just nutted. what the fuck. wait 10 minutes. drink some water. jesus.'},
+  {emoji:'🤝',text:'your wrist texted me. it said "please stop." 10 minutes man. have some compassion for your wrist.'},
+  {emoji:'📋',text:'the cooldown exists because you have zero self control and we both know it. sit down. 10 minutes.'},
+  {emoji:'🚦',text:'bro your balls are on strike. labor dispute. 10 minute negotiation period. non negotiable.'},
+  {emoji:'⚖️',text:'your dick is not a vending machine. you cannot just spam it. cooldown required by law.'},
+  {emoji:'🍔',text:'i am calling your mother. she will be disappointed but not surprised. 10 minutes.'},
+  {emoji:'🧾',text:'your dominant hand has filed a formal complaint with HR. please allow 10 minutes for review.'},
+  {emoji:'🔬',text:'science says space your nuts 10 minutes apart. science also said go touch grass but here we are.'},
+  {emoji:'💻',text:'you absolute horndog. the timer is not negotiable. 10 minutes. drink water. think about your life choices.'},
+  {emoji:'📞',text:'the oracle is judging you. not the impressed kind of judging. the genuinely concerned kind. 10 minutes.'},
+  {emoji:'🌡️',text:'too horny. system overload. forced cooldown engaged. please step away from yourself for 10 minutes.'},
+  {emoji:'🏃',text:'even porn stars take breaks between scenes you animal. 10 minutes. go for a walk or something.'},
+  {emoji:'🎓',text:'two nuts back to back? buddy. seek help. or at minimum get some water and a snack. 10 minutes.'},
+  {emoji:'🚀',text:'the fuck do you think this is? an all you can eat buffet? cooldown is ACTIVE. 10 minutes. go sit down.'},
 ];
 
 const MILESTONES = {
-  1:  ['🥜','FIRST NUT','Welcome to the codex. Your name is now written in the sacred ledger.'],
-  5:  ['🔥','FIVE-FOLD','The ancient elders nod with deep, unsettling understanding.'],
-  10: ['💯','THE TENTH NUT','Double digits. Your dedication is noted. Concerning, but noted.'],
-  25: ['👑','NUT ROYALTY','25 nuts in one day. The codex grows heavy with your legacy.'],
-  50: ['🚀','ASCENSION','50 nuts today. At this point you may be eligible for a medical study.'],
-  100:['🏆','THE LEGEND','One hundred nuts. You have achieved something. We are not sure what.'],
+  1:  ['🥜','FIRST NUT','you absolute legend. it is logged. it is real. welcome home you degenerate.'],
+  5:  ['🔥','FIVE NUTS','what the fuck. five in one day. the elders are concerned. and a little impressed.'],
+  10: ['💯','TEN NUTS','double digits. holy shit. this goes in your permanent record. drink water.'],
+  25: ['👑','NUT ROYALTY','25 nuts in one day. are you ok? no seriously. drink water. call someone.'],
+  50: ['🚀','ASCENSION','50 today. we are legally required to tell you to see a doctor. also holy shit.'],
+  100:['🏆','THE LEGEND','one hundred nuts. holy fucking shit. we have no words. please hydrate. please.'],
 };
 
-const TOASTS = ['Recorded in the Codex ✦','The ledger grows.','So it is written.','Witnessed.','Added to the count.','The tally rises.'];
+const TOASTS = ['logged you absolute freak ✦','counted. no judgment. some judgment.','the codex witnesses your shame ✦','another one. damn.','noted you degenerate ✦','holy shit. counted. go drink water.'];
 
 // ═══════════════════════════════
 // CONTRACT / BUY SETUP
@@ -1130,11 +1130,12 @@ setInterval(()=>{
 // TICKER
 // ═══════════════════════════════
 function buildTicker() {
-  const items=['Peanuts are legumes, not nuts','Dopamine floods the brain at climax','Walnuts resemble the human brain','California produces 80% of world almonds',
-    'Ancient Sumerians referenced this circa 3000 BCE','Squirrels smell nuts through a foot of snow','Cashews grow outside their fruit',
-    'Pistachios are called the smiling nut in Persian','Masturbation documented in ancient Egyptian mythology','95% of men report it — Kinsey Institute',
-    'Prolactin surge after climax induces sleepiness','Regular release may boost IgA immune antibodies','Hazelnuts have been a human food source for 9,000 years',
-    '$NUT: the coin with the most honest utility in crypto','The Sacred Nut Codex grows with every nut'];
+  const items=['everybody jerks off nobody talks about it until now','peanuts are legumes not nuts look it up','dopamine floods the brain at climax its literally science','95% of men report it kinsey institute said that not us',
+    'ancient sumerians were nutting circa 3000 BCE so you are in good company','squirrels smell nuts through a foot of snow you cannot even find yours in the dark',
+    'cashews grow outside their fruit which is insane and so is your nut count','pistachios called the smiling nut in persia we call it something else',
+    'masturbation documented in ancient egypt the pharaohs were built different','prolactin surge after climax is why you fall asleep immediately',
+    'regular release may boost immune antibodies science said it not us','hazelnuts fed humans for 9000 years this coin has been alive for less than a week',
+    '$NUT the most honest coin in crypto and you know exactly why','the codex grows with every nut you degenerate keep going','no financial advice just nut advice','if you know you know if you dont you will'];
   const ticker=document.getElementById('ticker');
   [...items,...items].forEach(s=>{
     const e=document.createElement('span');e.className='ticker-item';e.textContent=s;ticker.appendChild(e);
@@ -1165,58 +1166,58 @@ function shareTwitter() {
 
   if (countToday === 0) {
     pool.push(
-      `i have logged zero nuts on $NUT today\n\nthis is called discipline\nsome call it rest\nthe oracle calls it suspicious\n\n${SITE_URL} #NUT #Solana`,
-      `zero nuts on $NUT today\n\ntaking a recovery day\n\neven legends rest\n\n${SITE_URL} #NUT`
+      `zero nuts on $NUT today\n\neither i have self control or i am about to go absolutely feral\n\nthe oracle is watching\n\n${SITE_URL} #NUT #Solana`,
+      `logged zero nuts on $NUT today\n\ntaking a rest day\n\neven degenerates need recovery\n\n${SITE_URL} #NUT`
     );
   }
 
   if (countToday === 1) {
     pool.push(
-      `first nut of the day logged on $NUT\n\n• motivation: locked in\n• regrets: none\n• wrist status: fresh\n\nnobody asked for this coin. everybody needed it.\n\n${SITE_URL} #NUT`,
-      `one nut. clean. deliberate. logged forever.\n\n$NUT tracks the thing everyone does and nobody talks about\n\nbe the change you want to see\n\n${SITE_URL} #NUT #Solana`
+      `first nut of the day logged on $NUT\n\n• wrist status: fresh\n• regrets: none\n• shame level: zero\n\nif you know what this coin tracks you are my people\n\n${SITE_URL} #NUT`,
+      `one nut. clean. deliberate. logged on the blockchain forever.\n\n$NUT tracks the thing everybody does and nobody admits\n\nyou are welcome\n\n${SITE_URL} #NUT #Solana`
     );
   }
 
   if (countToday >= 2 && countToday <= 4) {
     pool.push(
-      `$NUT market update\n\n• nuts today: ${countToday}\n• all time: ${countAllTime}\n• wrist status: operational\n• conviction: unwavering\n\nmost honest chart in all of crypto 📈\n\n${SITE_URL} #NUT`,
-      `${countToday} nuts logged on $NUT today\n\nsome call it a problem\nthe oracle calls it commitment\n\nyou know what this tracks\n\n${SITE_URL} #NUT #Solana`
+      `$NUT market update\n\n• nuts today: ${countToday}\n• all time: ${countAllTime}\n• wrist status: operational\n• shame: none detected\n\nmost honest chart in all of crypto\n\n${SITE_URL} #NUT`,
+      `${countToday} nuts on $NUT today\n\nsome call it a problem\nthe oracle calls it dedication\n\nyou know exactly what this coin tracks\n\n${SITE_URL} #NUT #Solana`
     );
   }
 
   if (countToday >= 5 && countToday <= 9) {
     pool.push(
-      `$NUT TECHNICAL ANALYSIS\n\n${countToday} nuts today\n${countAllTime} all time\n${s>1?`${s} day streak 🔥\n`:''}\nbullish. extremely bullish. no further comment.\n\n${SITE_URL} #NUT #Solana`,
-      `the sacred codex has been updated\n\n${countToday} entries today\n${countAllTime} recorded for eternity\n\nmost transparent project in web3 and i will not apologize for that\n\n${SITE_URL} #NUT`
+      `$NUT status check\n\n${countToday} nuts today\n${countAllTime} all time\n${s>1?`${s} day streak 🔥\n`:''}\nmy therapist has concerns\ni have conviction\n\n${SITE_URL} #NUT #Solana`,
+      `${countToday} nuts logged today on $NUT\n\nthe codex does not judge\nit just counts\n\nmost transparent project in web3 and i will not apologize\n\n${SITE_URL} #NUT`
     );
   }
 
   if (countToday >= 10) {
     pool.push(
-      `$NUT STATUS REPORT\n\n🥜 today: ${countToday} nuts\n📊 all time: ${countAllTime}\n${s>1?`🔥 streak: ${s} days\n`:''}\ni have a therapist. appointment is tuesday.\n\nstill bullish on $NUT\n\n${SITE_URL} #NUT`,
-      `posting my $NUT stats unironically and without shame\n\ntoday: ${countToday}\nall time: ${countAllTime}\n\nyou don't have to understand it. just respect it.\n\n${SITE_URL} #NUT #Solana`
+      `$NUT STATUS REPORT\n\n🥜 today: ${countToday} nuts\n📊 all time: ${countAllTime}\n${s>1?`🔥 streak: ${s} days\n`:''}\ni have a therapist. she is concerned.\n\nstill extremely bullish on $NUT\n\n${SITE_URL} #NUT`,
+      `posting my $NUT stats unironically and without a single ounce of shame\n\ntoday: ${countToday}\nall time: ${countAllTime}\n\nyou do not have to understand it. just respect it.\n\n${SITE_URL} #NUT #Solana`
     );
   }
 
   if (s >= 7) {
     pool.push(
-      `day ${s} of the $NUT streak\n\nsome people DCA into bitcoin every day\ni have a different kind of daily routine\n\nconsistency is a virtue\n\n${SITE_URL} #NUT #Solana`
+      `day ${s} of the $NUT streak\n\nsome people DCA into bitcoin every day\ni have a different kind of daily habit\n\nconsistency is a virtue apparently\n\n${SITE_URL} #NUT #Solana`
     );
   }
 
   if (s >= 3 && s < 7) {
     pool.push(
-      `${s} day $NUT streak 🔥\n\n${countToday} today · ${countAllTime} all time\n\nmost consistent chart in the entire space\n\n${SITE_URL} #NUT`
+      `${s} day $NUT streak 🔥\n\n${countToday} today and ${countAllTime} all time\n\nmost consistent chart in the entire space and you know why\n\n${SITE_URL} #NUT`
     );
   }
 
-  if (countAllTime === 1)  pool.push(`just joined $NUT\n\nfirst nut recorded in the eternal ledger\n\nthe most self aware memecoin ever made\n\n${SITE_URL} #NUT #Solana`);
+  if (countAllTime === 1)  pool.push(`just joined $NUT\n\nfirst nut in the eternal ledger\n\nthe most self aware coin ever made\n\n${SITE_URL} #NUT #Solana`);
   if (countAllTime === 69) pool.push(`my $NUT all time count just hit 69\n\nnice\n\n${SITE_URL} #NUT #Solana`);
-  if (countAllTime === 100) pool.push(`100 total nuts on $NUT\n\nthree digits. the codex grows heavy with my legacy.\n\n${SITE_URL} #NUT #Solana`);
-  if (countAllTime === 420) pool.push(`420 nuts on $NUT\n\ncoincidence? the oracle says no.\n\n${SITE_URL} #NUT #Solana`);
+  if (countAllTime === 100) pool.push(`100 total nuts on $NUT\n\nthree digits. the codex is getting heavy.\n\n${SITE_URL} #NUT #Solana`);
+  if (countAllTime === 420) pool.push(`420 nuts on $NUT\n\ncoincidence? the oracle says absolutely not.\n\n${SITE_URL} #NUT #Solana`);
 
   pool.push(
-    `${countToday} today · ${countAllTime} all time on $NUT\n\na coin for people who are built different\n\nif you know what it tracks welcome home\n\n${SITE_URL} #NUT #Solana`,
+    `${countToday} today and ${countAllTime} all time on $NUT\n\na coin for people who are built different\n\nif you know what it tracks welcome home\n\n${SITE_URL} #NUT #Solana`,
     `$NUT update\n\n${countToday} nuts today\n${countAllTime} recorded forever\n\nnobody asked for this coin\neverybody needed it\n\n${SITE_URL} #NUT #Solana #memecoin`
   );
 
@@ -1285,14 +1286,14 @@ function showToast(msg) {
 // CERTIFICATE
 // ═══════════════════════════════
 function getAchievementText(n) {
-  if(n===0) return 'A blank page in the sacred ledger. The journey awaits, whenever you are ready.';
-  if(n===1) return 'One nut. The first step on the sacred path is always the boldest.';
-  if(n<5)   return 'A noble showing. The codex receives your nut with quiet dignity.';
-  if(n<10)  return 'Impressive commitment. Your place in the annals of nut history is secured.';
-  if(n<25)  return 'A formidable entry. The council nods with knowing, unsettling approval.';
-  if(n<50)  return 'The ancient elders stir from their slumber. They are impressed. Deeply.';
-  if(n<100) return 'Beyond classification. The codex strains under the weight of your legacy. Hydrate.';
-  return 'One hundred nuts. You have transcended the mortal realm. Medical attention is gently suggested.';
+  if(n===0) return "you haven't nutted yet. what are you doing here. go nut. come back.";
+  if(n===1) return 'one nut. the journey begins. your ancestors are watching. they are confused.';
+  if(n<5)   return 'respectable. not impressive. respectable. there is a difference and you are on the wrong side of it.';
+  if(n<10)  return 'getting there. the codex takes note. so does your wrist. it is filing a complaint.';
+  if(n<25)  return 'ok now we are talking. the oracle is writing shit down. concerning shit.';
+  if(n<50)  return 'what in the actual hell. the elders have been notified. they said damn.';
+  if(n<100) return 'beyond normal human behavior. certified freak. we mean that as a compliment. please hydrate.';
+  return 'one hundred nuts. holy shit. frame this. hang it somewhere private. then drink water. then maybe get help.';
 }
 
 function rrect(ctx,x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.quadraticCurveTo(x+w,y,x+w,y+r);ctx.lineTo(x+w,y+h-r);ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);ctx.lineTo(x+r,y+h);ctx.quadraticCurveTo(x,y+h,x,y+h-r);ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath();}
@@ -1458,11 +1459,11 @@ function updateStreak() {
 }
 
 function getFlameConfig(s) {
-  if (s===0) return {c:'#3a3020',h:0,tier:'The ember awaits thine first nut.',sub:'Nut today to ignite the eternal flame'};
-  if (s<=2)  return {c:'#ff8c00',h:75,tier:'The flame stirs. Something ancient awakens.',sub:`Keep it alive tomorrow`};
-  if (s<=6)  return {c:'#ff3300',h:105,tier:'The flame grows. The elders take notice.',sub:`${7-s} more days to reach Inferno tier`};
-  if (s<=13) return {c:'#4488ff',h:135,tier:'A blue inferno. This is not normal behavior.',sub:`${14-s} more days to reach the Godflame`};
-  return {c:'#C8A96E',h:155,tier:'The Godflame burns eternal. Thou hast transcended.',sub:`${s} days of unbroken sacred discipline`};
+  if (s===0) return {c:'#3a3020',h:0,tier:'no streak. get your shit together and go nut.',sub:'come back tomorrow and start the damn flame'};
+  if (s<=2)  return {c:'#ff8c00',h:75,tier:'barely a streak but the flame remembers. keep going you degenerate.',sub:`do not blow it tomorrow`};
+  if (s<=6)  return {c:'#ff3300',h:105,tier:'a real streak going. the flame is impressed and slightly worried about you.',sub:`${7-s} more days to reach inferno tier`};
+  if (s<=13) return {c:'#4488ff',h:135,tier:'BLUE INFERNO. what the hell. this is not normal behavior and we mean that sincerely.',sub:`${14-s} more days to the godflame. seek help.`};
+  return {c:'#C8A96E',h:155,tier:'THE GODFLAME. 14 days straight. what the fuck is wrong with you. also respect.',sub:`${s} days of unbroken and deeply concerning discipline`};
 }
 
 function renderFlame() {
@@ -1517,35 +1518,35 @@ function renderChronometer() {
   svg.innerHTML=out;
   const peakH=hourCounts.indexOf(Math.max(...hourCounts));
   document.getElementById('chronoPeak').textContent=todayLog.length?`${peakH%12||12}:00 ${peakH>=12?'PM':'AM'}`:'—';
-  const arches=[[0,5,'The Midnight Scholar. Thy sacred rites occur in the void between days.'],[5,9,'The Dawn Ritualist. The sun rises alongside thy dedication.'],[9,12,'The Morning Devotee. Thy mornings are consecrated to the codex.'],[12,15,'The Noon Zealot. The midday sun witnesses thy commitment.'],[15,18,'The Afternoon Practitioner. The working hours conceal thine activities.'],[18,21,'The Dusk Disciple. As light fades, thy practice begins.'],[21,24,'The Evening Oracle. Night is thy temple.']];
+  const arches=[[0,5,'the midnight nutter. while the world sleeps you are out here doing this. wild.'],[5,9,'the dawn nutter. up before the sun to handle business. unhinged. genuinely impressive.'],[9,12,'a morning person in the worst possible way. the codex is taking notes and shaking its head.'],[12,15,'nutting on your lunch break. the absolute audacity. we respect it fully.'],[15,18,'the afternoon degenerate. peak working hours and here you are. incredible.'],[18,21,'the sunset freak. the day winds down and you wind up. naturally.'],[21,24,'a creature of the night. the darkness is your temple. this is your ritual. you need help.']];
   const arch=arches.find(([s,e])=>peakH>=s&&peakH<e);
-  document.getElementById('chronoArchetype').textContent=todayLog.length?(arch?arch[2]:'Thy timing defies classification.'):'Complete a nut to reveal thy daily pattern.';
+  document.getElementById('chronoArchetype').textContent=todayLog.length?(arch?arch[2]:'your timing defies classification. the oracle is stumped.'):'go nut first. then we will judge what time of day you do this.';
 }
 
 // ════════════════════════════════════════
 // FEATURE 3: THE SACRED ORDER (Badges)
 // ════════════════════════════════════════
 const BADGES = [
-  {id:'first',    icon:'🩸', name:'First Blood',    tier:1, desc:'Has nutted for the very first time.'},
-  {id:'five',     icon:'⚔️', name:'Seeker',          tier:1, desc:'Five nuts. The path reveals itself.'},
-  {id:'ten',      icon:'📜', name:'Dedicated',       tier:1, desc:'Ten nuts etched in the sacred ledger.'},
-  {id:'dawn',     icon:'🌅', name:'Dawn Nut',        tier:1, desc:'Has nutted before 7 AM.'},
-  {id:'midnight', icon:'🌙', name:'Midnight Scholar',tier:1, desc:'Has nutted after midnight.'},
-  {id:'best10',   icon:'💯', name:'Double Digits',   tier:2, desc:'Ten nuts in a single day.'},
-  {id:'streak3',  icon:'🔥', name:'Three Flame',     tier:2, desc:'Three consecutive days active.'},
-  {id:'fifty',    icon:'🎯', name:'Half Century',    tier:2, desc:'Fifty total nuts across all time.'},
-  {id:'days7',    icon:'📅', name:'Week Devotee',    tier:2, desc:'Seven different days recorded.'},
-  {id:'session2', icon:'⚡', name:'Speedster',       tier:2, desc:'Two nuts in a single session.'},
-  {id:'hundred',  icon:'🏛️', name:'The Century',    tier:3, desc:'One hundred total sacred nuts.'},
-  {id:'streak7',  icon:'🌊', name:'Blue Inferno',    tier:3, desc:'Seven or more consecutive days.'},
-  {id:'best25',   icon:'👑', name:'Day of Legend',   tier:3, desc:'Twenty-five nuts in one day.'},
-  {id:'days30',   icon:'🗓️', name:'Month of Nuts',  tier:3, desc:'Thirty different days recorded.'},
-  {id:'sunday',   icon:'📿', name:'Sacred Sunday',   tier:3, desc:'Has nutted on a Sunday.'},
-  {id:'fivehund', icon:'⚜️', name:'Five Hundred',    tier:4, desc:'500 total nuts. You need help.'},
-  {id:'streak14', icon:'☀️', name:'The Godflame',    tier:4, desc:'Fourteen consecutive days. Unreal.'},
-  {id:'best50',   icon:'💎', name:'Perfectionist',   tier:4, desc:'Fifty nuts in a single day.'},
-  {id:'thousand', icon:'🔱', name:'The Thousand',    tier:4, desc:'One thousand total sacred nuts.'},
-  {id:'streak30', icon:'🌌', name:'Transcendent',    tier:4, desc:'Thirty day streak. Thou art legend.'},
+  {id:'first',    icon:'🩸', name:'First Blood',    tier:1, desc:'nutted for the first time. welcome you freak. you are home.'},
+  {id:'five',     icon:'⚔️', name:'Seeker',          tier:1, desc:'five nuts. the path reveals itself and it is deeply weird.'},
+  {id:'ten',      icon:'📜', name:'Dedicated',       tier:1, desc:'ten nuts etched in the codex. your wrist is filing paperwork.'},
+  {id:'dawn',     icon:'🌅', name:'Dawn Nut',        tier:1, desc:'nutted before 7 AM. what the hell is wrong with you. in a good way.'},
+  {id:'midnight', icon:'🌙', name:'Midnight Scholar',tier:1, desc:'nutted after midnight. go to sleep you absolute gremlin.'},
+  {id:'best10',   icon:'💯', name:'Double Digits',   tier:2, desc:'ten nuts in one day. your dick needs a union and a day off.'},
+  {id:'streak3',  icon:'🔥', name:'Three Flame',     tier:2, desc:'three days straight. the flame lives. your wrist does not.'},
+  {id:'fifty',    icon:'🎯', name:'Half Century',    tier:2, desc:'fifty total nuts. the codex is running out of ink. seek help.'},
+  {id:'days7',    icon:'📅', name:'Week Devotee',    tier:2, desc:'seven different days. consistent. concerning. impressive.'},
+  {id:'session2', icon:'⚡', name:'Speedster',       tier:2, desc:'two nuts in one session. buddy. oh buddy.'},
+  {id:'hundred',  icon:'🏛️', name:'The Century',    tier:3, desc:'one hundred total nuts. holy shit. please see a doctor.'},
+  {id:'streak7',  icon:'🌊', name:'Blue Inferno',    tier:3, desc:'seven days in a row. what the fuck are you on and can we have some.'},
+  {id:'best25',   icon:'👑', name:'Day of Legend',   tier:3, desc:'twenty five nuts in one day. you are not ok. we respect that.'},
+  {id:'days30',   icon:'🗓️', name:'Month of Nuts',  tier:3, desc:'thirty different days recorded. you are genuinely a different kind of person.'},
+  {id:'sunday',   icon:'📿', name:'Sacred Sunday',   tier:3, desc:'nutted on a Sunday. the lord is watching. he seems tired.'},
+  {id:'fivehund', icon:'⚜️', name:'Five Hundred',    tier:4, desc:'500 total nuts. you need professional help. and a trophy. mostly help.'},
+  {id:'streak14', icon:'☀️', name:'The Godflame',    tier:4, desc:'fourteen days straight. what in the actual hell. we are calling someone.'},
+  {id:'best50',   icon:'💎', name:'Perfectionist',   tier:4, desc:'fifty nuts in one day. we do not have words. go drink water. right now.'},
+  {id:'thousand', icon:'🔱', name:'The Thousand',    tier:4, desc:'one thousand total nuts. you are a legend and a cautionary tale. simultaneously.'},
+  {id:'streak30', icon:'🌌', name:'Transcendent',    tier:4, desc:'thirty day streak. you have transcended humanity. god is confused. so are we.'},
 ];
 const KEY_BADGES = 'nut_badges_v1';
 let earnedBadges = new Set(JSON.parse(localStorage.getItem(KEY_BADGES)||'[]'));
@@ -1586,13 +1587,13 @@ function renderBadges() {
 // ════════════════════════════════════════
 // FEATURE 4: THE PROPHECY ORACLE
 // ════════════════════════════════════════
-const OPENINGS=['The stars align in thine favor, though they seem confused by thine choices.','The ancient scrolls speak clearly of one such as thee.','The Oracle peers into the void and finds thee staring back.','The sacred ether carries whispers of thine nuts.','The celestial ledger hath been updated on thy behalf.','The universe has taken note, and it is processing.','The sacred fog clears to reveal a most peculiar soul.','The Oracle consulted seventeen ancient texts and three therapists.','Lo, the heavens gaze upon thee with equal parts admiration and concern.'];
+const OPENINGS=['the oracle looks into your soul and finds it shame free and a little sticky.','the ancient spirits gather. they are not impressed but they respect the commitment.','destiny has led you here. destiny also needs a shower now.','the cosmos has been watching. the cosmos is uncomfortable.','the oracle has seen some shit. this qualifies as some of it.','the sacred spirits convene. the vote is unanimous: you are a lot.','the stars align to witness your bullshit and honestly respect it.','the oracle consulted seventeen ancient texts and a therapist. none of them were ready for you.','the heavens gaze upon you with equal parts admiration and genuine medical concern.'];
 const MIDDLES=[
-  s=>s.t>=10?'Thy dedication today transcends biology and defies the laws of physics.':s.t>=5?'Thy enthusiasm is noted. Thy wrist hath submitted a formal complaint.':s.t>=2?'Two nuts this day. The codex grows heavy with thine storied legacy.':s.t===1?'A single nut, pure and deliberate. The elders nod with grave solemnity.':'The nut count remaineth at zero. The Oracle waits with infinite patience.',
-  s=>s.str>=14?`${s.str} days unbroken. Three physicians hath been notified.`:s.str>=7?`${s.str} days. The blue flame burns. Something ancient stirs.`:s.str>=3?`${s.str} days committed. The sacred order begins to whisper thy name.`:'The streak awaits. Return tomorrow and the flame shall remember thee.',
-  s=>s.all>=100?'A centenary of nuts. History shall record this, or mercifully shall not.':s.all>=50?'Fifty nuts etched in permanence upon the sacred stone.':s.all>=10?'Ten nuts, and yet the journey hath barely commenced, bold scholar.':'The codex is young, much like thy commitment, which is also very young.',
+  s=>s.t>=10?`${s.t} nuts today. what the actual fuck. seek help. we say this with love.`:s.t>=5?`${s.t} today. buddy your dick needs union representation and a vacation.`:s.t>=2?`${s.t} nuts today. the codex respects the commitment. barely.`:s.t===1?'one nut. clean. deliberate. a little pathetic. perfect.':'zero nuts so far. either you have self control or you are about to go absolutely feral.',
+  s=>s.str>=14?`${s.str} days straight. what in the actual hell. the oracle demands you go outside immediately.`:s.str>=7?`${s.str} days in a row. the blue flame burns. your wrist does not. please rest.`:s.str>=3?`${s.str} days committed. the codex whispers your name. so do several therapists.`:'no streak yet. nut and sleep. come back tomorrow. repeat.',
+  s=>s.all>=100?`${s.all} total nuts. jesus christ. history will record this. or mercifully will not.`:s.all>=50?`${s.all} total nuts etched into the permanent record of your shame.`:s.all>=10?`${s.all} total nuts and barely getting started you absolute freak.`:'early days. the codex is new and so is your commitment to being completely feral.',
 ];
-const OMENS=['⚔ The omen is: MORE WATER','🌙 The omen is: TOUCH GRASS','🔮 The omen is: GET SOME SLEEP','⚗️ The omen is: TAKE A WALK','📜 The omen is: TELL NO ONE','🌟 The omen is: STRETCHING HELPS','🗝️ The omen is: STAY HYDRATED','⚡ The omen is: THIS WILL PASS','🌊 The omen is: THE CODEX APPROVES','🍵 The omen is: DRINK SOME WATER','🏃 The omen is: GO OUTSIDE'];
+const OMENS=['⚔ the omen is: DRINK SOME FUCKING WATER','🌙 the omen is: GO OUTSIDE YOU DEGENERATE','🔮 the omen is: YOUR WRIST NEEDS A BREAK','⚗️ the omen is: EAT SOMETHING. YOU NEED THE PROTEIN','📜 the omen is: TELL ABSOLUTELY NO ONE','🌟 the omen is: WASH YOUR HANDS FOR GODS SAKE','🗝️ the omen is: HYDRATE OR SUFFER','⚡ the omen is: PACE YOURSELF YOU MANIAC','🌊 the omen is: THE CODEX APPROVES BUT IS WORRIED','🍵 the omen is: CALL YOUR MOTHER. LATER THOUGH','🏃 the omen is: TOUCH GRASS. NOW. RIGHT NOW.'];
 
 function generateProphecy() {
   if (countAllTime===0) return;
@@ -1630,7 +1631,7 @@ function renderAura(){
   const el=document.getElementById('auraContent');
   const ins=document.getElementById('auraInsight');
   if(!moodLog.length){
-    el.innerHTML='<div class="aura-empty">No aura data yet. After each nut the Oracle shall record thy emotional state.</div>';
+    el.innerHTML='<div class="aura-empty">no data yet. after each nut the oracle records your emotional damage. keep nutting to find out.</div>';
     ins.textContent=''; return;
   }
   const counts={};MOODS.forEach(m=>counts[m.label]=0);
@@ -1644,7 +1645,7 @@ function renderAura(){
       <span class="aura-pct">${pct}%</span></div>`;
   }).join('');
   const top=MOODS.reduce((b,m)=>counts[m.label]>counts[b.label]?m:b,MOODS[0]);
-  const insightMap={Wrecked:'The codex observes: thou mayest be overdoing it, champion.',Drained:'Energy is currency. The Oracle urges greater spacing of expenditures.',Calm:'A tranquil aura. The Oracle is pleased with this equilibrium.',Wired:'Electric energy followeth thy nuts. Channel it wisely, scholar.',Euphoric:'Peak euphoria. The Oracle hath recorded this moment for posterity.'};
+  const insightMap={Wrecked:'you broke yourself. rest you absolute beast. drink something.',Drained:'drained as expected. eat something. drink something. for gods sake.',Calm:'post nut calm is a gift. do not waste it scrolling crypto twitter like a maniac.',Wired:'wired after a nut? what are you made of? the codex is impressed and also scared.',Euphoric:'peak euphoria. living the dream. disgusting. we respect it completely.'};
   ins.textContent=insightMap[top.label]||'';
 }
 
