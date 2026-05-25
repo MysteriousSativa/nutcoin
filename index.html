@@ -1161,62 +1161,64 @@ function updateClock() {
 // ═══════════════════════════════
 function shareTwitter() {
   const s = currentStreak || 0;
-  const nick = nickname ? `${nickname} ` : '';
   const pool = [];
 
-  // 0 deeds today
   if (countToday === 0) {
     pool.push(
-      `i have logged zero deeds today on $NUT\n\nthis is called rest day strategy\n\n${SITE_URL}\n#NUT #Solana`,
-      `taking a sacred day of rest on $NUT\n\neven the greatest athletes taper\n\n${SITE_URL} #NUT`
+      `i have logged zero deeds on $NUT today\n\nthis is called discipline\nsome call it rest\nthe oracle calls it suspicious\n\n${SITE_URL} #NUT #Solana`,
+      `zero deeds on $NUT today\n\ntaking a recovery day\n\neven legends rest\n\n${SITE_URL} #NUT`
     );
   }
-  // First deed of the day
+
   if (countToday === 1) {
     pool.push(
-      `just committed my first sacred deed of the day on $NUT\n\n• motivation: ✅\n• regrets: 0\n• wrist status: nominal\n\nthe world's only honest memecoin\n${SITE_URL} #NUT`,
-      `one deed. pure. deliberate. unironic.\n\n$NUT tracks the one thing everyone does and nobody talks about\n\nbe the change\n${SITE_URL} #NUT #Solana`
+      `first deed of the day logged on $NUT\n\n• motivation: locked in\n• regrets: none\n• wrist status: fresh\n\nnobody asked for this coin. everybody needed it.\n\n${SITE_URL} #NUT`,
+      `one deed. clean. deliberate. logged forever.\n\n$NUT tracks the thing everyone does and nobody talks about\n\nbe the change you want to see\n\n${SITE_URL} #NUT #Solana`
     );
   }
-  // 2-4
+
   if (countToday >= 2 && countToday <= 4) {
     pool.push(
-      `$NUT market update:\n\n• deeds today: ${countToday}\n• all time: ${countAllTime}\n• wrist status: operational\n• conviction: maximum\n\nmost honest chart in crypto 📈\n${SITE_URL} #NUT`,
-      `${countToday} sacred deeds logged today on $NUT\n\nsome people call this a problem\nthe oracle calls it dedication\n\n${SITE_URL} #NUT #Solana`
+      `$NUT market update\n\n• deeds today: ${countToday}\n• all time: ${countAllTime}\n• wrist status: operational\n• conviction: unwavering\n\nmost honest chart in all of crypto 📈\n\n${SITE_URL} #NUT`,
+      `${countToday} deeds logged on $NUT today\n\nsome call it a problem\nthe oracle calls it commitment\n\nyou know what this tracks\n\n${SITE_URL} #NUT #Solana`
     );
   }
-  // 5-9
+
   if (countToday >= 5 && countToday <= 9) {
     pool.push(
-      `$NUT TECHNICAL ANALYSIS 🧵\n\n${countToday} deeds today\n${countAllTime} all time\n${s>1?`${s} day streak 🔥\n`:''}\nbullish. extremely bullish.\n\n${SITE_URL} #NUT #Solana`,
-      `the $NUT codex has been updated:\n\n${countToday} entries today\n${countAllTime} recorded for eternity\n\nmost transparent coin in crypto and i will die on this hill\n\n${SITE_URL} #NUT`
+      `$NUT TECHNICAL ANALYSIS\n\n${countToday} deeds today\n${countAllTime} all time\n${s>1?`${s} day streak 🔥\n`:''}\nbullish. extremely bullish. no further comment.\n\n${SITE_URL} #NUT #Solana`,
+      `the sacred codex has been updated\n\n${countToday} entries today\n${countAllTime} recorded for eternity\n\nmost transparent project in web3 and i will not apologize for that\n\n${SITE_URL} #NUT`
     );
   }
-  // 10+
+
   if (countToday >= 10) {
     pool.push(
-      `$NUT STATUS REPORT:\n\n🥜 today: ${countToday} deeds\n📊 all-time: ${countAllTime}\n${s>1?`🔥 streak: ${s} days\n`:''}\ni have a therapist. i'm seeing them tuesday.\n\nstill bullish\n${SITE_URL} #NUT`,
-      `posting my $NUT stats completely unironically:\n\ntoday: ${countToday}\nall time: ${countAllTime}\n\nyou don't have to understand it. just respect it.\n\n${SITE_URL} #NUT #Solana`
+      `$NUT STATUS REPORT\n\n🥜 today: ${countToday} deeds\n📊 all time: ${countAllTime}\n${s>1?`🔥 streak: ${s} days\n`:''}\ni have a therapist. appointment is tuesday.\n\nstill bullish on $NUT\n\n${SITE_URL} #NUT`,
+      `posting my $NUT stats unironically and without shame\n\ntoday: ${countToday}\nall time: ${countAllTime}\n\nyou don't have to understand it. just respect it.\n\n${SITE_URL} #NUT #Solana`
     );
   }
-  // Streak special
+
   if (s >= 7) {
     pool.push(
-      `day ${s} of the $NUT streak\n\nsome people DCA into bitcoin daily\ni have a different kind of daily practice\n\nconsistency is a virtue\n\n${SITE_URL} #NUT #Solana`
+      `day ${s} of the $NUT streak\n\nsome people DCA into bitcoin every day\ni have a different kind of daily routine\n\nconsistency is a virtue\n\n${SITE_URL} #NUT #Solana`
     );
   }
+
   if (s >= 3 && s < 7) {
     pool.push(
-      `${s}-day $NUT streak 🔥\n\n${countToday} today · ${countAllTime} all time\n\nmost disciplined chart in the entire space\n\n${SITE_URL} #NUT`
+      `${s} day $NUT streak 🔥\n\n${countToday} today · ${countAllTime} all time\n\nmost consistent chart in the entire space\n\n${SITE_URL} #NUT`
     );
   }
-  // Milestone callout
-  if (countAllTime === 1)  pool.push(`just joined $NUT — the world's most honest memecoin\n\none deed recorded. the eternal ledger grows.\n\n${SITE_URL} #NUT #Solana`);
-  if (countAllTime === 69) pool.push(`my $NUT all-time count just hit 69\n\nnice\n\n${SITE_URL} #NUT #Solana`);
-  if (countAllTime === 100) pool.push(`100 total deeds on $NUT\n\nthree digits. the codex is heavy.\n\n${SITE_URL} #NUT #Solana`);
 
-  // Always have a fallback
-  pool.push(`${nick}tracking deeds on $NUT — the only memecoin with genuinely honest utility\n\n${countToday} today · ${countAllTime} all time · ${s>0?`${s} day streak`:'building my streak'}\n\n${SITE_URL} #NUT #Solana #memecoin`);
+  if (countAllTime === 1)  pool.push(`just joined $NUT\n\nfirst deed recorded in the eternal ledger\n\nthe most self aware memecoin ever made\n\n${SITE_URL} #NUT #Solana`);
+  if (countAllTime === 69) pool.push(`my $NUT all time count just hit 69\n\nnice\n\n${SITE_URL} #NUT #Solana`);
+  if (countAllTime === 100) pool.push(`100 total deeds on $NUT\n\nthree digits. the codex grows heavy with my legacy.\n\n${SITE_URL} #NUT #Solana`);
+  if (countAllTime === 420) pool.push(`420 deeds on $NUT\n\ncoincidence? the oracle says no.\n\n${SITE_URL} #NUT #Solana`);
+
+  pool.push(
+    `${countToday} today · ${countAllTime} all time on $NUT\n\na coin for people who are built different\n\nif you know what it tracks welcome home\n\n${SITE_URL} #NUT #Solana`,
+    `$NUT update\n\n${countToday} deeds today\n${countAllTime} recorded forever\n\nnobody asked for this coin\neverybody needed it\n\n${SITE_URL} #NUT #Solana #memecoin`
+  );
 
   const pick = pool[Math.floor(Math.random()*pool.length)];
   window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(pick)}`,'_blank');
@@ -1226,10 +1228,11 @@ function shareCertTweet() {
   const s = currentStreak || 0;
   const badges = typeof earnedBadges !== 'undefined' ? earnedBadges.size : 0;
   const pool = [
-    `just minted my official $NUT Certificate of Sacred Achievement\n\n📊 today: ${countToday} deeds\n📈 all time: ${countAllTime}\n🔥 streak: ${s} days\n🏅 ${badges} badge${badges!==1?'s':''} earned\n\nthe blockchain doesn't lie. neither does this certificate.\n\n${SITE_URL} #NUT #Solana`,
-    `my $NUT Certificate just dropped\n\n${countToday} deeds today\n${countAllTime} recorded forever\n${s>0?`${s} day streak 🔥\n`:''}\nframe-worthy honestly\n\n${SITE_URL} #NUT`,
-    `downloaded my official $NUT Certificate\n\n${countAllTime} sacred deeds recorded for eternity\n\nmost transparent ledger in all of crypto. respectfully.\n\n${SITE_URL} #NUT #Solana #memecoin`,
+    `just minted my $NUT Certificate of Sacred Achievement\n\n📊 today: ${countToday} deeds\n📈 all time: ${countAllTime}\n🔥 streak: ${s} days\n🏅 ${badges} badge${badges!==1?'s':''} earned\n\nthe ledger does not lie\n\n${SITE_URL} #NUT #Solana`,
+    `my $NUT Certificate just dropped\n\n${countToday} today\n${countAllTime} all time\n${s>0?`${s} day streak 🔥\n`:''}\nhonestly frame worthy\n\n${SITE_URL} #NUT`,
+    `${countAllTime} sacred deeds. recorded forever. certified.\n\n$NUT is the most self aware coin ever made and i stand by that\n\n${SITE_URL} #NUT #Solana #memecoin`,
     `$NUT certificate secured 🥜\n\n${countToday} today · ${countAllTime} all time\n\nif you know what this tracks you are my people\n\n${SITE_URL} #NUT`,
+    `just got my official $NUT Certificate\n\nsome people collect NFTs\ni collect proof of something else\n\n${SITE_URL} #NUT #Solana`,
   ];
   const pick = pool[Math.floor(Math.random()*pool.length)];
   window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(pick)}`,'_blank');
