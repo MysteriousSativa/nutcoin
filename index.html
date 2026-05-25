@@ -293,6 +293,69 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .cert-tweet-btn{background:rgba(29,161,242,0.12);border:1px solid rgba(29,161,242,0.4);border-radius:8px;padding:11px 28px;font-family:'Cinzel',serif;font-size:12px;letter-spacing:.14em;color:#4E9AC9;cursor:pointer;transition:background .2s;}
 .cert-tweet-btn:hover{background:rgba(29,161,242,0.2);}
 
+/* ── ETERNAL FLAME ── */
+.flame-panel{text-align:center;padding:10px 0;}
+.flame-container{display:inline-flex;flex-direction:column;align-items:center;margin:0 auto 16px;position:relative;}
+.flame-num{font-family:'Cinzel Decorative',serif;font-size:54px;font-weight:900;line-height:1;margin:6px 0 2px;transition:color 1s;}
+.flame-day-label{font-family:'Cinzel',serif;font-size:10px;letter-spacing:.22em;color:var(--muted);text-transform:uppercase;}
+.flame-tier{font-family:'Crimson Text',serif;font-size:18px;color:var(--cream);font-style:italic;margin:14px 0 5px;min-height:28px;}
+.flame-sub{font-family:'Cinzel',serif;font-size:10px;letter-spacing:.14em;color:var(--muted);}
+@keyframes flicker{0%,100%{transform:scaleX(1) scaleY(1);}25%{transform:scaleX(.97) scaleY(1.03);}50%{transform:scaleX(1.02) scaleY(.97);}75%{transform:scaleX(.98) scaleY(1.02);}}
+.flame-alive{animation:flicker .38s ease-in-out infinite;transform-origin:bottom center;}
+
+/* ── SACRED CHRONOMETER ── */
+.chrono-wrap{display:flex;flex-direction:column;align-items:center;gap:18px;}
+.chrono-svg{max-width:300px;width:100%;}
+.chrono-peak{font-family:'Cinzel Decorative',serif;font-size:24px;font-weight:700;color:var(--gold);}
+.chrono-peak-label{font-family:'Cinzel',serif;font-size:9px;letter-spacing:.2em;color:var(--muted);text-transform:uppercase;margin-top:3px;}
+.chrono-archetype{font-family:'Crimson Text',serif;font-size:17px;color:var(--cream);font-style:italic;margin-top:10px;max-width:560px;text-align:center;}
+
+/* ── SACRED ORDER BADGES ── */
+.badge-header-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+.badge-earned-label{font-family:'Cinzel',serif;font-size:10px;letter-spacing:.14em;color:var(--muted);}
+.badge-earned-label span{color:var(--gold);}
+.badge-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;}
+@media(max-width:560px){.badge-grid{grid-template-columns:repeat(4,1fr);}}
+.badge-cell{aspect-ratio:1;border-radius:10px;border:1px solid var(--border);background:var(--card2);display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;transition:border-color .2s,box-shadow .2s;}
+.badge-cell.earned{border-color:var(--gold);background:rgba(200,169,110,0.09);}
+.badge-cell.earned:hover{box-shadow:0 0 18px rgba(200,169,110,0.25);}
+.badge-cell.locked{opacity:.28;filter:grayscale(1);}
+.badge-icon{font-size:24px;}
+.badge-name{font-family:'Cinzel',serif;font-size:6.5px;letter-spacing:.05em;color:var(--muted);text-align:center;margin-top:3px;text-transform:uppercase;line-height:1.2;padding:0 2px;}
+.badge-cell.earned .badge-name{color:var(--gold);}
+.badge-tip{display:none;position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:var(--card);border:1px solid var(--gold);border-radius:10px;padding:9px 12px;min-width:155px;max-width:190px;z-index:999;pointer-events:none;text-align:center;white-space:normal;}
+.badge-cell:hover .badge-tip{display:block;}
+.badge-tip-name{font-family:'Cinzel',serif;font-size:10px;letter-spacing:.1em;color:var(--gold);text-transform:uppercase;margin-bottom:4px;}
+.badge-tip-desc{font-family:'Crimson Text',serif;font-size:12px;color:var(--cream);font-style:italic;line-height:1.4;}
+
+/* ── PROPHECY ORACLE ── */
+.prophecy-wrap{text-align:center;padding:6px 0;}
+.prophecy-eye{font-size:46px;display:block;margin-bottom:12px;animation:float 4s ease-in-out infinite;}
+.prophecy-heading{font-family:'Cinzel',serif;font-size:9px;letter-spacing:.28em;color:var(--gold);text-transform:uppercase;margin-bottom:16px;}
+.prophecy-text{font-family:'Crimson Text',serif;font-size:20px;line-height:1.65;color:var(--cream);font-style:italic;max-width:700px;margin:0 auto 16px;min-height:80px;}
+.prophecy-omen{font-family:'Cinzel',serif;font-size:10px;letter-spacing:.2em;color:var(--muted);text-transform:uppercase;}
+
+/* ── SACRED AURA (MOOD) ── */
+.mood-overlay{display:none;position:fixed;inset:0;background:rgba(6,4,2,.88);z-index:860;align-items:center;justify-content:center;backdrop-filter:blur(8px);}
+.mood-overlay.show{display:flex;}
+.mood-box{background:var(--card);border:1px solid var(--gold);border-radius:20px;padding:36px 42px;text-align:center;max-width:420px;width:92%;animation:modal-pop .3s cubic-bezier(.34,1.56,.64,1);}
+.mood-title{font-family:'Cinzel Decorative',serif;font-size:16px;font-weight:700;color:var(--gold);margin-bottom:5px;}
+.mood-sub{font-family:'Crimson Text',serif;font-size:15px;color:var(--muted);font-style:italic;margin-bottom:20px;}
+.mood-options{display:flex;gap:9px;justify-content:center;flex-wrap:wrap;margin-bottom:16px;}
+.mood-btn{background:var(--card2);border:2px solid var(--border);border-radius:12px;padding:12px 8px 8px;cursor:pointer;transition:border-color .15s,transform .1s;min-width:62px;display:flex;flex-direction:column;align-items:center;gap:4px;}
+.mood-btn:hover{border-color:var(--gold);transform:translateY(-3px);}
+.mood-e{font-size:28px;}
+.mood-l{font-family:'Cinzel',serif;font-size:7.5px;letter-spacing:.1em;color:var(--muted);text-transform:uppercase;}
+.mood-skip{font-family:'Cinzel',serif;font-size:10px;letter-spacing:.12em;color:var(--muted);cursor:pointer;text-decoration:underline;transition:color .2s;}
+.mood-skip:hover{color:var(--gold);}
+.aura-row{display:flex;align-items:center;gap:10px;margin-bottom:9px;}
+.aura-emoji{font-size:20px;width:28px;text-align:center;flex-shrink:0;}
+.aura-track{flex:1;height:11px;background:var(--card2);border-radius:99px;overflow:hidden;}
+.aura-fill{height:100%;border-radius:99px;transition:width .6s ease;}
+.aura-pct{font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);width:30px;text-align:right;flex-shrink:0;}
+.aura-empty{font-family:'Crimson Text',serif;font-size:17px;color:var(--muted);font-style:italic;text-align:center;padding:20px 0;}
+.aura-insight{font-family:'Crimson Text',serif;font-size:17px;color:var(--cream);font-style:italic;text-align:center;margin-top:14px;line-height:1.5;}
+
 /* confetti + toast */
 .confetti-wrap{position:fixed;inset:0;pointer-events:none;z-index:9999;}
 .cp{position:absolute;width:10px;height:10px;border-radius:2px;animation:cp-fall 1.1s ease-out forwards;}
@@ -478,6 +541,61 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
       </div>
     </div>
 
+    <!-- 6: The Eternal Flame -->
+    <div class="panel" id="panel-6">
+      <div class="panel-title">The Eternal Flame</div>
+      <div class="flame-panel">
+        <div class="flame-container">
+          <div id="flameSvgWrap"></div>
+          <div class="flame-num" id="flameNum">0</div>
+          <div class="flame-day-label">Day Streak</div>
+        </div>
+        <div class="flame-tier" id="flameTier">The ember awaits thine first deed.</div>
+        <div class="flame-sub" id="flameSub">Log a deed today to ignite the eternal flame</div>
+      </div>
+    </div>
+
+    <!-- 7: Sacred Chronometer -->
+    <div class="panel" id="panel-7">
+      <div class="panel-title">The Sacred Chronometer</div>
+      <div class="chrono-wrap">
+        <svg class="chrono-svg" id="chronoSvg" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg"></svg>
+        <div style="text-align:center;">
+          <div class="chrono-peak" id="chronoPeak">—</div>
+          <div class="chrono-peak-label">Sacred Hour of Peak Activity</div>
+          <div class="chrono-archetype" id="chronoArchetype">Complete a deed to reveal thy daily pattern.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 8: The Sacred Order -->
+    <div class="panel" id="panel-8">
+      <div class="panel-title">The Sacred Order</div>
+      <div class="badge-header-row">
+        <div class="badge-earned-label">Earned: <span id="badgeCount">0 / 20</span></div>
+        <div class="badge-earned-label" style="font-style:italic;">hover for lore</div>
+      </div>
+      <div class="badge-grid" id="badgeGrid"></div>
+    </div>
+
+    <!-- 9: Prophecy Oracle -->
+    <div class="panel" id="panel-9">
+      <div class="panel-title">The Prophecy Oracle</div>
+      <div class="prophecy-wrap">
+        <span class="prophecy-eye">🔮</span>
+        <div class="prophecy-heading">The Oracle Speaks</div>
+        <div class="prophecy-text" id="prophecyText">Log thy first deed to receive a reading.</div>
+        <div class="prophecy-omen" id="prophecyOmen"></div>
+      </div>
+    </div>
+
+    <!-- 10: Sacred Aura -->
+    <div class="panel" id="panel-10">
+      <div class="panel-title">The Sacred Aura</div>
+      <div id="auraContent"><div class="aura-empty">No mood data yet. After each deed, rate thy emotional state.</div></div>
+      <div class="aura-insight" id="auraInsight"></div>
+    </div>
+
   </div><!-- /panels-wrap -->
 
   <!-- ACTIVITY LOG -->
@@ -571,6 +689,22 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
       <button class="cert-tweet-btn" onclick="shareCertTweet()">𝕏 &nbsp; Share on X</button>
       <button class="modal-close" onclick="closeCert()">Dismiss</button>
     </div>
+  </div>
+</div>
+
+<!-- MOOD POPUP -->
+<div class="mood-overlay" id="moodOverlay">
+  <div class="mood-box">
+    <div class="mood-title">The Oracle Asks</div>
+    <div class="mood-sub">How dost thou feel after this sacred deed?</div>
+    <div class="mood-options">
+      <button class="mood-btn" onclick="logMood('😵','Wrecked')"><span class="mood-e">😵</span><span class="mood-l">Wrecked</span></button>
+      <button class="mood-btn" onclick="logMood('😮‍💨','Drained')"><span class="mood-e">😮‍💨</span><span class="mood-l">Drained</span></button>
+      <button class="mood-btn" onclick="logMood('😌','Calm')"><span class="mood-e">😌</span><span class="mood-l">Calm</span></button>
+      <button class="mood-btn" onclick="logMood('⚡','Wired')"><span class="mood-e">⚡</span><span class="mood-l">Wired</span></button>
+      <button class="mood-btn" onclick="logMood('🌟','Euphoric')"><span class="mood-e">🌟</span><span class="mood-l">Euphoric</span></button>
+    </div>
+    <span class="mood-skip" onclick="closeMood()">Skip for now</span>
   </div>
 </div>
 
@@ -882,6 +1016,13 @@ function nut() {
     showMilestone(em,ti,su);
   }
   logToSupabase();
+  // New features
+  updateStreak();
+  renderFlame();
+  renderChronometer();
+  checkBadges();
+  generateProphecy();
+  setTimeout(showMoodOverlay, 1200);
 }
 
 // ═══════════════════════════════
@@ -954,7 +1095,7 @@ function seedLogs() {
 // ═══════════════════════════════
 // ROTATING PANELS
 // ═══════════════════════════════
-const PANEL_COUNT=6;
+const PANEL_COUNT=11;
 let currentPanel=0, factIdx=0, factIdx2=Math.floor(FACTS.length/2);
 
 function buildDots() {
@@ -1226,6 +1367,224 @@ setInterval(fetchLeaderboard,60000);
 // Seed initial facts
 renderFact('factCat','factText','factSrc',factIdx);
 renderFact('factCat2','factText2','factSrc2',factIdx2);
+
+// ════════════════════════════════════════
+// FEATURE 1: THE ETERNAL FLAME (Streak)
+// ════════════════════════════════════════
+const KEY_STREAK      = 'nut_streak_v1';
+const KEY_STREAK_LAST = 'nut_streak_last_v1';
+let currentStreak     = parseInt(localStorage.getItem(KEY_STREAK) || '0');
+let streakLastDate    = localStorage.getItem(KEY_STREAK_LAST) || '';
+
+function updateStreak() {
+  if (streakLastDate === dateStr) return;
+  const yest = new Date(today);
+  yest.setDate(yest.getDate() - 1);
+  const yStr = `${yest.getFullYear()}-${String(yest.getMonth()+1).padStart(2,'0')}-${String(yest.getDate()).padStart(2,'0')}`;
+  currentStreak = (streakLastDate === yStr || currentStreak === 0) ? currentStreak + 1 : 1;
+  streakLastDate = dateStr;
+  localStorage.setItem(KEY_STREAK, currentStreak);
+  localStorage.setItem(KEY_STREAK_LAST, streakLastDate);
+}
+
+function getFlameConfig(s) {
+  if (s===0) return {c:'#3a3020',h:0,tier:'The ember awaits thine first deed.',sub:'Log a deed today to ignite the eternal flame'};
+  if (s<=2)  return {c:'#ff8c00',h:75,tier:'The flame stirs. Something ancient awakens.',sub:`Keep it alive tomorrow`};
+  if (s<=6)  return {c:'#ff3300',h:105,tier:'The flame grows. The elders take notice.',sub:`${7-s} more days to reach Inferno tier`};
+  if (s<=13) return {c:'#4488ff',h:135,tier:'A blue inferno. This is not normal behavior.',sub:`${14-s} more days to reach the Godflame`};
+  return {c:'#C8A96E',h:155,tier:'The Godflame burns eternal. Thou hast transcended.',sub:`${s} days of unbroken sacred discipline`};
+}
+
+function renderFlame() {
+  const cfg = getFlameConfig(currentStreak);
+  document.getElementById('flameNum').textContent = currentStreak;
+  document.getElementById('flameNum').style.color = cfg.c;
+  document.getElementById('flameTier').textContent = cfg.tier;
+  document.getElementById('flameSub').textContent = cfg.sub;
+  const wrap = document.getElementById('flameSvgWrap');
+  if (currentStreak === 0) { wrap.innerHTML='<div style="font-size:56px;opacity:.22;margin-bottom:6px">🪨</div>'; return; }
+  const h=cfg.h, c=cfg.c, c2=currentStreak>=14?'#fffaee':currentStreak>=7?'#aabbff':currentStreak>=3?'#ff8833':'#ffdd44';
+  wrap.innerHTML=`<svg width="110" height="${h+18}" viewBox="0 0 110 ${h+18}" style="overflow:visible;filter:drop-shadow(0 0 16px ${c})">
+    <defs><radialGradient id="fg${currentStreak}" cx="50%" cy="90%" r="55%">
+      <stop offset="0%" stop-color="${c2}"/><stop offset="55%" stop-color="${c}" stop-opacity=".9"/><stop offset="100%" stop-color="${c}" stop-opacity="0"/>
+    </radialGradient></defs>
+    <g class="flame-alive" style="transform-origin:55px ${h+10}px">
+      <ellipse cx="55" cy="${h+8}" rx="25" ry="10" fill="${c}" opacity=".6"/>
+      <path d="M55,8 C47,${h*.4} 33,${h*.52} 35,${h*.76} C37,${h*.9} 45,${h} 55,${h+8} C65,${h} 73,${h*.9} 75,${h*.76} C77,${h*.52} 63,${h*.4} 55,8Z" fill="url(#fg${currentStreak})"/>
+      <path d="M55,${h*.28} C51,${h*.54} 46,${h*.6} 47,${h*.75} C48,${h*.88} 52,${h*.95} 55,${h+4} C58,${h*.95} 62,${h*.88} 63,${h*.75} C64,${h*.6} 59,${h*.54} 55,${h*.28}Z" fill="${c2}" opacity=".65"/>
+    </g></svg>`;
+}
+
+// ════════════════════════════════════════
+// FEATURE 2: SACRED CHRONOMETER (24hr heatmap)
+// ════════════════════════════════════════
+function renderChronometer() {
+  const svg = document.getElementById('chronoSvg');
+  const hourCounts = new Array(24).fill(0);
+  todayLog.forEach(ts => { const h=parseInt(ts.split(':')[0]); if (!isNaN(h)) hourCounts[h]++; });
+  const maxCount = Math.max(...hourCounts, 1);
+  const cx=150, cy=150, oR=125, iR=68, currH=new Date().getHours();
+  let out = '';
+  for (let i=0; i<24; i++) {
+    const a1=(i/24)*2*Math.PI-Math.PI/2, a2=((i+1)/24)*2*Math.PI-Math.PI/2;
+    const x1=cx+oR*Math.cos(a1),y1=cy+oR*Math.sin(a1),x2=cx+oR*Math.cos(a2),y2=cy+oR*Math.sin(a2);
+    const x3=cx+iR*Math.cos(a2),y3=cy+iR*Math.sin(a2),x4=cx+iR*Math.cos(a1),y4=cy+iR*Math.sin(a1);
+    const int=hourCounts[i]/maxCount, isNow=i===currH;
+    const fill=int>.65?'#C8A96E':int>.3?'#9a7040':isNow?'#2244aa':'#1a1408';
+    const alpha=int>0?0.28+int*.72:isNow?.18:.07;
+    const stroke=isNow?'rgba(78,154,201,.8)':int>0?'rgba(200,169,110,.35)':'rgba(200,169,110,.1)';
+    out+=`<path d="M${x1},${y1} A${oR},${oR} 0 0,1 ${x2},${y2} L${x3},${y3} A${iR},${iR} 0 0,0 ${x4},${y4}Z" fill="${fill}" fill-opacity="${alpha}" stroke="${stroke}" stroke-width=".8"/>`;
+    if (i%6===0) {
+      const lx=cx+(oR+16)*Math.cos(a1+(a2-a1)/2), ly=cy+(oR+16)*Math.sin(a1+(a2-a1)/2);
+      const lbl=i===0?'12A':i===6?'6A':i===12?'12P':'6P';
+      out+=`<text x="${lx}" y="${ly}" text-anchor="middle" dominant-baseline="middle" font-family="Cinzel,serif" font-size="9" fill="${isNow?'#4E9AC9':'rgba(200,169,110,.45)'}">${lbl}</text>`;
+    }
+  }
+  out+=`<circle cx="${cx}" cy="${cy}" r="${iR-2}" fill="#060402" stroke="rgba(200,169,110,.12)" stroke-width="1"/>`;
+  out+=`<text x="${cx}" y="${cy-10}" text-anchor="middle" font-family="Cinzel Decorative,serif" font-size="10" fill="rgba(200,169,110,.5)">SACRED</text>`;
+  out+=`<text x="${cx}" y="${cy+7}" text-anchor="middle" font-family="Cinzel Decorative,serif" font-size="10" fill="rgba(200,169,110,.5)">CHRONO</text>`;
+  out+=`<text x="${cx}" y="${cy+22}" text-anchor="middle" font-family="Space Mono,monospace" font-size="9" fill="rgba(200,169,110,.3)">${new Date().toTimeString().slice(0,5)}</text>`;
+  svg.innerHTML=out;
+  const peakH=hourCounts.indexOf(Math.max(...hourCounts));
+  document.getElementById('chronoPeak').textContent=todayLog.length?`${peakH%12||12}:00 ${peakH>=12?'PM':'AM'}`:'—';
+  const arches=[[0,5,'The Midnight Scholar. Thy sacred rites occur in the void between days.'],[5,9,'The Dawn Ritualist. The sun rises alongside thy dedication.'],[9,12,'The Morning Devotee. Thy mornings are consecrated to the codex.'],[12,15,'The Noon Zealot. The midday sun witnesses thy commitment.'],[15,18,'The Afternoon Practitioner. The working hours conceal thine activities.'],[18,21,'The Dusk Disciple. As light fades, thy practice begins.'],[21,24,'The Evening Oracle. Night is thy temple.']];
+  const arch=arches.find(([s,e])=>peakH>=s&&peakH<e);
+  document.getElementById('chronoArchetype').textContent=todayLog.length?(arch?arch[2]:'Thy timing defies classification.'):'Complete a deed to reveal thy daily pattern.';
+}
+
+// ════════════════════════════════════════
+// FEATURE 3: THE SACRED ORDER (Badges)
+// ════════════════════════════════════════
+const BADGES = [
+  {id:'first',    icon:'🩸', name:'First Blood',    tier:1, desc:'Logged thy very first sacred deed.'},
+  {id:'five',     icon:'⚔️', name:'Seeker',          tier:1, desc:'Five deeds. The path reveals itself.'},
+  {id:'ten',      icon:'📜', name:'Dedicated',       tier:1, desc:'Ten deeds etched in the sacred ledger.'},
+  {id:'dawn',     icon:'🌅', name:'Dawn Deed',       tier:1, desc:'A deed completed before 7 AM.'},
+  {id:'midnight', icon:'🌙', name:'Midnight Scholar',tier:1, desc:'A deed logged after midnight.'},
+  {id:'best10',   icon:'💯', name:'Double Digits',   tier:2, desc:'Ten deeds in a single day.'},
+  {id:'streak3',  icon:'🔥', name:'Three Flame',     tier:2, desc:'Three consecutive days active.'},
+  {id:'fifty',    icon:'🎯', name:'Half Century',    tier:2, desc:'Fifty total deeds across all time.'},
+  {id:'days7',    icon:'📅', name:'Week Devotee',    tier:2, desc:'Seven different days recorded.'},
+  {id:'session2', icon:'⚡', name:'Speedster',       tier:2, desc:'Two deeds in a single session.'},
+  {id:'hundred',  icon:'🏛️', name:'The Century',    tier:3, desc:'One hundred total sacred deeds.'},
+  {id:'streak7',  icon:'🌊', name:'Blue Inferno',    tier:3, desc:'Seven or more consecutive days.'},
+  {id:'best25',   icon:'👑', name:'Day of Legend',   tier:3, desc:'Twenty-five deeds in one day.'},
+  {id:'days30',   icon:'🗓️', name:'Month of Deeds', tier:3, desc:'Thirty different days recorded.'},
+  {id:'sunday',   icon:'📿', name:'Sacred Sunday',   tier:3, desc:'A deed logged on a Sunday.'},
+  {id:'fivehund', icon:'⚜️', name:'Five Hundred',    tier:4, desc:'500 total deeds. You need help.'},
+  {id:'streak14', icon:'☀️', name:'The Godflame',    tier:4, desc:'Fourteen consecutive days. Unreal.'},
+  {id:'best50',   icon:'💎', name:'Perfectionist',   tier:4, desc:'Fifty deeds in a single day.'},
+  {id:'thousand', icon:'🔱', name:'The Thousand',    tier:4, desc:'One thousand total sacred deeds.'},
+  {id:'streak30', icon:'🌌', name:'Transcendent',    tier:4, desc:'Thirty day streak. Thou art legend.'},
+];
+const KEY_BADGES = 'nut_badges_v1';
+let earnedBadges = new Set(JSON.parse(localStorage.getItem(KEY_BADGES)||'[]'));
+
+function checkBadges() {
+  const newOnes = [];
+  const conds = {
+    first:()=>countAllTime>=1, five:()=>countAllTime>=5, ten:()=>countAllTime>=10,
+    dawn:()=>todayLog.some(t=>parseInt(t.split(':')[0])<7),
+    midnight:()=>todayLog.some(t=>parseInt(t.split(':')[0])===0),
+    best10:()=>bestDay>=10, streak3:()=>currentStreak>=3, fifty:()=>countAllTime>=50,
+    days7:()=>daysTracked>=7, session2:()=>countSession>=2, hundred:()=>countAllTime>=100,
+    streak7:()=>currentStreak>=7, best25:()=>bestDay>=25, days30:()=>daysTracked>=30,
+    sunday:()=>new Date().getDay()===0&&countToday>=1, fivehund:()=>countAllTime>=500,
+    streak14:()=>currentStreak>=14, best50:()=>bestDay>=50, thousand:()=>countAllTime>=1000,
+    streak30:()=>currentStreak>=30
+  };
+  BADGES.forEach(b=>{ if(!earnedBadges.has(b.id)&&conds[b.id]&&conds[b.id]()) { earnedBadges.add(b.id); newOnes.push(b); } });
+  if (newOnes.length) {
+    localStorage.setItem(KEY_BADGES, JSON.stringify([...earnedBadges]));
+    newOnes.forEach((b,i)=>setTimeout(()=>showToast(`🏅 Badge: ${b.name}`),i*1100));
+  }
+  renderBadges();
+}
+
+function renderBadges() {
+  const tierBg={1:'rgba(160,100,40,.15)',2:'rgba(160,160,160,.1)',3:'rgba(200,169,110,.13)',4:'rgba(120,60,200,.15)'};
+  document.getElementById('badgeCount').textContent=`${earnedBadges.size} / ${BADGES.length}`;
+  document.getElementById('badgeGrid').innerHTML=BADGES.map(b=>{
+    const on=earnedBadges.has(b.id);
+    return `<div class="badge-cell ${on?'earned':'locked'}" style="${on?`background:${tierBg[b.tier]}`:''}">
+      <span class="badge-icon">${b.icon}</span><span class="badge-name">${b.name}</span>
+      <div class="badge-tip"><div class="badge-tip-name">${b.name}</div><div class="badge-tip-desc">${on?b.desc:'???'}</div></div>
+    </div>`;
+  }).join('');
+}
+
+// ════════════════════════════════════════
+// FEATURE 4: THE PROPHECY ORACLE
+// ════════════════════════════════════════
+const OPENINGS=['The stars align in thine favor, though they seem confused by thine choices.','The ancient scrolls speak clearly of one such as thee.','The Oracle peers into the void and finds thee staring back.','The sacred ether carries whispers of thine deeds.','The celestial ledger hath been updated on thy behalf.','The universe has taken note, and it is processing.','The sacred fog clears to reveal a most peculiar soul.','The Oracle consulted seventeen ancient texts and three therapists.','Lo, the heavens gaze upon thee with equal parts admiration and concern.'];
+const MIDDLES=[
+  s=>s.t>=10?'Thy dedication today transcends biology and defies the laws of physics.':s.t>=5?'Thy enthusiasm is noted. Thy wrist hath submitted a formal complaint.':s.t>=2?'Two deeds this day. The codex grows heavy with thine storied legacy.':s.t===1?'A single deed, pure and deliberate. The elders nod with grave solemnity.':'The deed count remaineth at zero. The Oracle waits with infinite patience.',
+  s=>s.str>=14?`${s.str} days unbroken. Three physicians hath been notified.`:s.str>=7?`${s.str} days. The blue flame burns. Something ancient stirs.`:s.str>=3?`${s.str} days committed. The sacred order begins to whisper thy name.`:'The streak awaits. Return tomorrow and the flame shall remember thee.',
+  s=>s.all>=100?'A centenary of deeds. History shall record this, or mercifully shall not.':s.all>=50?'Fifty deeds etched in permanence upon the sacred stone.':s.all>=10?'Ten deeds, and yet the journey hath barely commenced, bold scholar.':'The codex is young, much like thy commitment, which is also very young.',
+];
+const OMENS=['⚔ The omen is: MORE WATER','🌙 The omen is: TOUCH GRASS','🔮 The omen is: GET SOME SLEEP','⚗️ The omen is: TAKE A WALK','📜 The omen is: TELL NO ONE','🌟 The omen is: STRETCHING HELPS','🗝️ The omen is: STAY HYDRATED','⚡ The omen is: THIS WILL PASS','🌊 The omen is: THE CODEX APPROVES','🍵 The omen is: DRINK SOME WATER','🏃 The omen is: GO OUTSIDE'];
+
+function generateProphecy() {
+  if (countAllTime===0) return;
+  const stats={t:countToday,str:currentStreak,all:countAllTime};
+  const open=OPENINGS[(countAllTime+countToday)%OPENINGS.length];
+  const mid=MIDDLES[countAllTime%MIDDLES.length](stats);
+  const omen=OMENS[(countToday*3+countAllTime)%OMENS.length];
+  document.getElementById('prophecyText').textContent=`"${open} ${mid}"`;
+  document.getElementById('prophecyOmen').textContent=omen;
+}
+
+// ════════════════════════════════════════
+// FEATURE 5: THE SACRED AURA (Mood)
+// ════════════════════════════════════════
+const KEY_MOOD='nut_mood_'+dateStr;
+let moodLog=JSON.parse(localStorage.getItem(KEY_MOOD)||'[]');
+const MOODS=[
+  {emoji:'😵',label:'Wrecked', color:'#c94e4e'},
+  {emoji:'😮‍💨',label:'Drained', color:'#9a7a4e'},
+  {emoji:'😌',label:'Calm',    color:'#4ec97a'},
+  {emoji:'⚡',label:'Wired',   color:'#4e9ac9'},
+  {emoji:'🌟',label:'Euphoric',color:'#C8A96E'},
+];
+
+function showMoodOverlay(){ document.getElementById('moodOverlay').classList.add('show'); }
+function closeMood(){ document.getElementById('moodOverlay').classList.remove('show'); renderAura(); }
+function logMood(emoji,label){
+  moodLog.push({emoji,label,t:new Date().toTimeString().slice(0,8)});
+  localStorage.setItem(KEY_MOOD,JSON.stringify(moodLog));
+  closeMood();
+  showToast(`Aura recorded: ${emoji}`);
+}
+
+function renderAura(){
+  const el=document.getElementById('auraContent');
+  const ins=document.getElementById('auraInsight');
+  if(!moodLog.length){
+    el.innerHTML='<div class="aura-empty">No aura data yet. After each deed the Oracle shall record thy emotional state.</div>';
+    ins.textContent=''; return;
+  }
+  const counts={};MOODS.forEach(m=>counts[m.label]=0);
+  moodLog.forEach(m=>{if(counts[m.label]!==undefined)counts[m.label]++;});
+  const maxC=Math.max(...Object.values(counts),1);
+  el.innerHTML=MOODS.map(m=>{
+    const pct=Math.round((counts[m.label]/moodLog.length)*100);
+    const w=Math.round((counts[m.label]/maxC)*100);
+    return `<div class="aura-row"><span class="aura-emoji">${m.emoji}</span>
+      <div class="aura-track"><div class="aura-fill" style="width:${w}%;background:linear-gradient(90deg,${m.color},${m.color}66)"></div></div>
+      <span class="aura-pct">${pct}%</span></div>`;
+  }).join('');
+  const top=MOODS.reduce((b,m)=>counts[m.label]>counts[b.label]?m:b,MOODS[0]);
+  const insightMap={Wrecked:'The codex observes: thou mayest be overdoing it, champion.',Drained:'Energy is currency. The Oracle urges greater spacing of expenditures.',Calm:'A tranquil aura. The Oracle is pleased with this equilibrium.',Wired:'Electric energy followeth thy deeds. Channel it wisely, scholar.',Euphoric:'Peak euphoria. The Oracle hath recorded this moment for posterity.'};
+  ins.textContent=insightMap[top.label]||'';
+}
+
+// ── INIT NEW FEATURES ──
+renderFlame();
+renderChronometer();
+renderBadges();
+checkBadges();
+generateProphecy();
+renderAura();
 
 // ── SCROLL TO NUT BUTTON ──
 const scrollNutBtn = document.getElementById('scrollNutBtn');
