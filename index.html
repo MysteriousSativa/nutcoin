@@ -1161,33 +1161,29 @@ function updateClock() {
 // TWITTER SHARE
 // ═══════════════════════════════
 
-// Renders cert (reuses existing canvas if already drawn), then:
-//   1. Web Share API with image file  (mobile / Chrome desktop)
-//   2. Clipboard image copy + open Twitter  (other desktop)
-//   3. Plain text tweet fallback
+// Opens Twitter immediately (preserves user gesture / avoids popup blocker),
+// then renders cert and auto-downloads it so user can attach in the tweet composer.
 async function openXWithCert(text) {
   const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
+
+  // MUST happen before any await — popup blockers kill window.open after async gaps
+  window.open(twitterUrl, '_blank');
+
+  // Render cert (reuse modal canvas if already drawn, else render fresh)
   try {
     let canvas = document.getElementById('certCanvas');
     if (!canvas || canvas.width !== 1400) {
-      showToast('generating certificate...');
       canvas = document.createElement('canvas');
       await renderCertificate(canvas);
     }
-    const blob = await new Promise(res => canvas.toBlob(res, 'image/png', 0.95));
-    const file = new File([blob], 'nut-certificate.png', {type: 'image/png'});
-    // Try native share sheet (works on mobile, Chrome on Windows with right flags)
-    if (navigator.canShare && navigator.canShare({files: [file]})) {
-      await navigator.share({files: [file], title: '$NUT', text});
-      return;
-    }
-    // Clipboard copy then open Twitter so user can paste
-    await navigator.clipboard.write([new ClipboardItem({'image/png': blob})]);
-    showToast('📋 certificate copied — paste into tweet with Ctrl+V');
-    setTimeout(() => window.open(twitterUrl, '_blank'), 700);
+    // Trigger download — browsers allow this even after await
+    const link = document.createElement('a');
+    link.download = `NUT-Certificate-${dateStr}${nickname ? '-' + nickname : ''}.png`;
+    link.href = canvas.toDataURL('image/png', 0.95);
+    link.click();
+    showToast('📎 certificate downloaded — attach it to your tweet');
   } catch(e) {
-    // Any failure: just open Twitter with text
-    window.open(twitterUrl, '_blank');
+    // Twitter is already open — cert just won't be auto-attached
   }
 }
 
