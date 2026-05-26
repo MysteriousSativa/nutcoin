@@ -1151,7 +1151,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 
     <!-- 2: Timeline -->
     <div class="panel" id="panel-2">
-      <div class="panel-title">Today's Sacred Timeline</div>
+      <div class="panel-title">Today's Timeline</div>
       <div class="tl-empty" id="tlEmpty">nothing yet. what are you waiting for. go nut.</div>
       <div id="timelineList"></div>
     </div>
@@ -1183,7 +1183,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
     <div class="panel" id="panel-5">
       <div class="panel-title">Global Leaderboard — All Time Top 20</div>
       <div id="lbContent">
-        <div class="lb-empty">Connecting to the sacred ledger...</div>
+        <div class="lb-empty">Connecting to the ledger...</div>
       </div>
       <div class="lb-join" id="lbJoin" style="display:none">
         <button class="lb-join-btn" onclick="openNickModal()">Join Leaderboard</button>
@@ -1205,22 +1205,22 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
       </div>
     </div>
 
-    <!-- 7: Sacred Chronometer -->
+    <!-- 7: Chronometer -->
     <div class="panel" id="panel-7">
-      <div class="panel-title">The Sacred Chronometer</div>
+      <div class="panel-title">The Chronometer</div>
       <div class="chrono-wrap">
         <svg class="chrono-svg" id="chronoSvg" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg"></svg>
         <div style="text-align:center;">
           <div class="chrono-peak" id="chronoPeak">—</div>
-          <div class="chrono-peak-label">Sacred Hour of Peak Activity</div>
+          <div class="chrono-peak-label">Peak Hour of Activity</div>
           <div class="chrono-archetype" id="chronoArchetype">go nut first. then we will judge what time of day you do this.</div>
         </div>
       </div>
     </div>
 
-    <!-- 8: The Sacred Order -->
+    <!-- 8: The Order -->
     <div class="panel" id="panel-8">
-      <div class="panel-title">The Sacred Order</div>
+      <div class="panel-title">The Order</div>
       <div class="badge-header-row">
         <div class="badge-earned-label">Earned: <span id="badgeCount">0 / 20</span></div>
         <div class="badge-earned-label" style="font-style:italic;">hover for lore</div>
@@ -1239,9 +1239,9 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
       </div>
     </div>
 
-    <!-- 10: Sacred Aura -->
+    <!-- 10: The Aura -->
     <div class="panel" id="panel-10">
-      <div class="panel-title">The Sacred Aura</div>
+      <div class="panel-title">The Aura</div>
       <div id="auraContent"><div class="aura-empty">no data yet. go nut and tell us how bad you feel about it.</div></div>
       <div class="aura-insight" id="auraInsight"></div>
     </div>
@@ -2352,13 +2352,13 @@ async function renderCertificate(canvas) {
     si.onerror = () => { ctx.font='42px serif';ctx.fillText('🥜',sx,sy+2);resolve(); };
     si.src='./nut-coin.jpg';
   });
-  ctx.font='700 11px "Cinzel",serif';ctx.fillStyle='#4A2800';ctx.fillText('THE SACRED NUT COUNCIL',sx,sy+sr+16);
+  ctx.font='700 11px "Cinzel",serif';ctx.fillStyle='#4A2800';ctx.fillText('THE NUT COUNCIL',sx,sy+sr+16);
 
   ctx.textAlign='right';
   ctx.strokeStyle='rgba(50,25,0,0.55)';ctx.lineWidth=1.5;
   ctx.beginPath();ctx.moveTo(W-380,920);ctx.lineTo(W-78,920);ctx.stroke();
-  ctx.font='italic 32px "Crimson Text",Georgia,serif';ctx.fillStyle='#0A0400';ctx.fillText('The Sacred Nut Council',W-80,908);
-  ctx.font='700 12px "Cinzel",serif';ctx.fillStyle='#5C3000';ctx.fillText('AUTHENTICATED · SACRED NUT CODEX',W-80,932);
+  ctx.font='italic 32px "Crimson Text",Georgia,serif';ctx.fillStyle='#0A0400';ctx.fillText('The Nut Council',W-80,908);
+  ctx.font='700 12px "Cinzel",serif';ctx.fillStyle='#5C3000';ctx.fillText('AUTHENTICATED · NUT CODEX',W-80,932);
 
   ctx.textAlign='center';ctx.font='11px "Cinzel",serif';ctx.fillStyle='rgba(80,40,0,0.45)';
   ctx.fillText(`$NUT  ·  pump.fun  ·  Issued ${dateStr}  ·  ${SITE_URL}`,W/2,H-18);
@@ -2479,7 +2479,7 @@ function renderChronometer() {
     }
   }
   out+=`<circle cx="${cx}" cy="${cy}" r="${iR-2}" fill="#060402" stroke="rgba(200,169,110,.12)" stroke-width="1"/>`;
-  out+=`<text x="${cx}" y="${cy-10}" text-anchor="middle" font-family="Cinzel Decorative,serif" font-size="10" fill="rgba(200,169,110,.5)">SACRED</text>`;
+  out+=`<text x="${cx}" y="${cy-10}" text-anchor="middle" font-family="Cinzel Decorative,serif" font-size="10" fill="rgba(200,169,110,.5)">NUT</text>`;
   out+=`<text x="${cx}" y="${cy+7}" text-anchor="middle" font-family="Cinzel Decorative,serif" font-size="10" fill="rgba(200,169,110,.5)">CHRONO</text>`;
   out+=`<text x="${cx}" y="${cy+22}" text-anchor="middle" font-family="Space Mono,monospace" font-size="9" fill="rgba(200,169,110,.3)">${new Date().toTimeString().slice(0,5)}</text>`;
   svg.innerHTML=out;
