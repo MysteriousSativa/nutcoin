@@ -321,16 +321,28 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .cd-fill{height:100%;background:linear-gradient(90deg,var(--red),var(--gold),var(--green));border-radius:99px;transition:width 1s linear;box-shadow:0 0 6px rgba(78,201,122,0.28);}
 
 /* fact panel */
-.fact-box{text-align:center;padding:16px 4px;}
-.fact-category{font-family:'Cinzel',serif;font-size:10px;letter-spacing:.25em;color:var(--gold);text-transform:uppercase;margin-bottom:16px;text-shadow:0 0 10px rgba(200,169,110,0.28);}
-.fact-text{font-family:'Crimson Text',serif;font-size:22px;line-height:1.6;color:var(--cream);font-style:italic;max-width:680px;margin:0 auto 16px;}
+.fact-box{
+  text-align:center;
+  background:
+    linear-gradient(rgba(4,2,0,0.52),rgba(4,2,0,0.52)),
+    url('./img/parchment.png') center/cover no-repeat;
+  border-radius:16px;
+  padding:28px 20px;
+  border:1px solid rgba(200,169,110,0.22);
+  box-shadow:0 0 28px rgba(200,140,0,0.1) inset, 0 4px 24px rgba(0,0,0,0.4);
+}
+.fact-category{font-family:'Cinzel',serif;font-size:10px;letter-spacing:.25em;color:var(--gold-bright);text-transform:uppercase;margin-bottom:16px;text-shadow:0 0 14px rgba(200,169,110,0.5);}
+.fact-text{font-family:'Crimson Text',serif;font-size:22px;line-height:1.6;color:var(--cream);font-style:italic;max-width:680px;margin:0 auto 16px;text-shadow:0 1px 4px rgba(0,0,0,0.6);}
 .fact-src{font-family:'Cinzel',serif;font-size:10px;letter-spacing:.14em;color:var(--muted);}
 
 /* timeline */
 .tl-item{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(200,169,110,0.08);}
 .tl-item:last-child{border-bottom:none;}
 .tl-num{font-family:'Cinzel',serif;font-size:10px;color:var(--muted);width:28px;text-align:right;flex-shrink:0;}
-.tl-dot{width:8px;height:8px;border-radius:50%;background:var(--gold);flex-shrink:0;box-shadow:0 0 10px rgba(200,169,110,0.65);}
+.tl-dot{display:none;}
+.tl-nut{width:24px;height:24px;object-fit:contain;flex-shrink:0;
+  filter:drop-shadow(0 0 8px rgba(200,140,0,0.55)) drop-shadow(0 0 16px rgba(180,100,0,0.3));
+  animation:nut-ring-pulse 2.8s ease-in-out infinite;}
 .tl-text{font-family:'Crimson Text',serif;font-size:15px;color:var(--text);flex:1;}
 .tl-time{font-family:'Space Mono',monospace;font-size:11px;color:var(--muted);}
 .tl-empty{font-family:'Crimson Text',serif;font-size:17px;color:var(--muted);font-style:italic;text-align:center;padding:20px 0;}
@@ -1603,7 +1615,7 @@ function addLogEntry(t,num) {
   const list=document.getElementById('logList');
   const item=document.createElement('div');
   item.className='tl-item';
-  item.innerHTML=`<span class="tl-num">#${num}</span><div class="tl-dot"></div><span class="tl-text">Has nutted</span><span class="tl-time">${t}</span>`;
+  item.innerHTML=`<span class="tl-num">#${num}</span><img class="tl-nut" src="./img/nut-icon.png" alt=""><span class="tl-text">Has nutted</span><span class="tl-time">${t}</span>`;
   list.insertBefore(item,list.firstChild);
   if(list.children.length>10) list.removeChild(list.lastChild);
 }
@@ -1612,7 +1624,7 @@ function addTimelineEntry(t,num) {
   const list=document.getElementById('timelineList');
   const item=document.createElement('div');
   item.className='tl-item';
-  item.innerHTML=`<span class="tl-num">#${num}</span><div class="tl-dot"></div><span class="tl-text">Has nutted</span><span class="tl-time">${t}</span>`;
+  item.innerHTML=`<span class="tl-num">#${num}</span><img class="tl-nut" src="./img/nut-icon.png" alt=""><span class="tl-text">Has nutted</span><span class="tl-time">${t}</span>`;
   list.insertBefore(item,list.firstChild);
   if(list.children.length>8) list.removeChild(list.lastChild);
 }
@@ -1624,7 +1636,7 @@ function seedLogs() {
   const tlList=document.getElementById('timelineList');
   todayLog.slice(-5).reverse().forEach((t,i)=>{
     const n=todayLog.length-i;
-    const mk=(text)=>{const d=document.createElement('div');d.className='tl-item';d.innerHTML=`<span class="tl-num">#${n}</span><div class="tl-dot"></div><span class="tl-text">${text}</span><span class="tl-time">${t}</span>`;return d;};
+    const mk=(text)=>{const d=document.createElement('div');d.className='tl-item';d.innerHTML=`<span class="tl-num">#${n}</span><img class="tl-nut" src="./img/nut-icon.png" alt=""><span class="tl-text">${text}</span><span class="tl-time">${t}</span>`;return d;};
     logList.appendChild(mk('Has nutted'));
     tlList.appendChild(mk('Has nutted'));
   });
