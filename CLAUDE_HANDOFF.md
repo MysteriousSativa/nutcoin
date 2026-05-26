@@ -4,6 +4,8 @@
 **Live:** https://nutcoin-alpha.vercel.app/  
 **Full spec:** read this file first before editing anything.
 
+**Images & receipt (ChatGPT):** read **`CHATGPT_IMAGES.md`**. Receipt download / Post to X = **1080×1350 dark card** with live stats (`getReceiptPayload()`). Do not revert to parchment canvas.
+
 ---
 
 ## Step 1 — Launch on pump.fun (OWNER ONLY — you wait)
