@@ -92,29 +92,26 @@ Never use old ChatGPT PNGs, religious symbols, or checkerboard fake-alpha images
 
 ---
 
-## Step 6 — Supabase hardening (OWNER + CLAUDE, before real traffic)
+## Step 6 — Supabase (OWNER runs SQL once; CLAUDE verifies)
 
-Owner tightens RLS in Supabase dashboard. Optionally Claude adds rate-limit RPC and switches inserts from raw `.insert()` to RPC. Never commit service role key.
+**Full guide:** `SUPABASE.md` · **SQL file:** `supabase/schema.sql`
 
-### Supabase schema (required, do not change column names)
+**Owner (manual, ~10 min):**
 
-```sql
-create table nut_logs (
-  id bigserial primary key,
-  session_id text not null,
-  nickname text,
-  deed_date date default current_date,  -- NEVER rename
-  deeds bigint,                          -- NEVER rename
-  created_at timestamptz default now()
-);
+1. https://supabase.com/dashboard → project `ynzbwnlltqrprnrlbtna`
+2. **SQL Editor** → paste entire `supabase/schema.sql` → **Run**
+3. **Settings → API** → confirm URL + **anon** key match `index.html` CONFIG
+4. Tap NUT on live site → row appears in **Table Editor → nut_logs**
 
-create or replace function leaderboard()
-returns table(session_id text, nickname text, deeds bigint)
-language sql security definer as $$
-  select session_id, max(nickname), count(*)::bigint
-  from nut_logs group by session_id order by count(*) desc;
-$$;
-```
+**Claude (already done in repo — verify after owner runs SQL):**
+
+- Client uses RPCs only: `log_nut`, `global_counts`, `leaderboard`
+- Do **not** revert to `db.from('nut_logs').insert()` or open RLS insert/select policies
+- `log_nut` enforces **10-minute server cooldown** per `session_id`
+- Troubleshooting: see `SUPABASE.md`
+- Never commit **service_role** key
+
+**Table columns (do not rename):** `session_id`, `nickname`, `deed_date`, `created_at`
 
 ---
 
