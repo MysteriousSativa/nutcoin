@@ -1452,8 +1452,9 @@ async function openXWithCert(text) {
     blob = await new Promise(r => c.toBlob(r, 'image/png', 0.95));
   }
 
-  // Mobile: native share sheet
-  if (blob && navigator.canShare) {
+  // Mobile only: native share sheet (skip on Windows/Mac desktop — they open system dialogs)
+  const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  if (isMobile && blob && navigator.canShare) {
     try {
       const file = new File([blob], 'nut-certificate.png', {type:'image/png'});
       if (navigator.canShare({files:[file]})) { await navigator.share({files:[file],text}); return; }
