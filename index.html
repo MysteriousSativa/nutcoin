@@ -607,13 +607,16 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .mood-sub{font-family:'Crimson Text',serif;font-size:15px;color:var(--muted);font-style:italic;margin-bottom:22px;}
 .mood-options{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:18px;}
 .mood-btn{
-  background:url('./img/panel-bg.png') center/cover no-repeat, rgba(20,14,6,0.9);
+  background:url('./img/btn-mood.png') center/cover no-repeat, rgba(20,14,6,0.92);
   border:2px solid var(--border);border-radius:14px;padding:14px 10px 10px;
   cursor:pointer;transition:border-color .15s,transform .1s,box-shadow .15s,filter .15s;
   min-width:66px;display:flex;flex-direction:column;align-items:center;gap:5px;
-  filter:drop-shadow(0 2px 8px rgba(0,0,0,0.4));
+  filter:drop-shadow(0 2px 10px rgba(0,0,0,0.5));
 }
-.mood-btn:hover{border-color:var(--gold);transform:translateY(-4px);box-shadow:0 8px 22px rgba(0,0,0,0.3);filter:drop-shadow(0 0 16px rgba(200,140,0,0.35));}
+.mood-btn:hover{
+  border-color:var(--gold);transform:translateY(-4px);
+  filter:drop-shadow(0 0 18px rgba(200,140,0,0.45)) drop-shadow(0 4px 12px rgba(0,0,0,0.4));
+}
 .mood-e{font-size:30px;}
 .mood-l{font-family:'Cinzel',serif;font-size:7.5px;letter-spacing:.1em;color:var(--muted);text-transform:uppercase;}
 .mood-skip{font-family:'Cinzel',serif;font-size:10px;letter-spacing:.12em;color:var(--muted);cursor:pointer;text-decoration:underline;transition:color .2s;}
