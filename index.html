@@ -63,7 +63,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
   text-align:center;padding:170px 20px 60px;position:relative;
   background:
     linear-gradient(to bottom,rgba(5,3,1,0.45) 0%,rgba(5,3,1,0.88) 72%,#050301 100%),
-    url('https://images.unsplash.com/photo-1550583724-b2692b85b150?w=1400&q=80&fit=crop') center/cover no-repeat;
+    url('./hero-bg.jpg') center/cover no-repeat;
 }
 .hero::before{
   content:'';position:absolute;inset:0;pointer-events:none;
@@ -586,7 +586,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 
 <!-- HERO -->
 <div class="hero">
-  <div class="crown">🥜</div>
+  <img class="crown" src="./nut-coin.jpg" alt="$NUT Coin" style="width:96px;height:96px;border-radius:50%;object-fit:cover;filter:drop-shadow(0 0 32px rgba(200,169,110,0.85));"/>
   <div class="coin-name">$NUT</div>
   <div class="tagline">The Sacred World Nut Tracking Memecoin</div>
   <div class="hero-actions">
@@ -1592,10 +1592,24 @@ async function renderCertificate(canvas) {
   canvas.width=W;canvas.height=H;
   const ctx=canvas.getContext('2d');
 
-  const bg=ctx.createLinearGradient(0,0,W,H);
-  bg.addColorStop(0,'#FFF8EE');bg.addColorStop(.4,'#FFFDF8');bg.addColorStop(.7,'#FFFAF2');bg.addColorStop(1,'#FFF0D8');
-  ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
-  ctx.fillStyle='rgba(200,169,110,0.04)';
+  // Draw parchment background
+  await new Promise(resolve => {
+    const img = new Image();
+    img.onload = () => {
+      ctx.drawImage(img, 0, 0, W, H);
+      ctx.fillStyle = 'rgba(20,8,0,0.22)';
+      ctx.fillRect(0, 0, W, H);
+      resolve();
+    };
+    img.onerror = () => {
+      const bg=ctx.createLinearGradient(0,0,W,H);
+      bg.addColorStop(0,'#FFF8EE');bg.addColorStop(.4,'#FFFDF8');bg.addColorStop(.7,'#FFFAF2');bg.addColorStop(1,'#FFF0D8');
+      ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+      resolve();
+    };
+    img.src='./parchment.jpg';
+  });
+  ctx.fillStyle='rgba(200,169,110,0.03)';
   for(let x=0;x<W;x+=18)for(let y=0;y<H;y+=18)ctx.fillRect(x,y,1,1);
 
   ctx.strokeStyle='#5C3D0A';ctx.lineWidth=7;rrect(ctx,16,16,W-32,H-32,3);ctx.stroke();
@@ -1613,7 +1627,27 @@ async function renderCertificate(canvas) {
   });
 
   ctx.textAlign='center';ctx.textBaseline='middle';
-  ctx.font='52px serif';ctx.fillText('🥜',W/2-230,128);ctx.fillText('🥜',W/2+230,128);
+  // Draw coin icon flanking the title
+  await new Promise(resolve => {
+    const coinImg = new Image();
+    coinImg.onload = () => {
+      const cs = 68;
+      ctx.save();
+      ctx.beginPath();ctx.arc(W/2-230,128,cs/2,0,Math.PI*2);ctx.clip();
+      ctx.drawImage(coinImg,W/2-230-cs/2,128-cs/2,cs,cs);
+      ctx.restore();
+      ctx.save();
+      ctx.beginPath();ctx.arc(W/2+230,128,cs/2,0,Math.PI*2);ctx.clip();
+      ctx.drawImage(coinImg,W/2+230-cs/2,128-cs/2,cs,cs);
+      ctx.restore();
+      resolve();
+    };
+    coinImg.onerror = () => {
+      ctx.font='52px serif';ctx.fillText('🥜',W/2-230,128);ctx.fillText('🥜',W/2+230,128);
+      resolve();
+    };
+    coinImg.src='./nut-coin.jpg';
+  });
   ctx.font='900 98px "Cinzel Decorative",serif';ctx.fillStyle='#1A0E04';
   ctx.shadowColor='rgba(200,169,110,0.35)';ctx.shadowBlur=18;
   ctx.fillText('$NUT',W/2,128);ctx.shadowBlur=0;
@@ -1657,7 +1691,16 @@ async function renderCertificate(canvas) {
   const sx=158,sy=900,sr=66;
   ctx.beginPath();ctx.arc(sx,sy,sr,0,Math.PI*2);ctx.strokeStyle='#C8A96E';ctx.lineWidth=3;ctx.stroke();
   ctx.beginPath();ctx.arc(sx,sy,sr-14,0,Math.PI*2);ctx.strokeStyle='rgba(200,169,110,0.4)';ctx.lineWidth=1;ctx.stroke();
-  ctx.font='42px serif';ctx.fillText('🥜',sx,sy+2);
+  await new Promise(resolve => {
+    const si = new Image();
+    si.onload = () => {
+      ctx.save();ctx.beginPath();ctx.arc(sx,sy,sr-18,0,Math.PI*2);ctx.clip();
+      ctx.drawImage(si,sx-(sr-18),sy-(sr-18),(sr-18)*2,(sr-18)*2);ctx.restore();
+      resolve();
+    };
+    si.onerror = () => { ctx.font='42px serif';ctx.fillText('🥜',sx,sy+2);resolve(); };
+    si.src='./nut-coin.jpg';
+  });
   ctx.font='700 9.5px "Cinzel",serif';ctx.fillStyle='#8B6914';ctx.fillText('THE SACRED NUT COUNCIL',sx,sy+sr+15);
 
   ctx.textAlign='right';
