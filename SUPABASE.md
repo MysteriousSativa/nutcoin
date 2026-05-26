@@ -25,7 +25,7 @@ This creates:
 | Piece | Purpose |
 |--------|---------|
 | `nut_logs` table | One row per logged nut |
-| `log_nut()` RPC | Insert with **10-minute server cooldown** + `nut_type` (solo, partner, etc.) |
+| `log_nut()` RPC | Insert with **10-minute cooldown**, `nut_type`, `points` (1 or 2 for 2× hour) |
 | `nut_type_stats()` RPC | Optional global method mix for a date |
 | `global_counts()` RPC | Today + all-time totals without exposing raw rows |
 | `leaderboard()` RPC | Top 20 sessions by count |

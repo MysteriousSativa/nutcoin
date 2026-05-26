@@ -7,11 +7,13 @@ create table if not exists public.nut_logs (
   session_id text not null,
   nickname   text,
   nut_type   text not null default 'solo',
+  points     int not null default 1 check (points >= 1 and points <= 10),
   deed_date  date not null default current_date,
   created_at timestamptz not null default now()
 );
 
 alter table public.nut_logs add column if not exists nut_type text not null default 'solo';
+alter table public.nut_logs add column if not exists points int not null default 1;
 
 create index if not exists nut_logs_session_created_idx
   on public.nut_logs (session_id, created_at desc);
@@ -35,7 +37,8 @@ create or replace function public.log_nut(
   p_session_id text,
   p_nickname   text default null,
   p_deed_date  date default current_date,
-  p_nut_type   text default 'solo'
+  p_nut_type   text default 'solo',
+  p_points     int default 1
 )
 returns jsonb
 language plpgsql
@@ -46,6 +49,7 @@ declare
   last_at timestamptz;
   cooldown interval := interval '10 minutes';
   v_type text := coalesce(nullif(trim(p_nut_type), ''), 'solo');
+  v_pts int := greatest(1, least(coalesce(p_points, 1), 10));
 begin
   if p_session_id is null or length(trim(p_session_id)) < 8 then
     return jsonb_build_object('ok', false, 'error', 'invalid_session');
@@ -67,10 +71,10 @@ begin
     );
   end if;
 
-  insert into public.nut_logs (session_id, nickname, deed_date, nut_type)
-  values (p_session_id, nullif(trim(p_nickname), ''), p_deed_date, v_type);
+  insert into public.nut_logs (session_id, nickname, deed_date, nut_type, points)
+  values (p_session_id, nullif(trim(p_nickname), ''), p_deed_date, v_type, v_pts);
 
-  return jsonb_build_object('ok', true, 'nut_type', v_type);
+  return jsonb_build_object('ok', true, 'nut_type', v_type, 'points', v_pts);
 end;
 $$;
 
@@ -83,8 +87,8 @@ set search_path = public
 stable
 as $$
   select
-    (select count(*)::bigint from public.nut_logs where deed_date = p_deed_date),
-    (select count(*)::bigint from public.nut_logs);
+    (select coalesce(sum(points), 0)::bigint from public.nut_logs where deed_date = p_deed_date),
+    (select coalesce(sum(points), 0)::bigint from public.nut_logs);
 $$;
 
 -- ── Leaderboard top 20 ──────────────────────────────────────────────────
@@ -98,7 +102,7 @@ as $$
   select
     session_id,
     max(nickname) as nickname,
-    count(*)::bigint as deeds
+    coalesce(sum(points), 0)::bigint as deeds
   from public.nut_logs
   group by session_id
   order by deeds desc
@@ -113,7 +117,7 @@ security definer
 set search_path = public
 stable
 as $$
-  select nut_type, count(*)::bigint as cnt
+  select nut_type, coalesce(sum(points), 0)::bigint as cnt
   from public.nut_logs
   where deed_date = p_deed_date
   group by nut_type
@@ -125,10 +129,11 @@ grant usage on schema public to anon, authenticated;
 grant select, insert on public.nut_logs to service_role;
 revoke all on public.nut_logs from anon, authenticated;
 
-grant execute on function public.log_nut(text, text, date, text) to anon, authenticated;
+grant execute on function public.log_nut(text, text, date, text, int) to anon, authenticated;
 grant execute on function public.global_counts(date) to anon, authenticated;
 grant execute on function public.leaderboard() to anon, authenticated;
 grant execute on function public.nut_type_stats(date) to anon, authenticated;
 
--- Drop old 3-arg overload if upgrading
+-- Drop old overloads if upgrading
 drop function if exists public.log_nut(text, text, date);
+drop function if exists public.log_nut(text, text, date, text);

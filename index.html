@@ -345,6 +345,19 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
   box-shadow:0 0 16px rgba(220,100,0,0.25);
 }
 .nut-method-chip .em{font-size:13px;line-height:1;}
+.nut-method-chip.is-2x{border-color:rgba(120,220,120,0.55);box-shadow:0 0 14px rgba(78,201,122,0.2);}
+.nut-method-chip.is-2x::after{
+  content:'2×';margin-left:4px;font-size:9px;font-weight:800;color:#8EE4A8;
+  background:rgba(78,201,122,0.2);padding:1px 5px;border-radius:4px;
+}
+.bonus-hour{
+  margin:0 auto 14px;max-width:420px;padding:10px 14px;border-radius:12px;text-align:center;
+  background:linear-gradient(135deg,rgba(78,201,122,0.12),rgba(200,100,10,0.1));
+  border:1px solid rgba(120,220,120,0.35);
+}
+.bonus-hour-title{font-size:10px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#8EE4A8;margin-bottom:6px;}
+.bonus-hour-types{font-size:13px;font-weight:700;color:var(--cream);line-height:1.4;}
+.bonus-hour-sub{font-size:10px;color:var(--muted);margin-top:6px;}
 .nut-verdict{
   min-height:1.2em;font-size:12px;font-weight:600;color:var(--gold-bright);
   margin:-8px 0 14px;font-style:italic;position:relative;z-index:1;padding:0 12px;
@@ -1126,7 +1139,7 @@ position:relative;overflow:hidden;
   <div class="global-bar" id="globalBar">
     <div class="live-chip"><span class="live-dot"></span>LIVE</div>
     <div class="global-half">
-      <div class="global-lbl">Global Nuts Today</div>
+      <div class="global-lbl">Global Nut Points Today</div>
       <div class="global-val loading" id="globalToday">—</div>
       <div class="global-sub" id="globalTodaySub">connecting...</div>
     </div>
@@ -1152,9 +1165,10 @@ position:relative;overflow:hidden;
 
   <!-- COUNTER CARD -->
   <div class="counter-card" id="nutCard">
-    <div class="counter-label">Your Nut Count — Today</div>
+    <div class="counter-label">Your Nut Points — Today</div>
     <div class="big-count" id="bigCount">0</div>
-    <div class="reset-sub">any climax counts · resets at midnight</div>
+    <div class="reset-sub">2× methods rotate each hour · any climax counts</div>
+    <div class="bonus-hour" id="bonusHour" aria-live="polite"></div>
     <div class="nut-methods" id="nutMethods">
       <div class="nut-methods-label">How did you nut?</div>
       <div class="nut-method-grid" id="nutMethodGrid"></div>
@@ -1279,7 +1293,7 @@ position:relative;overflow:hidden;
     <div class="panel" id="panel-8">
       <div class="panel-title">The Order</div>
       <div class="badge-header-row">
-        <div class="badge-earned-label">Earned: <span id="badgeCount">0 / 30</span></div>
+        <div class="badge-earned-label">Earned: <span id="badgeCount">0 / 31</span></div>
         <div class="badge-earned-label" style="font-style:italic;">hover for lore</div>
       </div>
       <div class="badge-grid" id="badgeGrid"></div>
@@ -1527,9 +1541,47 @@ const NUT_VERDICTS = [
 ];
 
 function normalizeLogEntry(e) {
-  if (typeof e === 'string') return { t: e, type: 'solo' };
+  if (typeof e === 'string') return { t: e, type: 'solo', pts: 1 };
   const ty = e.type || 'solo';
-  return { t: e.t || '00:00:00', type: NUT_TYPES[ty] ? ty : 'solo' };
+  const pts = Math.max(1, Math.min(10, parseInt(e.pts, 10) || 1));
+  return { t: e.t || '00:00:00', type: NUT_TYPES[ty] ? ty : 'solo', pts };
+}
+function logPts(e) { return typeof e === 'object' && e.pts ? e.pts : 1; }
+
+const BONUS_TYPES_PER_HOUR = 2;
+
+function getHourly2xTypes() {
+  const hour = new Date().getHours();
+  const keys = Object.keys(NUT_TYPES);
+  const daySeed = dateStr.split('-').reduce((a, p) => a + parseInt(p, 10), 0);
+  const picked = new Set();
+  for (let n = 0; picked.size < BONUS_TYPES_PER_HOUR && n < 24; n++) {
+    const idx = (hour * 17 + daySeed * 11 + n * 7) % keys.length;
+    picked.add(keys[idx]);
+  }
+  return [...picked];
+}
+
+function is2xNutType(typeId) {
+  return getHourly2xTypes().includes(typeId);
+}
+
+function getNutPoints(typeId) {
+  return is2xNutType(typeId) ? 2 : 1;
+}
+
+function renderBonusHour() {
+  const el = document.getElementById('bonusHour');
+  if (!el) return;
+  const types = getHourly2xTypes();
+  const labels = types.map(id => {
+    const m = NUT_TYPES[id];
+    return `${m.em} ${m.label}`;
+  }).join(' · ');
+  const minsLeft = 60 - new Date().getMinutes();
+  el.innerHTML = `<div class="bonus-hour-title">⚡ 2× points this hour</div>
+    <div class="bonus-hour-types">${labels}</div>
+    <div class="bonus-hour-sub">log these methods for double score · rotates in ${minsLeft}m</div>`;
 }
 let todayLog = todayLogRaw.map(normalizeLogEntry);
 function logTime(e) { return typeof e === 'string' ? e : e.t; }
@@ -1537,7 +1589,7 @@ function logType(e) { return typeof e === 'string' ? 'solo' : (e.type || 'solo')
 function typeLabel(id) { return NUT_TYPES[id]?.label || id; }
 function countTypesToday() {
   const c = {};
-  todayLog.forEach(e => { const ty = logType(e); c[ty] = (c[ty] || 0) + 1; });
+  todayLog.forEach(e => { const ty = logType(e); c[ty] = (c[ty] || 0) + logPts(e); });
   return c;
 }
 function countPartneredToday() {
@@ -1550,8 +1602,9 @@ function buildNutMethodChips() {
   const grid = document.getElementById('nutMethodGrid');
   if (!grid) return;
   grid.innerHTML = Object.entries(NUT_TYPES).map(([id, m]) =>
-    `<button type="button" class="nut-method-chip${id === selectedNutType ? ' active' : ''}" data-type="${id}" onclick="selectNutType('${id}')"><span class="em">${m.em}</span>${m.label}</button>`
+    `<button type="button" class="nut-method-chip${id === selectedNutType ? ' active' : ''}${is2xNutType(id) ? ' is-2x' : ''}" data-type="${id}" onclick="selectNutType('${id}')"><span class="em">${m.em}</span>${m.label}</button>`
   ).join('');
+  renderBonusHour();
 }
 function selectNutType(id) {
   if (!NUT_TYPES[id]) return;
@@ -1730,7 +1783,7 @@ async function fetchGlobalCounts() {
     const ht = document.getElementById('heroToday');
     const ha = document.getElementById('heroAll');
     if (ht) ht.textContent = t.toLocaleString();
-    document.getElementById('globalTodaySub').textContent = 'real nuts logged today';
+    document.getElementById('globalTodaySub').textContent = 'points logged today (2× hour active)';
     document.getElementById('globalAllTime').textContent = a.toLocaleString();
     document.getElementById('globalAllTime').classList.remove('loading');
     if (ha) ha.textContent = a.toLocaleString();
@@ -1742,11 +1795,13 @@ async function fetchGlobalCounts() {
 async function logToSupabase() {
   if (!db) return;
   try {
+    const pts = getNutPoints(selectedNutType);
     const { data, error } = await db.rpc('log_nut', {
       p_session_id: sessionId,
       p_nickname: nickname || null,
       p_deed_date: dateStr,
       p_nut_type: selectedNutType,
+      p_points: pts,
     });
     if (error || (data && data.ok === false)) return;
     fetchGlobalCounts();
@@ -1885,14 +1940,17 @@ function nut() {
     showJokeModal(j.emoji, j.text, Math.ceil((TEN_MIN-elapsed)/60000));
     return;
   }
-  countToday++; countAllTime++; countSession++;
+  const method = selectedNutType;
+  const points = getNutPoints(method);
+  countToday += points;
+  countAllTime += points;
+  countSession += points;
   lastClick = now;
   if (countToday > bestDay) bestDay = countToday;
-  if (countToday === 1) daysTracked++;
+  if (points >= 1 && countToday === points) daysTracked++;
   const t = new Date().toTimeString().slice(0,8);
-  const method = selectedNutType;
-  todayLog.push({ t, type: method });
-  typeStatsAll[method] = (typeStatsAll[method] || 0) + 1;
+  todayLog.push({ t, type: method, pts: points });
+  typeStatsAll[method] = (typeStatsAll[method] || 0) + points;
   localStorage.setItem(KEY_TYPE_ALL, JSON.stringify(typeStatsAll));
   save();
   showNutVerdict(method);
@@ -1905,10 +1963,11 @@ function nut() {
   spawnSquirt();
   shakeCard();
   haptic([60, 18, 100, 18, 160]);
-  addLogEntry(t, countToday, method);
-  addTimelineEntry(t, countToday, method);
+  addLogEntry(t, countToday, method, points);
+  addTimelineEntry(t, countToday, method, points);
   renderMethodLedger();
-  if (Math.random()<1) showToast(TOASTS[Math.floor(Math.random()*TOASTS.length)]);
+  if (points > 1) showToast(`2× POINTS — +${points} for ${typeLabel(method)} ✦`);
+  else if (Math.random() < 1) showToast(TOASTS[Math.floor(Math.random()*TOASTS.length)]);
   if (MILESTONES[countToday]) {
     const[em,ti,su]=MILESTONES[countToday];
     showMilestone(em,ti,su);
@@ -1964,27 +2023,28 @@ function updateCooldown() {
 // ═══════════════════════════════
 // FEED / LOG
 // ═══════════════════════════════
-function nutLogText(typeId) {
+function nutLogText(typeId, pts) {
   const m = NUT_TYPES[typeId] || NUT_TYPES.solo;
-  if (typeId === 'partner') return `${m.em} Partnered nut — body count respectfully updated`;
-  if (typeId === 'solo') return `${m.em} Solo mission accomplished`;
-  return `${m.em} ${m.label} — nut logged`;
+  const mult = pts > 1 ? ` (+${pts} pts, 2× hour)` : '';
+  if (typeId === 'partner') return `${m.em} Partnered nut${mult}`;
+  if (typeId === 'solo') return `${m.em} Solo mission${mult}`;
+  return `${m.em} ${m.label}${mult}`;
 }
-function addLogEntry(t,num,typeId) {
+function addLogEntry(t, num, typeId, pts) {
   document.getElementById('logEmpty').style.display='none';
   const list=document.getElementById('logList');
   const item=document.createElement('div');
   item.className='tl-item';
-  item.innerHTML=`<span class="tl-num">#${num}</span><img class="tl-nut" src="./img/nut-icon.png" alt=""><span class="tl-text">${nutLogText(typeId)}</span><span class="tl-time">${t}</span>`;
+  item.innerHTML=`<span class="tl-num">#${num}</span><img class="tl-nut" src="./img/nut-icon.png" alt=""><span class="tl-text">${nutLogText(typeId, pts)}</span><span class="tl-time">${t}</span>`;
   list.insertBefore(item,list.firstChild);
   if(list.children.length>10) list.removeChild(list.lastChild);
 }
-function addTimelineEntry(t,num,typeId) {
+function addTimelineEntry(t, num, typeId, pts) {
   document.getElementById('tlEmpty').style.display='none';
   const list=document.getElementById('timelineList');
   const item=document.createElement('div');
   item.className='tl-item';
-  item.innerHTML=`<span class="tl-num">#${num}</span><img class="tl-nut" src="./img/nut-icon.png" alt=""><span class="tl-text">${nutLogText(typeId)}</span><span class="tl-time">${t}</span>`;
+  item.innerHTML=`<span class="tl-num">#${num}</span><img class="tl-nut" src="./img/nut-icon.png" alt=""><span class="tl-text">${nutLogText(typeId, pts)}</span><span class="tl-time">${t}</span>`;
   list.insertBefore(item,list.firstChild);
   if(list.children.length>8) list.removeChild(list.lastChild);
 }
@@ -1996,10 +2056,10 @@ function seedLogs() {
   const tlList=document.getElementById('timelineList');
   todayLog.slice(-5).reverse().forEach((e,i)=>{
     const n=todayLog.length-i;
-    const t=logTime(e), ty=logType(e);
+    const t=logTime(e), ty=logType(e), pts=logPts(e);
     const mk=(text)=>{const d=document.createElement('div');d.className='tl-item';d.innerHTML=`<span class="tl-num">#${n}</span><img class="tl-nut" src="./img/nut-icon.png" alt=""><span class="tl-text">${text}</span><span class="tl-time">${t}</span>`;return d;};
-    logList.appendChild(mk(nutLogText(ty)));
-    tlList.appendChild(mk(nutLogText(ty)));
+    logList.appendChild(mk(nutLogText(ty, pts)));
+    tlList.appendChild(mk(nutLogText(ty, pts)));
   });
 }
 
@@ -2449,6 +2509,8 @@ function getReceiptPayload() {
     topEmoji: top.em,
     methodsLine: methodsLine || `${lm.em} ${lm.label}`,
     variety: uniqueMethodsToday(),
+    hourly2x: getHourly2xTypes().map(id => NUT_TYPES[id].label).join(', '),
+    lastPoints: todayLog.length ? logPts(todayLog[todayLog.length - 1]) : 1,
     verdict: getAchievementText(countToday),
     date: dateStr,
     site: SITE_URL,
@@ -2563,11 +2625,12 @@ async function renderCertificate(canvas) {
 
   ctx.font = '700 28px Inter,system-ui,sans-serif';
   ctx.fillStyle = CREAM;
-  ctx.fillText('NUTS LOGGED TODAY', W / 2, 455);
+  ctx.fillText('NUT POINTS TODAY', W / 2, 455);
 
   ctx.font = '600 36px Inter,system-ui,sans-serif';
   ctx.fillStyle = EMBER;
-  ctx.fillText(`${p.lastEmoji}  LAST: ${p.lastMethod.toUpperCase()}`, W / 2, 520);
+  const ptsTag = p.lastPoints > 1 ? ` (+${p.lastPoints} PTS · 2× HOUR)` : '';
+  ctx.fillText(`${p.lastEmoji}  LAST: ${p.lastMethod.toUpperCase()}${ptsTag}`, W / 2, 520);
 
   ctx.font = '500 22px Inter,system-ui,sans-serif';
   ctx.fillStyle = MUTED;
@@ -2605,7 +2668,7 @@ async function renderCertificate(canvas) {
   ctx.fillText(`ISSUED TO: ${p.nickname}`, W / 2, 800);
   ctx.font = '500 20px Inter,system-ui,sans-serif';
   ctx.fillStyle = MUTED;
-  ctx.fillText(`TOP METHOD TODAY: ${p.topEmoji} ${p.topMethod}  ·  ${p.variety} methods  ·  ${p.date}`, W / 2, 835);
+  ctx.fillText(`2× HOUR: ${p.hourly2x}  ·  TOP: ${p.topEmoji} ${p.topMethod}  ·  ${p.date}`, W / 2, 835);
 
   ctx.fillStyle = 'rgba(200,100,10,0.12)';
   rrect(ctx, 56, 890, W - 112, 200, 14);
@@ -2661,6 +2724,7 @@ function downloadCert() {
 setupBuyButtons();
 buildNutMethodChips();
 renderMethodLedger();
+setInterval(() => { renderBonusHour(); buildNutMethodChips(); }, 60000);
 buildDots();
 showPanel(0);
 buildTicker();
@@ -2801,6 +2865,7 @@ const BADGES = [
   {id:'stress8',  icon:'📉', name:'Market Coping',   tier:2, desc:'stress nut while having 8+ nuts today. portfolio and pants down.'},
   {id:'victory5', icon:'🍾', name:'Celebration Nut', tier:2, desc:'victory lap nut on a 5+ nut day. you won something. yourself.'},
   {id:'revenge',  icon:'😤', name:'Petty King',      tier:2, desc:'revenge nut logged. unhinged. valid. documented forever.'},
+  {id:'doublehr', icon:'⚡', name:'Double Hour',     tier:2, desc:'logged a 2× method during its bonus hour. gaming the system. respect.'},
 ];
 const KEY_TYPE_ALL = 'nut_types_alltime_v1';
 let typeStatsAll = JSON.parse(localStorage.getItem(KEY_TYPE_ALL) || '{}');
@@ -2824,7 +2889,8 @@ function checkBadges() {
     hotelnut:()=>(typeStatsAll.hotel||0)>=1, quick3:()=>(ct.quickie||0)>=3,
     variety4:()=>uniqueMethodsToday()>=4, round2x:()=>(ct.round2||0)>=2,
     sneaky5:()=>(typeStatsAll.sneaky||0)>=5, stress8:()=>(ct.stress||0)>=1&&countToday>=8,
-    victory5:()=>(ct.celebration||0)>=1&&countToday>=5, revenge:()=>(typeStatsAll.revenge||0)>=1,
+    victory5:()=>(ct.celebration||0)>=1&&countToday>=5,     revenge:()=>(typeStatsAll.revenge||0)>=1,
+    doublehr:()=>todayLog.some(e=>logPts(e)>1),
   };
   BADGES.forEach(b=>{ if(!earnedBadges.has(b.id)&&conds[b.id]&&conds[b.id]()) { earnedBadges.add(b.id); newOnes.push(b); } });
   if (newOnes.length) {
