@@ -1023,6 +1023,9 @@ function nut() {
   checkBadges();
   generateProphecy();
   setTimeout(showMoodOverlay, 1200);
+  // Re-render cert cache in background after count changes
+  _certCache = null;
+  setTimeout(prerenderCert, 2000);
 }
 
 // ═══════════════════════════════
@@ -1161,30 +1164,74 @@ function updateClock() {
 // TWITTER SHARE
 // ═══════════════════════════════
 
-// Opens Twitter immediately (preserves user gesture / avoids popup blocker),
-// then renders cert and auto-downloads it so user can attach in the tweet composer.
+// ── CERT PRE-RENDER CACHE ──
+// Render the cert in the background so the blob is ready the instant
+// share is clicked — no async gap before clipboard / WebShare calls.
+let _certCache = null;
+async function prerenderCert() {
+  try {
+    const c = document.createElement('canvas');
+    await renderCertificate(c);
+    _certCache = await new Promise(r => c.toBlob(r, 'image/png', 0.95));
+  } catch(e) { _certCache = null; }
+}
+
 async function openXWithCert(text) {
   const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
 
-  // MUST happen before any await — popup blockers kill window.open after async gaps
+  // Grab blob from cache (instant) or reuse the cert modal canvas if already rendered
+  let blob = _certCache;
+  if (!blob) {
+    const dc = document.getElementById('certCanvas');
+    if (dc && dc.width === 1400) blob = await new Promise(r => dc.toBlob(r, 'image/png', 0.95));
+  }
+
+  // ── MOBILE: native share sheet sends image straight to X app ──
+  if (blob && navigator.canShare) {
+    try {
+      const file = new File([blob], 'nut-certificate.png', {type: 'image/png'});
+      if (navigator.canShare({files: [file]})) {
+        await navigator.share({files: [file], text});
+        return;
+      }
+    } catch(e) {}
+  }
+
+  // ── DESKTOP: open Twitter compose, copy cert to clipboard ──
+  // window.open must fire before any await to avoid popup blockers
   window.open(twitterUrl, '_blank');
 
-  // Render cert (reuse modal canvas if already drawn, else render fresh)
+  if (window.ClipboardItem && navigator.clipboard) {
+    try {
+      // If blob already in cache: Promise.resolve() is instant, gesture survives fine.
+      // If not cached: Chrome 92+ holds the user gesture open while a Promise<Blob> resolves.
+      const blobPromise = blob
+        ? Promise.resolve(blob)
+        : (async () => {
+            const c = document.createElement('canvas');
+            await renderCertificate(c);
+            return new Promise(r => c.toBlob(r, 'image/png', 0.95));
+          })();
+      await navigator.clipboard.write([new ClipboardItem({'image/png': blobPromise})]);
+      showToast('📋 certificate copied — paste into X with Ctrl+V');
+      return;
+    } catch(e) {}
+  }
+
+  // ── FALLBACK: auto-download so user can attach manually ──
   try {
-    let canvas = document.getElementById('certCanvas');
-    if (!canvas || canvas.width !== 1400) {
-      canvas = document.createElement('canvas');
-      await renderCertificate(canvas);
+    if (!blob) {
+      const c = document.createElement('canvas');
+      await renderCertificate(c);
+      blob = await new Promise(r => c.toBlob(r, 'image/png', 0.95));
     }
-    // Trigger download — browsers allow this even after await
     const link = document.createElement('a');
     link.download = `NUT-Certificate-${dateStr}${nickname ? '-' + nickname : ''}.png`;
-    link.href = canvas.toDataURL('image/png', 0.95);
+    link.href = URL.createObjectURL(blob);
     link.click();
+    URL.revokeObjectURL(link.href);
     showToast('📎 certificate downloaded — attach it to your tweet');
-  } catch(e) {
-    // Twitter is already open — cert just won't be auto-attached
-  }
+  } catch(e) {}
 }
 
 async function shareTwitter() {
@@ -1683,6 +1730,8 @@ renderBadges();
 checkBadges();
 generateProphecy();
 renderAura();
+// Pre-render cert in background so share button has blob ready instantly
+setTimeout(prerenderCert, 3000);
 
 // ── SCROLL TO NUT BUTTON ──
 const scrollNutBtn = document.getElementById('scrollNutBtn');
