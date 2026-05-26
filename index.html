@@ -16,7 +16,10 @@
   --shadow-gold:0 0 50px rgba(200,169,110,0.1); --shadow-gold-lg:0 0 100px rgba(200,169,110,0.22);
 }
 *{box-sizing:border-box;margin:0;padding:0;}
-body{background:#050301;color:var(--text);font-family:'Crimson Text',Georgia,serif;min-height:100vh;overflow-x:hidden;}
+body{
+  background:url('./img/body-bg.png') fixed center/cover, #050301;
+  color:var(--text);font-family:'Crimson Text',Georgia,serif;min-height:100vh;overflow-x:hidden;
+}
 body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
   background:
     radial-gradient(ellipse 70% 50% at 15% 10%,rgba(200,169,110,0.07) 0%,transparent 65%),
@@ -195,7 +198,8 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 
 /* ── WRAP ── */
 .wrap{max-width:920px;margin:0 auto;padding:0 16px 160px;position:relative;z-index:1;}
-.ornament{text-align:center;font-family:'Cinzel',serif;color:var(--gold-dim);font-size:18px;letter-spacing:.3em;margin:6px 0 22px;user-select:none;}
+.ornament{text-align:center;margin:6px 0 22px;}
+.divider-img{display:block;width:clamp(260px,70vw,640px);height:auto;margin:0 auto;opacity:0.72;filter:drop-shadow(0 0 14px rgba(200,140,0,0.3)) drop-shadow(0 0 32px rgba(180,100,0,0.18));}
 
 /* ── COUNTER CARD ── */
 .counter-card{
@@ -700,7 +704,8 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 
   /* Wrap */
   .wrap{padding:0 10px 80px;}
-  .ornament{margin:2px 0 12px;font-size:14px;letter-spacing:.22em;}
+  .ornament{margin:2px 0 12px;}
+  .divider-img{width:clamp(180px,80vw,340px);}
 
   /* Global bar */
   .global-bar{padding:14px 16px;gap:0;}
@@ -903,7 +908,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
   </div>
 
   <div class="clock-bar" id="clockBar">Loading...</div>
-  <div class="ornament">✦ &nbsp; ✦ &nbsp; ✦</div>
+  <div class="ornament"><img class="divider-img" src="./img/divider.png" alt=""></div>
 
   <!-- COUNTER CARD -->
   <div class="counter-card" id="nutCard">
@@ -921,6 +926,8 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
   </div>
 
   <!-- PANEL INDICATORS -->
+  <div class="ornament"><img class="divider-img" src="./img/divider.png" alt=""></div>
+
   <div class="panel-indicators" id="panelDots"></div>
 
   <!-- ROTATING PANELS -->
@@ -1050,6 +1057,8 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
     </div>
 
   </div><!-- /panels-wrap -->
+
+  <div class="ornament"><img class="divider-img" src="./img/divider.png" alt=""></div>
 
   <!-- ACTIVITY LOG -->
   <div class="log-section">
