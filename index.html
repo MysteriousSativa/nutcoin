@@ -327,7 +327,38 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
   position:relative;z-index:1;
 }
 .big-count.bump{transform:scale(1.06);color:#FFE08A;}
-.reset-sub{font-family:'Crimson Text',serif;font-size:14px;color:var(--muted);font-style:italic;margin-bottom:36px;position:relative;z-index:1;}
+.reset-sub{font-family:'Crimson Text',serif;font-size:14px;color:var(--muted);font-style:italic;margin-bottom:20px;position:relative;z-index:1;}
+.nut-methods{position:relative;z-index:1;margin-bottom:18px;text-align:center;}
+.nut-methods-label{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;line-height:1.4;padding:0 8px;}
+.nut-method-grid{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;max-width:420px;margin:0 auto;}
+.nut-method-chip{
+  display:inline-flex;align-items:center;gap:4px;padding:7px 11px;border-radius:999px;
+  font-size:10px;font-weight:700;letter-spacing:.03em;cursor:pointer;font-family:inherit;
+  background:rgba(12,8,4,0.85);border:1px solid var(--border);color:var(--muted);
+  transition:border-color .15s,background .15s,color .15s,transform .1s;
+  -webkit-tap-highlight-color:transparent;
+}
+.nut-method-chip:hover{border-color:var(--gold);color:var(--cream);}
+.nut-method-chip.active{
+  border-color:rgba(255,160,40,0.65);color:#FFEAA0;
+  background:linear-gradient(135deg,rgba(200,100,10,0.35),rgba(80,40,0,0.5));
+  box-shadow:0 0 16px rgba(220,100,0,0.25);
+}
+.nut-method-chip .em{font-size:13px;line-height:1;}
+.nut-verdict{
+  min-height:1.2em;font-size:12px;font-weight:600;color:var(--gold-bright);
+  margin:-8px 0 14px;font-style:italic;position:relative;z-index:1;padding:0 12px;
+}
+.method-ledger{display:grid;gap:8px;}
+.method-row{
+  display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;
+  background:rgba(12,8,4,0.65);border:1px solid var(--border);
+}
+.method-row .em{font-size:20px;width:28px;text-align:center;}
+.method-row .bar-wrap{flex:1;height:10px;background:rgba(0,0,0,0.4);border-radius:99px;overflow:hidden;}
+.method-row .bar{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--ember),var(--gold-bright));}
+.method-row .cnt{font-family:'Space Mono',monospace;font-size:13px;font-weight:700;color:var(--stat);min-width:2ch;text-align:right;}
+.method-empty{font-size:14px;color:var(--muted);font-style:italic;text-align:center;padding:24px 12px;}
 
 /* ── NUT BUTTON ── */
 .nut-btn{
@@ -907,6 +938,9 @@ position:relative;overflow:hidden;
   .reset-sub{font-size:12px;margin-bottom:20px;}
 
   /* NUT BUTTON — FULL WIDTH, THICK, THUMB ZONE */
+  .nut-method-grid{gap:5px;}
+  .nut-method-chip{padding:8px 10px;font-size:9.5px;}
+  .nut-verdict{font-size:11px;margin-bottom:10px;}
   .nut-btn{
     width:100%;padding:28px 16px;font-size:22px;border-radius:18px;letter-spacing:.1em;
   }
@@ -1066,7 +1100,7 @@ position:relative;overflow:hidden;
 <div class="hero">
   <div class="hero-badge" id="launchBadge">PRE-LAUNCH · pump.fun soon</div>
   <h1 class="hero-title" aria-label="$NUT"><span class="sym">$</span>NUT</h1>
-  <p class="hero-pitch">World nut tracking on Solana. Tap the button. Watch the number go up. Tell your friends. We are not sorry.</p>
+  <p class="hero-pitch">Every nut counts — solo, sex, quickie, revenge nut, 2am chaos. Log it on-chain energy. Tap. Receipt. Post. Cause a scene.</p>
   <div class="ca-box" id="caBox">
     <span class="ca-label">CA</span>
     <code class="ca-addr" id="caAddr">Deploying on pump.fun — check back</code>
@@ -1114,16 +1148,22 @@ position:relative;overflow:hidden;
   </div>
 
   <div class="clock-bar" id="clockBar">Loading...</div>
-  <p class="section-kicker">Track your nuts · leaderboard · share card</p>
+  <p class="section-kicker">solo · partnered · unhinged — all nuts count</p>
 
   <!-- COUNTER CARD -->
   <div class="counter-card" id="nutCard">
     <div class="counter-label">Your Nut Count — Today</div>
     <div class="big-count" id="bigCount">0</div>
-    <div class="reset-sub">resets at midnight</div>
-    <button class="nut-btn" onclick="nut()">NUT</button>
+    <div class="reset-sub">any climax counts · resets at midnight</div>
+    <div class="nut-methods" id="nutMethods">
+      <div class="nut-methods-label">How did you nut?</div>
+      <div class="nut-method-grid" id="nutMethodGrid"></div>
+    </div>
+    <div class="nut-verdict" id="nutVerdict" aria-live="polite"></div>
+    <button class="nut-btn" onclick="nut()">LOG NUT</button>
     <div class="my-row">
-      All-time nuts: <span id="myAllTime">0</span> &nbsp;·&nbsp; Session: <span id="mySession">0</span>
+      All-time: <span id="myAllTime">0</span> &nbsp;·&nbsp; Session: <span id="mySession">0</span>
+      &nbsp;·&nbsp; Partnered today: <span id="partnerToday">0</span>
     </div>
     <div class="card-actions">
       <button class="cert-btn" onclick="openCertificate()">Get Receipt</button>
@@ -1239,7 +1279,7 @@ position:relative;overflow:hidden;
     <div class="panel" id="panel-8">
       <div class="panel-title">The Order</div>
       <div class="badge-header-row">
-        <div class="badge-earned-label">Earned: <span id="badgeCount">0 / 20</span></div>
+        <div class="badge-earned-label">Earned: <span id="badgeCount">0 / 30</span></div>
         <div class="badge-earned-label" style="font-style:italic;">hover for lore</div>
       </div>
       <div class="badge-grid" id="badgeGrid"></div>
@@ -1261,6 +1301,14 @@ position:relative;overflow:hidden;
       <div class="panel-title">The Aura</div>
       <div id="auraContent"><div class="aura-empty">no data yet. go nut and tell us how bad you feel about it.</div></div>
       <div class="aura-insight" id="auraInsight"></div>
+    </div>
+
+    <!-- 11: Method Ledger -->
+    <div class="panel" id="panel-11">
+      <div class="panel-title">How You Nut — Today's Ledger</div>
+      <p style="font-size:13px;color:var(--muted);text-align:center;margin:-8px 0 16px;line-height:1.45;">Hand stuff. Sex. Hotel nut. Stress nut. The codex does not judge method — only volume.</p>
+      <div class="method-ledger" id="methodLedger"></div>
+      <div class="aura-insight" id="methodInsight" style="margin-top:14px;"></div>
     </div>
 
   </div><!-- /panels-wrap -->
@@ -1448,7 +1496,100 @@ let countSession = 0;
 let lastClick    = parseInt(localStorage.getItem(KEY_LAST)    || '0');
 let bestDay      = parseInt(localStorage.getItem(KEY_BEST)    || '0');
 let daysTracked  = parseInt(localStorage.getItem(KEY_DAYS)    || '0');
-let todayLog     = JSON.parse(localStorage.getItem(KEY_LOG)   || '[]');
+let todayLogRaw  = JSON.parse(localStorage.getItem(KEY_LOG)   || '[]');
+let selectedNutType = localStorage.getItem('nut_method_selected_v1') || 'solo';
+
+const NUT_TYPES = {
+  solo:        { em:'✊', label:'Solo',        verb:'solo mission' },
+  partner:     { em:'💑', label:'Partnered',   verb:'partnered nut' },
+  quickie:     { em:'⚡', label:'Quickie',     verb:'quickie' },
+  round2:      { em:'🔁', label:'Round 2',     verb:'round two' },
+  morning:     { em:'🌅', label:'Morning',     verb:'morning nut' },
+  hotel:       { em:'🏨', label:'Hotel',       verb:'hotel nut' },
+  revenge:     { em:'😤', label:'Revenge',     verb:'revenge nut' },
+  sneaky:      { em:'🤫', label:'Sneaky Link', verb:'sneaky link nut' },
+  celebration: { em:'🎉', label:'Victory Lap', verb:'victory lap' },
+  stress:      { em:'📉', label:'Stress Nut',  verb:'stress nut' },
+};
+
+const NUT_VERDICTS = [
+  'certified bust. receipt printing. timeline not ready.',
+  'another nut in the ledger. historians will discuss this.',
+  'partnered or solo — irrelevant. the count went up. beautiful.',
+  'the council has received your disclosure. no further questions.',
+  'logged with zero shame and maximum transparency. respect.',
+  'this nut will be studied in future memecoin anthropology.',
+  'HR cannot stop what the codex has already recorded.',
+  'goated behavior. hydrate before you log another one.',
+  'the oracle saw that. the oracle is not mad. just tired.',
+  'body count? nut count? we only track one and you delivered.',
+];
+
+function normalizeLogEntry(e) {
+  if (typeof e === 'string') return { t: e, type: 'solo' };
+  const ty = e.type || 'solo';
+  return { t: e.t || '00:00:00', type: NUT_TYPES[ty] ? ty : 'solo' };
+}
+let todayLog = todayLogRaw.map(normalizeLogEntry);
+function logTime(e) { return typeof e === 'string' ? e : e.t; }
+function logType(e) { return typeof e === 'string' ? 'solo' : (e.type || 'solo'); }
+function typeLabel(id) { return NUT_TYPES[id]?.label || id; }
+function countTypesToday() {
+  const c = {};
+  todayLog.forEach(e => { const ty = logType(e); c[ty] = (c[ty] || 0) + 1; });
+  return c;
+}
+function countPartneredToday() {
+  return todayLog.filter(e => logType(e) === 'partner').length;
+}
+function uniqueMethodsToday() {
+  return new Set(todayLog.map(logType)).size;
+}
+function buildNutMethodChips() {
+  const grid = document.getElementById('nutMethodGrid');
+  if (!grid) return;
+  grid.innerHTML = Object.entries(NUT_TYPES).map(([id, m]) =>
+    `<button type="button" class="nut-method-chip${id === selectedNutType ? ' active' : ''}" data-type="${id}" onclick="selectNutType('${id}')"><span class="em">${m.em}</span>${m.label}</button>`
+  ).join('');
+}
+function selectNutType(id) {
+  if (!NUT_TYPES[id]) return;
+  selectedNutType = id;
+  localStorage.setItem('nut_method_selected_v1', id);
+  buildNutMethodChips();
+}
+function showNutVerdict(typeId) {
+  const el = document.getElementById('nutVerdict');
+  const m = NUT_TYPES[typeId] || NUT_TYPES.solo;
+  const v = NUT_VERDICTS[Math.floor(Math.random() * NUT_VERDICTS.length)];
+  if (el) el.textContent = `${m.em} ${m.verb} — ${v}`;
+}
+function renderMethodLedger() {
+  const el = document.getElementById('methodLedger');
+  const ins = document.getElementById('methodInsight');
+  if (!el) return;
+  const counts = countTypesToday();
+  const keys = Object.keys(counts).sort((a, b) => counts[b] - counts[a]);
+  if (!keys.length) {
+    el.innerHTML = '<div class="method-empty">no nuts logged yet. pick a method and tap LOG NUT.</div>';
+    if (ins) ins.textContent = '';
+    return;
+  }
+  const max = Math.max(...keys.map(k => counts[k]), 1);
+  el.innerHTML = keys.map(id => {
+    const m = NUT_TYPES[id] || { em:'🥜', label: id };
+    const w = Math.round((counts[id] / max) * 100);
+    return `<div class="method-row"><span class="em">${m.em}</span><span style="flex:0 0 88px;font-size:11px;font-weight:600;color:var(--cream)">${m.label}</span><div class="bar-wrap"><div class="bar" style="width:${w}%"></div></div><span class="cnt">${counts[id]}</span></div>`;
+  }).join('');
+  const partner = counts.partner || 0;
+  const variety = uniqueMethodsToday();
+  if (ins) {
+    if (partner > 0 && variety >= 3) ins.textContent = `${partner} partnered nut${partner>1?'s':''} and ${variety} different methods today. you are running a full lifestyle brand.`;
+    else if (partner > 0) ins.textContent = `partnered nuts logged. the codex respects a social life.`;
+    else if (variety >= 4) ins.textContent = `${variety} methods in one day. versatility goat.`;
+    else ins.textContent = 'keep logging. the ledger loves data.';
+  }
+}
 let nickname     = localStorage.getItem(KEY_NICK) || '';
 
 // Persistent session ID (unique per browser, stable across refreshes)
@@ -1461,16 +1602,17 @@ function save() {
   localStorage.setItem(KEY_LAST,    lastClick);
   localStorage.setItem(KEY_BEST,    bestDay);
   localStorage.setItem(KEY_DAYS,    daysTracked);
-  localStorage.setItem(KEY_LOG,     JSON.stringify(todayLog));
+  localStorage.setItem(KEY_LOG,     JSON.stringify(todayLog.map(e => ({ t: e.t, type: e.type }))));
 }
 
 // ═══════════════════════════════
 // CONTENT DATA
 // ═══════════════════════════════
 const FACTS = [
-  {cat:'KINSEY INSTITUTE RESEARCH',text:'Approximately 95% of men and 72% of women report having masturbated at some point in their lives.',src:'— Kinsey Institute Survey Data'},
-  {cat:'NEUROSCIENCE',text:'Orgasm releases dopamine, oxytocin, and endorphins simultaneously — the same neurochemical cocktail triggered by vigorous exercise.',src:'— Journal of Neuroscience Research'},
-  {cat:'SLEEP SCIENCE',text:'Studies suggest solo release before bed measurably reduces the time it takes to fall asleep, owing to the prolactin surge that follows.',src:'— Sleep Research Society'},
+  {cat:'KINSEY INSTITUTE',text:'Most adults orgasm solo and with partners — both count as sexual release. $NUT counts both because honesty is the brand.',src:'— Kinsey Institute Survey Data'},
+  {cat:'NEUROSCIENCE',text:'Orgasm releases dopamine, oxytocin, and endorphins — whether you got there alone, with someone, or in a hotel at 2am. Same chemicals. Same nut.',src:'— Journal of Neuroscience Research'},
+  {cat:'SLEEP SCIENCE',text:'Post-nut prolactin hits after partnered sex too — which is why people pass out after and pretend it was "just cuddling."',src:'— Sleep Research Society'},
+  {cat:'RELATIONSHIP DATA',text:'Couples who talk openly about sex report higher satisfaction. Couples who log $NUT report higher shamelessness. Correlation unclear.',src:'— Totally Real Studies Dept'},
   {cat:'BOTANICAL FACT',text:'Peanuts are technically legumes, not nuts. They grow underground in pods — unlike true tree nuts such as walnuts or pecans.',src:'— American Botanical Society'},
   {cat:'ANCIENT HISTORY',text:'Depictions of self-pleasure appear in ancient Sumerian texts circa 3000 BCE, where it was associated with the god Enki creating the Tigris River.',src:'— Ancient Near Eastern Studies'},
   {cat:'ETYMOLOGY',text:'The word "masturbation" likely derives from the Latin "manu stuprare" — meaning to defile with the hand. Romans were direct people.',src:'— Oxford Latin Dictionary'},
@@ -1489,8 +1631,8 @@ const FACTS = [
 ];
 
 const SPAM_JOKES = [
-  {emoji:'🛑',text:'dude. you literally just nutted. what the fuck. wait 10 minutes. drink some water. jesus.'},
-  {emoji:'🤝',text:'your wrist texted me. it said "please stop." 10 minutes man. have some compassion for your wrist.'},
+  {emoji:'🛑',text:'you literally just nutted. solo or otherwise. 10 minute cooldown. drink water. touch grass later.'},
+  {emoji:'🤝',text:'whether that was hand stuff or you got laid — either way. wait 10 minutes. the codex needs a breather.'},
   {emoji:'📋',text:'the cooldown exists because you have zero self control and we both know it. sit down. 10 minutes.'},
   {emoji:'🚦',text:'bro your balls are on strike. labor dispute. 10 minute negotiation period. non negotiable.'},
   {emoji:'⚖️',text:'your dick is not a vending machine. you cannot just spam it. cooldown required by law.'},
@@ -1514,7 +1656,7 @@ const MILESTONES = {
   100:['🏆','THE LEGEND','one hundred nuts. holy fucking shit. we have no words. please hydrate. please.'],
 };
 
-const TOASTS = ['logged you absolute freak ✦','counted. no judgment. some judgment.','the codex witnesses your shame ✦','another one. damn.','noted you degenerate ✦','holy shit. counted. go drink water.'];
+const TOASTS = ['nut logged — method on file ✦','partnered or solo, counted ✦','the codex does not judge ✦','another one for the ledger ✦','receipt printer go brr ✦','bodied. numerically. ✦'];
 
 // ═══════════════════════════════
 // CONTRACT / BUY SETUP
@@ -1603,6 +1745,7 @@ async function logToSupabase() {
       p_session_id: sessionId,
       p_nickname: nickname || null,
       p_deed_date: dateStr,
+      p_nut_type: selectedNutType,
     });
     if (error || (data && data.ok === false)) return;
     fetchGlobalCounts();
@@ -1746,8 +1889,12 @@ function nut() {
   if (countToday > bestDay) bestDay = countToday;
   if (countToday === 1) daysTracked++;
   const t = new Date().toTimeString().slice(0,8);
-  todayLog.push(t);
+  const method = selectedNutType;
+  todayLog.push({ t, type: method });
+  typeStatsAll[method] = (typeStatsAll[method] || 0) + 1;
+  localStorage.setItem(KEY_TYPE_ALL, JSON.stringify(typeStatsAll));
   save();
+  showNutVerdict(method);
 
   document.getElementById('bigCount').classList.add('bump');
   setTimeout(()=>document.getElementById('bigCount').classList.remove('bump'),100);
@@ -1757,8 +1904,9 @@ function nut() {
   spawnSquirt();
   shakeCard();
   haptic([60, 18, 100, 18, 160]);
-  addLogEntry(t, countToday);
-  addTimelineEntry(t, countToday);
+  addLogEntry(t, countToday, method);
+  addTimelineEntry(t, countToday, method);
+  renderMethodLedger();
   if (Math.random()<1) showToast(TOASTS[Math.floor(Math.random()*TOASTS.length)]);
   if (MILESTONES[countToday]) {
     const[em,ti,su]=MILESTONES[countToday];
@@ -1786,6 +1934,8 @@ function updateUI() {
   document.getElementById('bigCount').textContent=countToday.toLocaleString();
   document.getElementById('myAllTime').textContent=countAllTime.toLocaleString();
   document.getElementById('mySession').textContent=countSession.toLocaleString();
+  const pt = document.getElementById('partnerToday');
+  if (pt) pt.textContent = countPartneredToday().toLocaleString();
   document.getElementById('p0-today').textContent=countToday.toLocaleString();
   document.getElementById('p0-alltime').textContent=countAllTime.toLocaleString();
   document.getElementById('p0-best').textContent=bestDay.toLocaleString();
@@ -1813,21 +1963,27 @@ function updateCooldown() {
 // ═══════════════════════════════
 // FEED / LOG
 // ═══════════════════════════════
-function addLogEntry(t,num) {
+function nutLogText(typeId) {
+  const m = NUT_TYPES[typeId] || NUT_TYPES.solo;
+  if (typeId === 'partner') return `${m.em} Partnered nut — body count respectfully updated`;
+  if (typeId === 'solo') return `${m.em} Solo mission accomplished`;
+  return `${m.em} ${m.label} — nut logged`;
+}
+function addLogEntry(t,num,typeId) {
   document.getElementById('logEmpty').style.display='none';
   const list=document.getElementById('logList');
   const item=document.createElement('div');
   item.className='tl-item';
-  item.innerHTML=`<span class="tl-num">#${num}</span><img class="tl-nut" src="./img/nut-icon.png" alt=""><span class="tl-text">Has nutted</span><span class="tl-time">${t}</span>`;
+  item.innerHTML=`<span class="tl-num">#${num}</span><img class="tl-nut" src="./img/nut-icon.png" alt=""><span class="tl-text">${nutLogText(typeId)}</span><span class="tl-time">${t}</span>`;
   list.insertBefore(item,list.firstChild);
   if(list.children.length>10) list.removeChild(list.lastChild);
 }
-function addTimelineEntry(t,num) {
+function addTimelineEntry(t,num,typeId) {
   document.getElementById('tlEmpty').style.display='none';
   const list=document.getElementById('timelineList');
   const item=document.createElement('div');
   item.className='tl-item';
-  item.innerHTML=`<span class="tl-num">#${num}</span><img class="tl-nut" src="./img/nut-icon.png" alt=""><span class="tl-text">Has nutted</span><span class="tl-time">${t}</span>`;
+  item.innerHTML=`<span class="tl-num">#${num}</span><img class="tl-nut" src="./img/nut-icon.png" alt=""><span class="tl-text">${nutLogText(typeId)}</span><span class="tl-time">${t}</span>`;
   list.insertBefore(item,list.firstChild);
   if(list.children.length>8) list.removeChild(list.lastChild);
 }
@@ -1837,18 +1993,19 @@ function seedLogs() {
   document.getElementById('tlEmpty').style.display='none';
   const logList=document.getElementById('logList');
   const tlList=document.getElementById('timelineList');
-  todayLog.slice(-5).reverse().forEach((t,i)=>{
+  todayLog.slice(-5).reverse().forEach((e,i)=>{
     const n=todayLog.length-i;
+    const t=logTime(e), ty=logType(e);
     const mk=(text)=>{const d=document.createElement('div');d.className='tl-item';d.innerHTML=`<span class="tl-num">#${n}</span><img class="tl-nut" src="./img/nut-icon.png" alt=""><span class="tl-text">${text}</span><span class="tl-time">${t}</span>`;return d;};
-    logList.appendChild(mk('Has nutted'));
-    tlList.appendChild(mk('Has nutted'));
+    logList.appendChild(mk(nutLogText(ty)));
+    tlList.appendChild(mk(nutLogText(ty)));
   });
 }
 
 // ═══════════════════════════════
 // ROTATING PANELS
 // ═══════════════════════════════
-const PANEL_COUNT=11;
+const PANEL_COUNT=12;
 let currentPanel=0, factIdx=0, factIdx2=Math.floor(FACTS.length/2);
 
 function buildDots() {
@@ -1865,6 +2022,7 @@ function showPanel(idx) {
   if(idx===1) renderFact('factCat','factText','factSrc',factIdx);
   if(idx===3) renderFact('factCat2','factText2','factSrc2',factIdx2);
   if(idx===5) fetchLeaderboard();
+  if(idx===11) renderMethodLedger();
 }
 function renderFact(cid,tid,sid,idx) {
   const f=FACTS[idx%FACTS.length];
@@ -1883,7 +2041,7 @@ setInterval(()=>{
 // TICKER
 // ═══════════════════════════════
 function buildTicker() {
-  const items=['everybody jerks off nobody talks about it until now','peanuts are legumes not nuts look it up','dopamine floods the brain at climax its literally science','95% of men report it kinsey institute said that not us',
+  const items=['solo nuts count · partnered nuts count · hotel nuts count · all nuts count','you banged? log it. you solo? log it. same ledger','peanuts are legumes not nuts look it up','dopamine floods the brain at climax its literally science','95% of men report it kinsey institute said that not us',
     'ancient sumerians were nutting circa 3000 BCE so you are in good company','squirrels smell nuts through a foot of snow you cannot even find yours in the dark',
     'cashews grow outside their fruit which is insane and so is your nut count','pistachios called the smiling nut in persia we call it something else',
     'masturbation documented in ancient egypt the pharaohs were built different','prolactin surge after climax is why you fall asleep immediately',
@@ -2390,6 +2548,10 @@ async function renderCertificate(canvas) {
   const df=new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
   ctx.fillText(`on ${df} — timestamped for maximum timeline damage`,W/2,556);
   if(nickname){ctx.font='italic 20px "Crimson Text",Georgia,serif';ctx.fillStyle=GOLDMED;ctx.fillText(`Issued to: ${nickname} (do not show HR)`,W/2,586);}
+  const lastType = todayLog.length ? logType(todayLog[todayLog.length-1]) : selectedNutType;
+  const lm = NUT_TYPES[lastType] || NUT_TYPES.solo;
+  ctx.font='italic 18px "Crimson Text",Georgia,serif';ctx.fillStyle=GOLDMED;
+  ctx.fillText(`Method: ${lm.em} ${lm.label} — solo, sex, chaos — all count`,W/2,612);
 
   ornLine(ctx,W/2,615,540);
 
@@ -2456,6 +2618,8 @@ function downloadCert() {
 // INIT
 // ═══════════════════════════════
 setupBuyButtons();
+buildNutMethodChips();
+renderMethodLedger();
 buildDots();
 showPanel(0);
 buildTicker();
@@ -2531,7 +2695,7 @@ function renderFlame() {
 function renderChronometer() {
   const svg = document.getElementById('chronoSvg');
   const hourCounts = new Array(24).fill(0);
-  todayLog.forEach(ts => { const h=parseInt(ts.split(':')[0]); if (!isNaN(h)) hourCounts[h]++; });
+  todayLog.forEach(e => { const h=parseInt(logTime(e).split(':')[0]); if (!isNaN(h)) hourCounts[h]++; });
   const maxCount = Math.max(...hourCounts, 1);
   const cx=150, cy=150, oR=125, iR=68, currH=new Date().getHours();
   let out = '';
@@ -2586,22 +2750,40 @@ const BADGES = [
   {id:'best50',   icon:'💎', name:'Perfectionist',   tier:4, desc:'fifty nuts in one day. we do not have words. go drink water. right now.'},
   {id:'thousand', icon:'🔱', name:'The Thousand',    tier:4, desc:'one thousand total nuts. you are a legend and a cautionary tale. simultaneously.'},
   {id:'streak30', icon:'🌌', name:'Transcendent',    tier:4, desc:'thirty day streak. you have transcended humanity. god is confused. so are we.'},
+  {id:'partner',  icon:'💑', name:'Got Laid',        tier:2, desc:'logged a partnered nut. the codex respects a social life. body count energy.'},
+  {id:'player5',  icon:'🎭', name:'Serial Charmer',  tier:3, desc:'five partnered nuts all time. you are not a hermit. statistically impressive.'},
+  {id:'hotelnut', icon:'🏨', name:'Road Warrior',    tier:2, desc:'hotel nut logged. travel horny is a real condition.'},
+  {id:'quick3',   icon:'⚡', name:'Speed Demon',     tier:2, desc:'three quickies logged. efficiency king. no notes.'},
+  {id:'variety4', icon:'🎪', name:'Method Actor',    tier:3, desc:'four different nut methods in one day. versatility goat.'},
+  {id:'round2x',  icon:'🔁', name:'Encore Artist',   tier:2, desc:'two round-2 nuts in one day. could not leave well enough alone.'},
+  {id:'sneaky5',  icon:'🤫', name:'Ghost Pipeline',  tier:3, desc:'five sneaky link nuts. they think you are at yoga. you are not.'},
+  {id:'stress8',  icon:'📉', name:'Market Coping',   tier:2, desc:'stress nut while having 8+ nuts today. portfolio and pants down.'},
+  {id:'victory5', icon:'🍾', name:'Celebration Nut', tier:2, desc:'victory lap nut on a 5+ nut day. you won something. yourself.'},
+  {id:'revenge',  icon:'😤', name:'Petty King',      tier:2, desc:'revenge nut logged. unhinged. valid. documented forever.'},
 ];
+const KEY_TYPE_ALL = 'nut_types_alltime_v1';
+let typeStatsAll = JSON.parse(localStorage.getItem(KEY_TYPE_ALL) || '{}');
 const KEY_BADGES = 'nut_badges_v1';
 let earnedBadges = new Set(JSON.parse(localStorage.getItem(KEY_BADGES)||'[]'));
 
 function checkBadges() {
   const newOnes = [];
+  const ct = countTypesToday();
   const conds = {
     first:()=>countAllTime>=1, five:()=>countAllTime>=5, ten:()=>countAllTime>=10,
-    dawn:()=>todayLog.some(t=>parseInt(t.split(':')[0])<7),
-    midnight:()=>todayLog.some(t=>parseInt(t.split(':')[0])===0),
+    dawn:()=>todayLog.some(e=>parseInt(logTime(e).split(':')[0])<7),
+    midnight:()=>todayLog.some(e=>parseInt(logTime(e).split(':')[0])===0),
     best10:()=>bestDay>=10, streak3:()=>currentStreak>=3, fifty:()=>countAllTime>=50,
     days7:()=>daysTracked>=7, session2:()=>countSession>=2, hundred:()=>countAllTime>=100,
     streak7:()=>currentStreak>=7, best25:()=>bestDay>=25, days30:()=>daysTracked>=30,
     sunday:()=>new Date().getDay()===0&&countToday>=1, fivehund:()=>countAllTime>=500,
     streak14:()=>currentStreak>=14, best50:()=>bestDay>=50, thousand:()=>countAllTime>=1000,
-    streak30:()=>currentStreak>=30
+    streak30:()=>currentStreak>=30,
+    partner:()=>(typeStatsAll.partner||0)>=1, player5:()=>(typeStatsAll.partner||0)>=5,
+    hotelnut:()=>(typeStatsAll.hotel||0)>=1, quick3:()=>(ct.quickie||0)>=3,
+    variety4:()=>uniqueMethodsToday()>=4, round2x:()=>(ct.round2||0)>=2,
+    sneaky5:()=>(typeStatsAll.sneaky||0)>=5, stress8:()=>(ct.stress||0)>=1&&countToday>=8,
+    victory5:()=>(ct.celebration||0)>=1&&countToday>=5, revenge:()=>(typeStatsAll.revenge||0)>=1,
   };
   BADGES.forEach(b=>{ if(!earnedBadges.has(b.id)&&conds[b.id]&&conds[b.id]()) { earnedBadges.add(b.id); newOnes.push(b); } });
   if (newOnes.length) {

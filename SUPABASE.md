@@ -25,7 +25,8 @@ This creates:
 | Piece | Purpose |
 |--------|---------|
 | `nut_logs` table | One row per logged nut |
-| `log_nut()` RPC | Insert with **10-minute server cooldown** per browser session |
+| `log_nut()` RPC | Insert with **10-minute server cooldown** + `nut_type` (solo, partner, etc.) |
+| `nut_type_stats()` RPC | Optional global method mix for a date |
 | `global_counts()` RPC | Today + all-time totals without exposing raw rows |
 | `leaderboard()` RPC | Top 20 sessions by count |
 | RLS | Table locked down; only RPCs are callable from the website |
@@ -72,7 +73,7 @@ const SUPABASE_URL = '...';
 const SUPABASE_KEY = '...';  // anon only
 
 // Calls (do not revert to raw .from('nut_logs').insert)
-db.rpc('log_nut', { p_session_id, p_nickname, p_deed_date: dateStr })
+db.rpc('log_nut', { p_session_id, p_nickname, p_deed_date: dateStr, p_nut_type: selectedNutType })
 db.rpc('global_counts', { p_deed_date: dateStr })
 db.rpc('leaderboard')
 ```

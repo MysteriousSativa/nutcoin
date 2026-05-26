@@ -1,14 +1,17 @@
--- $NUT — Supabase schema (run once in SQL Editor)
--- Project: https://supabase.com/dashboard → your project → SQL → New query → Run
+-- $NUT — Supabase schema (run in SQL Editor — safe to re-run)
+-- Dashboard: https://supabase.com/dashboard → SQL → New query → Run
 
 -- ── Table ─────────────────────────────────────────────────────────────
 create table if not exists public.nut_logs (
   id         bigserial primary key,
   session_id text not null,
   nickname   text,
+  nut_type   text not null default 'solo',
   deed_date  date not null default current_date,
   created_at timestamptz not null default now()
 );
+
+alter table public.nut_logs add column if not exists nut_type text not null default 'solo';
 
 create index if not exists nut_logs_session_created_idx
   on public.nut_logs (session_id, created_at desc);
@@ -16,20 +19,23 @@ create index if not exists nut_logs_session_created_idx
 create index if not exists nut_logs_deed_date_idx
   on public.nut_logs (deed_date);
 
--- ── Remove old wide-open policies (if present) ───────────────────────────
+create index if not exists nut_logs_nut_type_idx
+  on public.nut_logs (nut_type);
+
+-- ── Remove old wide-open policies ───────────────────────────────────────
 drop policy if exists "insert" on public.nut_logs;
 drop policy if exists "select" on public.nut_logs;
 drop policy if exists "public insert" on public.nut_logs;
 drop policy if exists "public select" on public.nut_logs;
 
 alter table public.nut_logs enable row level security;
--- No anon policies on the table — clients use RPCs only (security definer).
 
--- ── Log a nut (10 min cooldown per session, server-side) ────────────────
+-- ── Log a nut (10 min cooldown per session) ─────────────────────────────
 create or replace function public.log_nut(
   p_session_id text,
   p_nickname   text default null,
-  p_deed_date  date default current_date
+  p_deed_date  date default current_date,
+  p_nut_type   text default 'solo'
 )
 returns jsonb
 language plpgsql
@@ -39,9 +45,14 @@ as $$
 declare
   last_at timestamptz;
   cooldown interval := interval '10 minutes';
+  v_type text := coalesce(nullif(trim(p_nut_type), ''), 'solo');
 begin
   if p_session_id is null or length(trim(p_session_id)) < 8 then
     return jsonb_build_object('ok', false, 'error', 'invalid_session');
+  end if;
+
+  if length(v_type) > 32 then
+    v_type := left(v_type, 32);
   end if;
 
   select max(created_at) into last_at
@@ -56,14 +67,14 @@ begin
     );
   end if;
 
-  insert into public.nut_logs (session_id, nickname, deed_date)
-  values (p_session_id, nullif(trim(p_nickname), ''), p_deed_date);
+  insert into public.nut_logs (session_id, nickname, deed_date, nut_type)
+  values (p_session_id, nullif(trim(p_nickname), ''), p_deed_date, v_type);
 
-  return jsonb_build_object('ok', true);
+  return jsonb_build_object('ok', true, 'nut_type', v_type);
 end;
 $$;
 
--- ── Global counts (no full-table client fetch) ───────────────────────────
+-- ── Global counts ───────────────────────────────────────────────────────
 create or replace function public.global_counts(p_deed_date date default current_date)
 returns table(today_count bigint, all_time_count bigint)
 language sql
@@ -76,7 +87,7 @@ as $$
     (select count(*)::bigint from public.nut_logs);
 $$;
 
--- ── Leaderboard top 20 ───────────────────────────────────────────────────
+-- ── Leaderboard top 20 ──────────────────────────────────────────────────
 create or replace function public.leaderboard()
 returns table(session_id text, nickname text, deeds bigint)
 language sql
@@ -94,11 +105,30 @@ as $$
   limit 20;
 $$;
 
--- ── Grants (anon key from the website) ───────────────────────────────────
+-- ── Method mix today (optional analytics) ───────────────────────────────
+create or replace function public.nut_type_stats(p_deed_date date default current_date)
+returns table(nut_type text, cnt bigint)
+language sql
+security definer
+set search_path = public
+stable
+as $$
+  select nut_type, count(*)::bigint as cnt
+  from public.nut_logs
+  where deed_date = p_deed_date
+  group by nut_type
+  order by cnt desc;
+$$;
+
+-- ── Grants ──────────────────────────────────────────────────────────────
 grant usage on schema public to anon, authenticated;
 grant select, insert on public.nut_logs to service_role;
 revoke all on public.nut_logs from anon, authenticated;
 
-grant execute on function public.log_nut(text, text, date) to anon, authenticated;
+grant execute on function public.log_nut(text, text, date, text) to anon, authenticated;
 grant execute on function public.global_counts(date) to anon, authenticated;
 grant execute on function public.leaderboard() to anon, authenticated;
+grant execute on function public.nut_type_stats(date) to anon, authenticated;
+
+-- Drop old 3-arg overload if upgrading
+drop function if exists public.log_nut(text, text, date);
