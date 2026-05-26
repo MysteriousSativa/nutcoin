@@ -53,8 +53,23 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 /* ── DRIPS ── */
 .drip-wrap{position:fixed;top:0;left:0;right:0;height:140px;pointer-events:none;z-index:300;filter:url('#goo');}
 .drip-wrap.bottom{top:auto;bottom:0;transform:scaleY(-1);}
-.drip-base{position:absolute;top:0;left:-1%;right:-1%;height:22px;background:var(--cream);}
-.drip{position:absolute;top:0;background:var(--cream);border-radius:0 0 50% 50%;animation:drip-breath ease-in-out infinite alternate;}
+.drip-base{
+  position:absolute;top:0;left:-1%;right:-1%;height:24px;
+  background:linear-gradient(to bottom,#FFFDF5 0%,#FAF0D5 55%,#F0DEB0 100%);
+  box-shadow:0 3px 12px rgba(200,169,110,0.22);
+}
+.drip{
+  position:absolute;top:0;
+  background:linear-gradient(to bottom,
+    #FFFDF5 0%,
+    #FAF0D0 30%,
+    #EFD9A0 62%,
+    #E2C87C 85%,
+    #D4B55A 100%);
+  border-radius:0 0 50% 50%;
+  animation:drip-breath ease-in-out infinite alternate;
+  box-shadow:inset 0 -4px 8px rgba(255,255,255,0.35), inset 2px 0 4px rgba(255,255,255,0.2);
+}
 @keyframes drip-breath{from{height:18px;}to{height:var(--h,60px);}}
 
 /* ── HERO ── */
@@ -80,16 +95,22 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .hero::after{content:'';position:absolute;bottom:0;left:0;right:0;height:160px;background:linear-gradient(transparent,#050301);pointer-events:none;}
 .crown{font-size:66px;filter:drop-shadow(0 0 32px rgba(200,169,110,0.85));animation:float 4s ease-in-out infinite;margin-bottom:14px;position:relative;z-index:1;}
 .coin-name{
-  font-family:'Cinzel Decorative',serif;font-size:clamp(56px,11vw,96px);font-weight:900;letter-spacing:.06em;
-  background:linear-gradient(135deg,#FFF8EE 0%,#FFD97D 30%,#C8A96E 55%,#FFF8EE 80%,#C8A96E 100%);
-  background-size:300% 300%;
+  font-family:'Cinzel Decorative',serif;font-size:clamp(56px,11vw,96px);font-weight:900;letter-spacing:.08em;
+  background:linear-gradient(160deg,
+    #FFFDF0 0%, #FFE090 12%, #C8A044 28%,
+    #FFE58A 42%, #FDFBF0 56%,
+    #D4A030 70%, #FFE090 84%, #C8A044 100%);
+  background-size:400% 400%;
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
   margin-bottom:14px;
-  animation:name-shine 6s ease-in-out infinite;
-  filter:drop-shadow(0 0 36px rgba(200,169,110,0.28));
+  animation:name-shine 5s ease-in-out infinite;
+  filter:
+    drop-shadow(0 2px 0 rgba(80,40,0,0.55))
+    drop-shadow(0 0 40px rgba(200,169,110,0.45))
+    drop-shadow(0 0 80px rgba(200,169,110,0.2));
   position:relative;z-index:1;
 }
-@keyframes name-shine{0%,100%{background-position:0% 50%;}50%{background-position:100% 50%;}}
+@keyframes name-shine{0%{background-position:0% 50%;}50%{background-position:100% 50%;}100%{background-position:0% 50%;}}
 .tagline{font-family:'Cinzel',serif;font-size:14px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:20px;text-shadow:0 0 20px rgba(200,169,110,0.45);position:relative;z-index:1;}
 .hero-actions{display:flex;gap:12px;align-items:center;flex-wrap:wrap;justify-content:center;margin-bottom:14px;position:relative;z-index:1;}
 .buy-btn-hero{
@@ -164,16 +185,18 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 
 /* ── COUNTER CARD ── */
 .counter-card{
-  background:rgba(12,8,4,0.9);
-  border:1px solid rgba(200,169,110,0.38);
+  background:linear-gradient(175deg,rgba(18,12,5,0.95) 0%,rgba(10,7,3,0.98) 100%);
+  border:1px solid rgba(200,169,110,0.42);
   border-radius:26px;padding:48px 28px;text-align:center;
   position:relative;overflow:hidden;margin-bottom:18px;
   backdrop-filter:blur(32px);
   box-shadow:
-    0 0 0 1px rgba(200,169,110,0.07),
-    0 0 70px rgba(200,169,110,0.09),
-    0 40px 90px rgba(0,0,0,0.45),
-    inset 0 1px 0 rgba(200,169,110,0.2);
+    0 0 0 1px rgba(200,169,110,0.08),
+    0 0 80px rgba(200,140,0,0.12),
+    0 0 160px rgba(200,100,0,0.06),
+    0 40px 90px rgba(0,0,0,0.55),
+    inset 0 1px 0 rgba(255,230,140,0.22),
+    inset 0 -1px 0 rgba(0,0,0,0.5);
 }
 .counter-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;
   background:linear-gradient(90deg,transparent,var(--gold-bright),var(--gold),var(--gold-bright),transparent);
@@ -185,39 +208,58 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .big-count{
   font-family:'Cinzel Decorative',serif;
   font-size:clamp(80px,17vw,130px);
-  font-weight:900;color:var(--cream);line-height:1;margin-bottom:6px;
-  text-shadow:0 0 40px rgba(255,248,238,0.28),0 0 90px rgba(255,248,238,0.08);
-  transition:transform .08s,text-shadow .15s;
+  font-weight:900;
+  line-height:1;margin-bottom:6px;
+  background:linear-gradient(180deg,#FFFFFF 0%,#FFF8EE 35%,#E8D5A8 70%,#C8A04A 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  filter:
+    drop-shadow(0 3px 0 rgba(60,30,0,0.6))
+    drop-shadow(0 0 45px rgba(255,240,180,0.35))
+    drop-shadow(0 8px 24px rgba(0,0,0,0.55));
+  transition:transform .08s,filter .15s;
   position:relative;z-index:1;
 }
 .big-count.bump{
   transform:scale(1.09);
-  text-shadow:0 0 50px rgba(255,248,238,0.95),0 0 110px rgba(200,169,110,0.55),0 0 160px rgba(200,169,110,0.18);
+  filter:
+    drop-shadow(0 3px 0 rgba(60,30,0,0.7))
+    drop-shadow(0 0 70px rgba(255,240,120,0.9))
+    drop-shadow(0 0 130px rgba(200,169,110,0.6))
+    drop-shadow(0 8px 24px rgba(0,0,0,0.55));
 }
 .reset-sub{font-family:'Crimson Text',serif;font-size:14px;color:var(--muted);font-style:italic;margin-bottom:36px;position:relative;z-index:1;}
 
 /* ── NUT BUTTON ── */
 .nut-btn{
-  background:linear-gradient(135deg,#FDFBF0 0%,#EEE0B4 28%,#FDFBF0 58%,#DBBF8C 100%);
-  background-size:300% 300%;
-  border:2px solid rgba(220,185,120,0.72);
+  background:linear-gradient(155deg,
+    #FEFDF4 0%, #F8ECC0 14%, #EDCE80 28%,
+    #FDFBEE 46%, #EDD898 62%,
+    #D4A840 78%, #C89830 90%, #FEFDF4 100%);
+  background-size:400% 400%;
+  border:2px solid rgba(220,175,80,0.8);
   border-radius:20px;
   padding:24px 64px;
   font-family:'Cinzel Decorative',serif;font-size:20px;font-weight:700;
-  color:#1A0E04;cursor:pointer;letter-spacing:.06em;
+  color:#1A0900;cursor:pointer;letter-spacing:.07em;
+  text-shadow:0 1px 0 rgba(255,255,255,0.5), 0 -1px 0 rgba(80,40,0,0.25);
   box-shadow:
-    0 0 0 5px rgba(200,169,110,0.1),
-    0 0 0 10px rgba(200,169,110,0.05),
-    0 14px 55px rgba(200,169,110,0.32),
-    0 5px 18px rgba(0,0,0,0.32),
-    inset 0 1px 0 rgba(255,255,255,0.55),
-    inset 0 -2px 0 rgba(0,0,0,0.1);
+    0 0 0 5px rgba(200,169,110,0.12),
+    0 0 0 10px rgba(200,169,110,0.06),
+    0 16px 60px rgba(200,140,0,0.38),
+    0 6px 20px rgba(0,0,0,0.38),
+    inset 0 2px 0 rgba(255,255,255,0.7),
+    inset 0 -3px 0 rgba(80,40,0,0.18),
+    inset 3px 0 8px rgba(255,255,255,0.12),
+    inset -3px 0 8px rgba(0,0,0,0.06);
   transition:transform .08s,box-shadow .15s,filter .15s;
-  animation:btn-shimmer 5s ease infinite,nut-ring-pulse 2.6s ease-in-out infinite;
+  animation:btn-shimmer 4s ease infinite,nut-ring-pulse 2.6s ease-in-out infinite;
   user-select:none;position:relative;overflow:hidden;z-index:1;
 }
 .nut-btn::after{content:'';position:absolute;inset:0;
-  background:linear-gradient(135deg,rgba(255,255,255,0.38) 0%,transparent 52%);border-radius:inherit;}
+  background:
+    linear-gradient(160deg,rgba(255,255,255,0.52) 0%,transparent 45%),
+    linear-gradient(to bottom,rgba(255,255,255,0.08) 0%,transparent 60%);
+  border-radius:inherit;pointer-events:none;}
 @keyframes nut-ring-pulse{
   0%,100%{box-shadow:0 0 0 5px rgba(200,169,110,0.1),0 0 0 10px rgba(200,169,110,0.05),0 14px 55px rgba(200,169,110,0.32),0 5px 18px rgba(0,0,0,0.32),inset 0 1px 0 rgba(255,255,255,0.55),inset 0 -2px 0 rgba(0,0,0,0.1);}
   50%{box-shadow:0 0 0 9px rgba(200,169,110,0.08),0 0 0 18px rgba(200,169,110,0.04),0 14px 55px rgba(200,169,110,0.44),0 5px 18px rgba(0,0,0,0.32),inset 0 1px 0 rgba(255,255,255,0.55),inset 0 -2px 0 rgba(0,0,0,0.1);}
@@ -939,7 +981,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 
     <!-- 5: Global Leaderboard -->
     <div class="panel" id="panel-5">
-      <div class="panel-title">Global Leaderboard — Today</div>
+      <div class="panel-title">Global Leaderboard — All Time Top 20</div>
       <div id="lbContent">
         <div class="lb-empty">Connecting to the sacred ledger...</div>
       </div>
@@ -1372,7 +1414,8 @@ async function fetchLeaderboard() {
       isAnon: !s.nickname,
       isYou: s.session_id === sessionId,
     }))
-    .sort((a,b) => b.deeds - a.deeds);
+    .sort((a,b) => b.deeds - a.deeds)
+    .slice(0, 20);
 
   renderLeaderboard(lbCache);
   updateNickRank(lbCache);
