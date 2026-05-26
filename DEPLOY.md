@@ -26,14 +26,15 @@ python scripts/generate-brand-assets.py
 
 Outputs: `img/og.png`, `img/favicon.ico`, `img/apple-touch-icon.png`
 
-## 4. Production domain
+## 4. Production domain (one-time in Vercel UI)
 
-Primary URL: **https://nutcoin.vercel.app**
+`nutcoin.vercel.app` must be added to **this** project (not a separate empty project).
 
-In [Vercel](https://vercel.com) → Project → Settings → Domains:
+1. [Vercel](https://vercel.com) → **nutcoin** project → **Settings** → **Domains**
+2. Add `nutcoin.vercel.app` (or your custom domain)
+3. In `index.html`, set `SITE_URL` and the `<link rel="canonical">` / `og:*` URLs to the new host
+4. Optional: add the `redirects` block back to `vercel.json` (see git history `6d351bf`) so `nutcoin-alpha` → production
 
-1. Add `nutcoin.vercel.app` (if not already linked)
-2. Optional: add a custom domain (e.g. `nutcoin.fun`) and set `SITE_URL` in `index.html` to match
-3. `nutcoin-alpha.vercel.app` redirects to production via `vercel.json`
+Until step 2 is done, the live URL stays **https://nutcoin-alpha.vercel.app**.
 
 Deploy: `git push origin main`
