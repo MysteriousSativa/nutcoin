@@ -1,56 +1,112 @@
-# $NUT — Project handoff for Claude
+# $NUT — Manual launch steps for Claude
 
-Read this **before** editing. The site is a **single-file** app: `index.html` (~2.6k lines) deployed to Vercel at `https://nutcoin.vercel.app/` (alpha URL redirects).
+**Repo:** MysteriousSativa/nutcoin  
+**Live:** https://nutcoin-alpha.vercel.app/  
+**Full spec:** read this file first before editing anything.
 
-## Product (one sentence)
+---
 
-**$NUT** is a Solana memecoin whose hook is a **global + personal nut counter** — joke product, real engagement loop (tap → cooldown → leaderboard → share card).
+## Step 1 — Launch on pump.fun (OWNER ONLY — you wait)
 
-## What buyers need in the first 3 seconds
+Owner creates token on https://pump.fun and sends you the Solana mint address.
 
-1. **Ticker** `$NUT` — huge, readable, no religious filigree PNGs
-2. **One-line pitch** — honest, funny, not medieval RP
-3. **CA box** — copy button, monospace address when live
-4. **BUY** + **CHART** + **Telegram** + **X** — all working URLs from CONFIG
-5. **Social proof** — global nuts today / all-time (Supabase), with LIVE chip
-6. **Fast mobile** — no goo drips, no backdrop-blur stacks, no 30 animated PNG backgrounds
+- Ticker: `NUT`
+- Coin URL format: `https://pump.fun/coin/{MINT}`
+- Do not invent a CA
 
-## CONFIG block (only edit these in `index.html`)
+---
+
+## Step 2 — Set contract address (CLAUDE)
+
+In `index.html` CONFIG:
 
 ```javascript
-const TICKER = 'NUT';
-const CONTRACT_ADDR = '';        // pump.fun mint — enables buy/chart/copy
-const TELEGRAM_URL = '';         // e.g. https://t.me/nutcoin
-const TWITTER_URL = '';          // e.g. https://x.com/nutcoin
-const SITE_URL = 'https://nutcoin.vercel.app';
-const SUPABASE_URL = '...';
-const SUPABASE_KEY = '...';      // anon key only — never service role
+const CONTRACT_ADDR = 'PASTE_MINT_FROM_OWNER';
 ```
 
-When `CONTRACT_ADDR` is set, `setupBuyButtons()` updates CA UI and removes `.tba` from buy buttons.
+Push to main. Verify live:
 
-## Stack
+- CA shows in banner
+- BUY / CHART / COPY CA work
+- `.tba` removed from buy buttons
 
-| Layer | Tech |
-|--------|------|
-| Frontend | Vanilla HTML/CSS/JS, no build step |
-| Deploy | Vercel static |
-| Global stats | Supabase `nut_logs` + `leaderboard()` RPC |
-| Personal stats | `localStorage` only |
-| Buy | pump.fun link |
-| Chart | DexScreener when CA set |
+---
 
-## Supabase schema (required)
+## Step 3 — Social (mostly done; confirm with owner)
+
+Current values:
+
+```javascript
+const TELEGRAM_URL = 'https://t.me/TheNutTracker';
+const TWITTER_URL  = 'https://x.com/TheNutTracker';
+const X_HANDLE     = '@TheNutTracker';
+```
+
+Ask owner:
+- Is Telegram a group/channel URL? If yes, update `TELEGRAM_URL`.
+- Owner pins launch tweet on X with CA + site link (not your job).
+
+---
+
+## Step 4 — Production domain (OWNER in Vercel, then CLAUDE in code)
+
+Do not point URLs at `nutcoin.vercel.app` until it's aliased — it 404s today and breaks OG.
+
+**Owner (Vercel dashboard):**
+
+1. Vercel → nutcoin project → Settings → Domains
+2. Add `nutcoin.vercel.app` (remove from any other project first)
+3. Confirm `https://nutcoin.vercel.app/` returns 200
+
+**Claude (after domain works):**
+
+1. Update in `index.html` `<head>`: canonical, `og:url`, `og:image`, `twitter:image` → `https://nutcoin.vercel.app/...`
+2. Set `SITE_URL = 'https://nutcoin.vercel.app'`
+3. Add redirect in `vercel.json`:
+
+```json
+"redirects": [{
+  "source": "/:path*",
+  "has": [{ "type": "host", "value": "nutcoin-alpha.vercel.app" }],
+  "destination": "https://nutcoin.vercel.app/:path*",
+  "permanent": true
+}]
+```
+
+4. Push and verify `https://nutcoin.vercel.app/img/og.png` → 200
+
+---
+
+## Step 5 — OG / favicons (CLAUDE, only if copy changes)
+
+Already live. Regenerate if needed:
+
+```bash
+pip install pillow
+python scripts/generate-brand-assets.py
+git add img/og.png img/favicon.ico img/apple-touch-icon.png
+git push
+```
+
+Never use old ChatGPT PNGs, religious symbols, or checkerboard fake-alpha images.
+
+---
+
+## Step 6 — Supabase hardening (OWNER + CLAUDE, before real traffic)
+
+Owner tightens RLS in Supabase dashboard. Optionally Claude adds rate-limit RPC and switches inserts from raw `.insert()` to RPC. Never commit service role key.
+
+### Supabase schema (required, do not change column names)
 
 ```sql
 create table nut_logs (
   id bigserial primary key,
   session_id text not null,
   nickname text,
-  deed_date date default current_date,
+  deed_date date default current_date,  -- NEVER rename
+  deeds bigint,                          -- NEVER rename
   created_at timestamptz default now()
 );
--- RLS: tighten before real launch (see critique — public insert is gameable)
 
 create or replace function leaderboard()
 returns table(session_id text, nickname text, deeds bigint)
@@ -60,52 +116,61 @@ language sql security definer as $$
 $$;
 ```
 
-## Files
+---
 
-| Path | Purpose |
-|------|---------|
-| `index.html` | Entire app |
-| `img/*` | Optional assets — **UI should not depend on button PNGs** |
-| `vercel.json` | CSP headers |
-| `CLAUDE_HANDOFF.md` | This file |
+## Step 7 — Verify before calling it "launched"
 
-## DO NOT (repeat failures)
+| Check | Pass? |
+|-------|-------|
+| Mobile scroll smooth (no goo drips / blur stacks) | |
+| Hero: `$NUT`, pitch, CA or "Mint not live yet" | |
+| BUY / CHART / COPY CA | |
+| X + Telegram links correct | |
+| OG preview shows `img/og.png` | |
+| Global counter updates on tap | |
+| Sticky mobile bar: BUY \| COPY CA \| CHART | |
 
-- Re-add `nut-logo.png` (had Star of David filigree + checkerboard fake alpha)
-- Use ChatGPT PNGs with white plates as `background-image` on buttons
-- `mix-blend-mode: screen` on bad PNGs
-- `background-attachment: fixed` on full-page images
-- 30+ drip elements + SVG `#goo` filter
-- `backdrop-filter: blur()` on every panel
-- Cinzel on body text (hard to read for CT traders)
+---
 
-## Visual direction (memecoin 2024–2026)
+## DO NOT
 
-- **Display**: bold sans (`Inter` / system-ui) for `$NUT` and CTAs
-- **Colors**: `#050301` bg, `#FFD97D` gold, ember orange CTAs
-- **Layout**: mobile-first, sticky **BUY | COPY CA | CHART** above bottom nav
-- **Vibe**: pump.fun energy — loud, simple, meme — not Diablo III UI clone
+- Re-add `nut-logo.png` or ChatGPT button PNGs as required UI (nut-logo.png had Star of David filigree + checkerboard fake alpha)
+- Redirect alpha → prod before prod domain serves this repo
+- Use `mix-blend-mode: screen`, `background-attachment: fixed`, goo filters, heavy `backdrop-filter`
+- Point OG at `nutcoin.vercel.app` before Vercel domain is linked
+- Use `font-size:0` / `color:transparent` button hacks — all buttons are CSS-only now
+- Commit `.env` or Supabase service role keys
 
-## Features map
+---
 
-| Feature | Panel / area |
-|---------|----------------|
-| Personal counter | `#nutCard` |
-| Global stats | `#globalBar` + `#heroProof` |
-| Leaderboard | panel 5, `fetchLeaderboard()` RPC |
-| Cooldown | 10 min local + should be server-side at launch |
-| Certificate | canvas modal |
-| Badges / streak / oracle | panels 6–10 — secondary to buyers |
+## Quick reference — CONFIG block
 
-## Launch checklist
+```javascript
+const TICKER         = 'NUT';
+const CONTRACT_ADDR  = '';                                    // Step 2: owner provides mint
+const TELEGRAM_URL   = 'https://t.me/TheNutTracker';         // Step 3: confirm group URL
+const TWITTER_URL    = 'https://x.com/TheNutTracker';
+const X_HANDLE       = '@TheNutTracker';
+const SITE_URL       = 'https://nutcoin-alpha.vercel.app';   // Step 4: switch after domain
+const SUPABASE_URL   = '...';
+const SUPABASE_KEY   = '...';                                 // anon key only
+```
 
-- [ ] `CONTRACT_ADDR` filled
-- [ ] `TELEGRAM_URL` + `TWITTER_URL` filled
-- [ ] Supabase RLS hardened (rate limit RPC)
-- [ ] Production domain (not `-alpha`)
-- [ ] OG image `img/og.png` with true alpha, no religious symbols
-- [ ] Test mobile: sticky trade bar + no jank on scroll
+---
 
-## Whoever edits next
+## What buyers need to see in the first 3 seconds
 
-Pull latest `index.html`, search for `CONFIG`, `hero`, `sticky-trade`. Do not rebuild from old ChatGPT asset pipeline without alpha testing on `#050301`.
+- **Display:** `$NUT` large and readable, no religious filigree PNGs
+- **One-line pitch** — honest, funny, not medieval RP
+- **CA box** — copy button, monospace address when live
+- **BUY + CHART + Telegram + X** — all working URLs from CONFIG
+- **Social proof** — global nuts today / all-time (Supabase), with LIVE chip
+- **Fast mobile** — no goo drips, no backdrop-blur stacks, no 30 animated PNG backgrounds
+
+---
+
+## What Claude needs from the owner to finish
+
+1. Mint address (after pump.fun launch)
+2. Real Telegram group URL if different from `https://t.me/TheNutTracker`
+3. Confirmation that `nutcoin.vercel.app` is added in Vercel
