@@ -162,7 +162,51 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
   border-radius:999px;background:rgba(12,8,4,0.6);
 }
 .social-row a:hover{border-color:var(--gold-bright);color:#fff;}
+.social-row a.social-x{
+  background:linear-gradient(135deg,rgba(255,255,255,0.12),rgba(255,255,255,0.04));
+  border-color:rgba(255,255,255,0.35);color:#fff;font-weight:700;
+}
+.social-row a.social-x:hover{border-color:#fff;box-shadow:0 0 20px rgba(255,255,255,0.12);}
 .social-row a.disabled{opacity:.35;pointer-events:none;}
+
+/* ── X / Twitter feed ── */
+.x-feed-section{
+  max-width:548px;margin:0 auto 40px;padding:0 16px;position:relative;z-index:1;
+}
+.x-feed-head{
+  text-align:center;margin-bottom:16px;padding:20px 16px 4px;
+  background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(255,255,255,0.06) 0%,transparent 70%);
+  border-radius:20px 20px 0 0;
+}
+.x-feed-kicker{
+  font-size:10px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:6px;
+}
+.x-feed-title{
+  font-size:clamp(22px,5vw,28px);font-weight:800;color:#fff;margin:0 0 14px;letter-spacing:-.02em;
+}
+.x-feed-title span{color:var(--gold-bright);}
+.x-follow-btn{
+  display:inline-flex;align-items:center;gap:8px;
+  background:#fff;color:#0a0a0a;text-decoration:none;
+  font-size:13px;font-weight:800;letter-spacing:.02em;
+  padding:12px 22px;border-radius:999px;
+  box-shadow:0 4px 24px rgba(255,255,255,0.12);
+  transition:transform .15s,box-shadow .15s;
+}
+.x-follow-btn:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(255,255,255,0.18);}
+.x-feed-embed{
+  border-radius:0 0 20px 20px;overflow:hidden;
+  border:1px solid var(--border-hi);border-top:none;
+  background:rgba(8,5,2,0.95);
+  min-height:420px;
+  box-shadow:0 12px 48px rgba(0,0,0,0.45), inset 0 1px 0 rgba(200,169,110,0.08);
+}
+.x-feed-embed .twitter-timeline{display:block;}
+.x-feed-loading{
+  display:flex;align-items:center;justify-content:center;min-height:320px;
+  font-size:13px;font-weight:600;color:var(--muted);letter-spacing:.06em;
+}
 .hero-proof{
   display:flex;justify-content:center;gap:24px;flex-wrap:wrap;
   padding:14px 16px;border-radius:14px;
@@ -770,10 +814,30 @@ position:relative;overflow:hidden;
   .sticky-trade{display:flex;}
   .scroll-nut-btn{display:none !important;}
   .buy-banner .contract{display:none;}
-  .hero{padding:64px 12px 24px;}
-  .hero-title{font-size:clamp(56px,16vw,80px);}
-  .hero-pitch{font-size:14px;padding:0 4px;}
-  .ca-box{margin:0 8px 14px;}
+  .hero{
+    padding:58px 14px 22px;
+    background:
+      radial-gradient(ellipse 100% 80% at 50% -20%,rgba(220,100,20,0.22) 0%,transparent 55%),
+      var(--hero-grad), linear-gradient(180deg,#140a04 0%,#050301 72%);
+  }
+  .hero-badge{font-size:10px;padding:5px 12px;margin-bottom:12px;}
+  .hero-title{font-size:clamp(72px,22vw,96px);margin-bottom:10px;}
+  .hero-pitch{font-size:15px;line-height:1.5;padding:0 2px;max-width:100%;}
+  .ca-box{margin:0 0 14px;padding:12px;border-radius:14px;}
+  .ca-addr{font-size:10px;}
+  .ca-copy{padding:10px 16px;border-radius:10px;font-size:12px;}
+  .cta-row{flex-direction:column;align-items:stretch;gap:8px;margin-bottom:12px;padding:0 2px;}
+  .buy-btn-hero,.chart-btn{width:100%;padding:16px;border-radius:14px;font-size:16px;}
+  .social-row{gap:8px;margin-bottom:16px;}
+  .social-row a{flex:1;text-align:center;padding:11px 12px;font-size:11px;}
+  .social-row a.social-x{flex:1.2;}
+  .hero-proof{
+    width:100%;max-width:none;gap:0;padding:0;
+    display:grid;grid-template-columns:1fr 1fr;border-radius:16px;overflow:hidden;
+  }
+  .hero-proof-item{padding:14px 12px;}
+  .hero-proof-item:first-child{border-right:1px solid var(--border);}
+  .hero-proof-item strong{font-size:26px;}
   .global-bar{display:none;}
   /* Bottom nav */
   .mobile-nav{
@@ -807,7 +871,19 @@ position:relative;overflow:hidden;
   .buy-btn-sm{padding:5px 14px;font-size:10px;}
 
   /* Wrap */
-  .wrap{padding:0 10px 80px;}
+  .wrap{padding:0 12px calc(148px + env(safe-area-inset-bottom,0px));}
+
+  /* X feed */
+  .x-feed-section{padding:0 4px;margin-bottom:20px;}
+  .x-feed-head{padding:18px 12px 2px;border-radius:16px 16px 0 0;}
+  .x-feed-embed{border-radius:0 0 16px 16px;min-height:360px;}
+  .x-follow-btn{width:100%;justify-content:center;padding:14px;font-size:14px;}
+
+  /* Counter card */
+  .counter-card{
+    padding:28px 16px 24px;border-radius:22px;margin-bottom:16px;
+    box-shadow:0 12px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,200,100,0.08);
+  }
   .ornament{margin:2px 0 12px;}
   .ornament-line{max-width:120px;}
 
@@ -825,8 +901,7 @@ position:relative;overflow:hidden;
   /* Clock */
   .clock-bar{font-size:10.5px;padding:6px 0 14px;letter-spacing:.07em;}
 
-  /* Counter card */
-  .counter-card{padding:26px 14px 22px;border-radius:20px;}
+  /* Counter card (continued) */
   .counter-label{font-size:8.5px;letter-spacing:.18em;margin-bottom:12px;}
   .big-count{font-size:clamp(86px,23vw,118px);margin-bottom:2px;}
   .reset-sub{font-size:12px;margin-bottom:20px;}
@@ -916,7 +991,10 @@ position:relative;overflow:hidden;
   .ticker-item{font-size:9px;padding:0 24px;}
 
   /* Footer */
-  .footer{font-size:9px;padding:18px 0 70px;line-height:2.2;}
+  .footer{font-size:10px;padding:12px 0 calc(12px + env(safe-area-inset-bottom,0px));line-height:2;}
+
+  /* Ticker — tighter on mobile */
+  .ticker-wrap{margin-bottom:8px;}
 
   /* Scroll NUT button — above nav */
   .scroll-nut-btn{
@@ -1000,8 +1078,7 @@ position:relative;overflow:hidden;
   </div>
   <div class="social-row" id="socialRow">
     <a href="https://pump.fun" target="_blank" rel="noopener noreferrer" id="linkPump">pump.fun</a>
-    <a href="https://t.me/TheNutTracker" target="_blank" rel="noopener noreferrer" id="linkTelegram">Telegram</a>
-    <a href="https://x.com/TheNutTracker" target="_blank" rel="noopener noreferrer" id="linkTwitter">@TheNutTracker</a>
+    <a href="https://x.com/TheNutTracker" target="_blank" rel="noopener noreferrer" id="linkTwitter" class="social-x">𝕏 @TheNutTracker</a>
   </div>
   <div class="hero-proof" id="heroProof">
     <div class="hero-proof-item"><span>nuts today (global)</span><strong id="heroToday">—</strong></div>
@@ -1202,14 +1279,31 @@ position:relative;overflow:hidden;
 <!-- TICKER -->
 <div class="ticker-wrap"><div class="ticker" id="ticker"></div></div>
 
+<!-- X FEED -->
+<section class="x-feed-section" id="xFeed" aria-label="Posts from @TheNutTracker">
+  <div class="x-feed-head">
+    <div class="x-feed-kicker">From the trenches</div>
+    <h2 class="x-feed-title"><span>@</span>TheNutTracker</h2>
+    <a href="https://x.com/TheNutTracker" class="x-follow-btn" id="xFollowBtn" target="_blank" rel="noopener noreferrer">Follow on 𝕏</a>
+  </div>
+  <div class="x-feed-embed" id="xFeedEmbed">
+    <div class="x-feed-loading" id="xFeedLoading">Loading posts…</div>
+    <a class="twitter-timeline" id="xTimeline"
+       href="https://twitter.com/TheNutTracker"
+       data-theme="dark"
+       data-chrome="noheader nofooter noborders transparent"
+       data-tweet-limit="5"
+       data-height="520">Posts by @TheNutTracker</a>
+  </div>
+</section>
+
 <div class="wrap" style="padding-top:0">
   <div class="footer">
     $NUT &nbsp;·&nbsp; Community Memecoin &nbsp;·&nbsp; Not Financial Advice<br>
-    All personal data stored locally &nbsp;·&nbsp; Global data powered by Supabase &nbsp;·&nbsp; Nothing sold, nothing surveilled<br>
+    All personal data stored locally &nbsp;·&nbsp; Global data powered by Supabase<br>
     <a href="https://pump.fun" target="_blank" rel="noopener" id="footerPump">pump.fun</a> &nbsp;·&nbsp;
-    <a href="https://t.me/TheNutTracker" target="_blank" rel="noopener" id="footerTelegram">Telegram</a> &nbsp;·&nbsp;
     <a href="https://x.com/TheNutTracker" target="_blank" rel="noopener" id="footerTwitter">@TheNutTracker</a> &nbsp;·&nbsp;
-    <a href="#" onclick="shareTwitter()">Share Your Stats</a>
+    <a href="#" onclick="shareTwitter();return false;">Share Your Stats</a>
   </div>
 </div>
 
@@ -1317,7 +1411,6 @@ const SUPABASE_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFz
 const TICKER           = 'NUT';
 // Paste Solana mint from pump.fun after launch (enables BUY, CHART, COPY CA)
 const CONTRACT_ADDR    = '';
-const TELEGRAM_URL     = 'https://t.me/TheNutTracker';
 const TWITTER_URL      = 'https://x.com/TheNutTracker';
 const X_HANDLE         = '@TheNutTracker';
 const PUMP_FUN_URL     = CONTRACT_ADDR ? `https://pump.fun/coin/${CONTRACT_ADDR}` : 'https://pump.fun';
@@ -1435,10 +1528,10 @@ function setupSocialLinks() {
     el.classList.remove('disabled');
     el.removeAttribute('aria-disabled');
   };
-  set('linkTelegram', TELEGRAM_URL, 'Telegram');
-  set('linkTwitter', TWITTER_URL, X_HANDLE);
-  set('footerTelegram', TELEGRAM_URL);
+  set('linkTwitter', TWITTER_URL, '𝕏 ' + X_HANDLE);
+  document.getElementById('linkTwitter')?.classList.add('social-x');
   set('footerTwitter', TWITTER_URL, X_HANDLE);
+  document.getElementById('xFollowBtn')?.setAttribute('href', TWITTER_URL);
   if (CONTRACT_ADDR) document.getElementById('footerPump')?.setAttribute('href', PUMP_FUN_URL);
   const canon = document.querySelector('link[rel=canonical]');
   if (canon && SITE_CANONICAL) canon.href = SITE_CANONICAL + (SITE_CANONICAL.endsWith('/') ? '' : '/');
@@ -2622,9 +2715,26 @@ scrollNutBtn.addEventListener('click', () => {
   <button class="mnav-btn" id="mnav6" onclick="mnavGo(6,event)">
     <span class="mnav-icon">🔥</span><span class="mnav-lbl">Streak</span>
   </button>
+  <button class="mnav-btn" id="mnavX" onclick="document.getElementById('xFeed')?.scrollIntoView({behavior:'smooth',block:'start'})">
+    <span class="mnav-icon">𝕏</span><span class="mnav-lbl">Posts</span>
+  </button>
   <button class="mnav-btn" id="mnav9" onclick="mnavGo(9,event)">
     <span class="mnav-icon">🔮</span><span class="mnav-lbl">Oracle</span>
   </button>
 </nav>
+<script async src="https://platform.twitter.com/widgets.js" charset="utf-8" onload="initTwitterEmbed()"></script>
+<script>
+function initTwitterEmbed() {
+  const tl = document.getElementById('xTimeline');
+  const loading = document.getElementById('xFeedLoading');
+  if (!tl || !window.twttr?.widgets) return;
+  if (window.matchMedia('(max-width:600px)').matches) tl.setAttribute('data-height', '440');
+  twttr.widgets.load(document.getElementById('xFeedEmbed')).then(() => {
+    if (loading) loading.style.display = 'none';
+  }).catch(() => {
+    if (loading) loading.textContent = 'Could not load posts — follow on X ↗';
+  });
+}
+</script>
 </body>
 </html>
