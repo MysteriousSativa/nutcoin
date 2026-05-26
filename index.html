@@ -974,7 +974,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
   <div class="tagline">The Sacred World Nut Tracking Memecoin</div>
   <div class="hero-actions">
     <button class="buy-btn-hero tba" id="heroBuyBtn" onclick="openBuy()">🚀 BUY $NUT</button>
-    <button class="chart-btn" onclick="openBuy()">View Chart</button>
+    <button class="chart-btn" onclick="openChart()">View Chart</button>
   </div>
   <div class="ca-pill" onclick="copyCA()" id="caPill">CA: Not yet deployed — click to copy when live</div>
 </div>
@@ -1176,9 +1176,9 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
   <div class="footer">
     $NUT &nbsp;·&nbsp; Community Memecoin &nbsp;·&nbsp; Not Financial Advice<br>
     All personal data stored locally &nbsp;·&nbsp; Global data powered by Supabase &nbsp;·&nbsp; Nothing sold, nothing surveilled<br>
-    <a href="#" onclick="openBuy()">pump.fun</a> &nbsp;·&nbsp;
-    <a href="#">Telegram</a> &nbsp;·&nbsp;
-    <a href="#">Twitter/X</a> &nbsp;·&nbsp;
+    <a href="https://pump.fun" target="_blank" rel="noopener">pump.fun</a> &nbsp;·&nbsp;
+    <a href="https://t.me" target="_blank" rel="noopener">Telegram</a> &nbsp;·&nbsp;
+    <a href="https://x.com/search?q=%24NUT" target="_blank" rel="noopener">Twitter/X</a> &nbsp;·&nbsp;
     <a href="#" onclick="shareTwitter()">Share Your Stats</a>
   </div>
 </div>
@@ -1209,7 +1209,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
     <div class="modal-title">COOLDOWN ACTIVE</div>
     <div class="modal-joke" id="jokeText"></div>
     <div class="modal-timer" id="jokeTimer"></div>
-    <button class="modal-close" onclick="closeJoke()">I Shall Wait &nbsp;·&nbsp; Dismiss</button>
+    <button class="modal-close" onclick="closeJoke()">Got It &nbsp;·&nbsp; Dismiss</button>
   </div>
 </div>
 
@@ -1220,7 +1220,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
     <div class="modal-title" style="color:var(--gold);font-size:18px;margin-bottom:6px;">Join the Leaderboard</div>
     <div style="font-family:'Crimson Text',serif;font-size:16px;color:var(--muted);font-style:italic;">pick a name. everyone on the leaderboard can see how many times you nutted. choose wisely.</div>
     <input class="nick-input" id="nickInput" type="text" maxlength="20" placeholder="Your name..."/>
-    <button class="nick-submit" onclick="submitNick()">Claim My Name</button>
+    <button class="nick-submit" onclick="submitNick()">Save Name</button>
     <span class="nick-skip" onclick="closeNickModal()">No thanks, stay anonymous</span>
   </div>
 </div>
@@ -1308,9 +1308,10 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 
 const SUPABASE_URL  = 'https://ynzbwnlltqrprnrlbtna.supabase.co';
 const SUPABASE_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InluemJ3bmxsdHFycHJucmxidG5hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk3MzQyNDQsImV4cCI6MjA5NTMxMDI0NH0.W7R5bD7F7XWpW0HEK9rgcMYsIbhF2caq57d0grZZjqA';
-const CONTRACT_ADDR = '';   // pump.fun contract address
-const PUMP_FUN_URL  = CONTRACT_ADDR ? `https://pump.fun/${CONTRACT_ADDR}` : 'https://pump.fun';
-const SITE_URL      = 'https://nutcoin-alpha.vercel.app';
+const CONTRACT_ADDR    = '';   // pump.fun contract address — fill in at launch
+const PUMP_FUN_URL     = CONTRACT_ADDR ? `https://pump.fun/${CONTRACT_ADDR}` : 'https://pump.fun';
+const DEXSCREENER_URL  = CONTRACT_ADDR ? `https://dexscreener.com/solana/${CONTRACT_ADDR}` : 'https://dexscreener.com';
+const SITE_URL         = 'https://nutcoin-alpha.vercel.app';
 
 // ═══════════════════════════════
 // SUPABASE INIT
@@ -1425,6 +1426,10 @@ function openBuy() {
   if (CONTRACT_ADDR) window.open(PUMP_FUN_URL,'_blank');
   else showToast('Contract not yet deployed — check back soon');
 }
+function openChart() {
+  if (CONTRACT_ADDR) window.open(DEXSCREENER_URL,'_blank');
+  else showToast('Chart live at launch — contract not yet deployed');
+}
 function copyCA() {
   if (CONTRACT_ADDR) {
     navigator.clipboard?.writeText(CONTRACT_ADDR).catch(()=>{});
@@ -1491,11 +1496,8 @@ async function fetchLeaderboard() {
     if (!nickname) document.getElementById('lbJoin').style.display='block';
     return;
   }
-  // Direct table query — no RPC, no date filter, all-time, all sessions
-  const {data, error} = await db
-    .from('nut_logs')
-    .select('nickname, session_id')
-    .limit(5000);
+  // Server-side aggregation via leaderboard() RPC — returns top rows pre-sorted
+  const {data, error} = await db.rpc('leaderboard').limit(20);
 
   const el = document.getElementById('lbContent');
 
@@ -1510,25 +1512,13 @@ async function fetchLeaderboard() {
     return;
   }
 
-  // Aggregate by session_id — one row per device, all time
-  const sessions = {};
-  data.forEach(row => {
-    const sid = row.session_id || 'unknown';
-    if (!sessions[sid]) sessions[sid] = {nickname: null, session_id: sid, count: 0};
-    if (row.nickname && !sessions[sid].nickname) sessions[sid].nickname = row.nickname;
-    sessions[sid].count++;
-  });
-
-  lbCache = Object.values(sessions)
-    .map(s => ({
-      nickname: s.nickname || anonName(s.session_id),
-      session_id: s.session_id,
-      deeds: s.count,
-      isAnon: !s.nickname,
-      isYou: s.session_id === sessionId,
-    }))
-    .sort((a,b) => b.deeds - a.deeds)
-    .slice(0, 20);
+  lbCache = data.map(row => ({
+    nickname: row.nickname || anonName(row.session_id),
+    session_id: row.session_id,
+    deeds: row.deeds,
+    isAnon: !row.nickname,
+    isYou: row.session_id === sessionId,
+  }));
 
   renderLeaderboard(lbCache);
   updateNickRank(lbCache);
