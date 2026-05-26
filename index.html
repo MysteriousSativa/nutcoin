@@ -1438,62 +1438,71 @@ async function prerenderCert() {
 }
 
 async function openXWithCert(text) {
-  const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
+  const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
 
-  // Grab blob from cache (instant) or reuse the cert modal canvas if already rendered
+  // Get or render the certificate blob
   let blob = _certCache;
   if (!blob) {
     const dc = document.getElementById('certCanvas');
     if (dc && dc.width === 1400) blob = await new Promise(r => dc.toBlob(r, 'image/png', 0.95));
   }
+  if (!blob) {
+    const c = document.createElement('canvas');
+    await renderCertificate(c);
+    blob = await new Promise(r => c.toBlob(r, 'image/png', 0.95));
+  }
 
-  // ── MOBILE: native share sheet sends image straight to X app ──
+  // Mobile: native share sheet
   if (blob && navigator.canShare) {
     try {
-      const file = new File([blob], 'nut-certificate.png', {type: 'image/png'});
-      if (navigator.canShare({files: [file]})) {
-        await navigator.share({files: [file], text});
-        return;
-      }
+      const file = new File([blob], 'nut-certificate.png', {type:'image/png'});
+      if (navigator.canShare({files:[file]})) { await navigator.share({files:[file],text}); return; }
     } catch(e) {}
   }
 
-  // ── DESKTOP: write clipboard FIRST (needs user gesture), then open Twitter ──
-  // Initiating clipboard.write before any window.open preserves the activation token.
-  if (blob && window.ClipboardItem && navigator.clipboard) {
-    try {
-      // Kick off the clipboard write without awaiting — this starts the write
-      // within the user gesture window before window.open consumes it.
-      const clipPromise = navigator.clipboard.write([new ClipboardItem({'image/png': blob})]);
-      // Open Twitter immediately after (still within gesture window)
-      window.open(twitterUrl, '_blank');
-      // Now await the result
-      await clipPromise;
-      showToast('📋 certificate copied — paste into X with Ctrl+V');
-      return;
-    } catch(e) {
-      // clipboard failed — still open Twitter, fall through to download
-      window.open(twitterUrl, '_blank');
-    }
-  } else {
-    // No blob or no clipboard API — open Twitter, then try to render + download
-    window.open(twitterUrl, '_blank');
-  }
+  // Desktop: open a dedicated share page with the image embedded
+  const dataUrl = await new Promise(resolve => {
+    const reader = new FileReader();
+    reader.onload = e => resolve(e.target.result);
+    reader.readAsDataURL(blob);
+  });
 
-  // ── FALLBACK: auto-download so user can attach manually ──
-  try {
-    if (!blob) {
-      const c = document.createElement('canvas');
-      await renderCertificate(c);
-      blob = await new Promise(r => c.toBlob(r, 'image/png', 0.95));
-    }
-    const link = document.createElement('a');
-    link.download = `NUT-Certificate-${dateStr}${nickname ? '-' + nickname : ''}.png`;
-    link.href = URL.createObjectURL(blob);
-    link.click();
-    URL.revokeObjectURL(link.href);
-    showToast('📎 certificate downloaded — attach it to your tweet');
-  } catch(e) {}
+  const fname = `NUT-Certificate-${dateStr}${nickname ? '-' + nickname : ''}.png`;
+  const win = window.open('', '_blank');
+  if (!win) { showToast('Allow popups to open the share page'); return; }
+
+  win.document.write(`<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta property="og:image" content="${dataUrl}">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="${dataUrl}">
+<title>$NUT Certificate ${dateStr}</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#050301;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 20px;gap:24px;font-family:'Segoe UI',system-ui,sans-serif}
+img{max-width:min(700px,100%);border-radius:10px;box-shadow:0 0 80px rgba(200,169,110,0.35),0 0 0 1px rgba(200,169,110,0.15);display:block}
+.btns{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+a,button{display:inline-block;padding:12px 28px;border-radius:7px;text-decoration:none;font-size:14px;font-weight:700;letter-spacing:.06em;cursor:pointer;border:none;transition:opacity .15s}
+.tweet{background:#000;color:#fff;border:1px solid #333}
+.tweet:hover{opacity:.8}
+.save{background:#C8A96E;color:#050301}
+.save:hover{opacity:.8}
+p{color:#5a4f44;font-size:12px;text-align:center;letter-spacing:.04em}
+</style>
+</head>
+<body>
+<img src="${dataUrl}" alt="NUT Certificate">
+<div class="btns">
+  <a class="tweet" href="${tweetUrl}" target="_blank">Post to X / Twitter</a>
+  <a class="save" download="${fname}" href="${dataUrl}">Save Image</a>
+</div>
+<p>Right-click the image and choose Save image as &nbsp;&bull;&nbsp; ${SITE_URL}</p>
+</body>
+</html>`);
+  win.document.close();
 }
 
 async function shareTwitter() {
