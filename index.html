@@ -545,6 +545,233 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 
 @keyframes float{0%,100%{transform:translateY(0);}50%{transform:translateY(-12px);}}
 @keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.4;transform:scale(.8);}}
+
+/* ════════════════════════════════════════
+   MOBILE ANIMATIONS
+   ════════════════════════════════════════ */
+
+/* Squirt particles */
+.squirt-dot{
+  position:fixed;border-radius:50% 50% 40% 40% / 60% 60% 40% 40%;
+  pointer-events:none;z-index:9998;
+  animation:squirt-fly var(--dur,.65s) cubic-bezier(.15,.5,.6,1) var(--del,0s) both;
+}
+@keyframes squirt-fly{
+  0%{transform:translate(0,0) scale(1) rotate(var(--ang,0deg));opacity:1;}
+  60%{opacity:.85;}
+  100%{transform:translate(var(--tx,0px),var(--ty,-80px)) scale(.25) rotate(calc(var(--ang,0deg) + 180deg));opacity:0;}
+}
+
+/* Card climax shake */
+@keyframes climax-shake{
+  0%,100%{transform:translateX(0);}
+  10%{transform:translateX(-8px) rotate(-.8deg);}
+  22%{transform:translateX(7px) rotate(.6deg);}
+  34%{transform:translateX(-5px) rotate(-.4deg);}
+  46%{transform:translateX(5px) rotate(.4deg);}
+  58%{transform:translateX(-3px);}
+  70%{transform:translateX(3px);}
+  82%{transform:translateX(-1px);}
+}
+.shaking{animation:climax-shake .5s ease !important;}
+
+/* Build-up glow as cooldown expires */
+@keyframes build-pulse{
+  0%,100%{box-shadow:0 0 0 6px rgba(200,169,110,.12),0 0 0 13px rgba(200,169,110,.06),0 14px 55px rgba(200,169,110,.35),0 5px 18px rgba(0,0,0,.32),inset 0 1px 0 rgba(255,255,255,.55);}
+  50%{box-shadow:0 0 0 12px rgba(200,169,110,.22),0 0 0 26px rgba(200,169,110,.1),0 14px 90px rgba(200,169,110,.75),0 5px 18px rgba(0,0,0,.32),inset 0 1px 0 rgba(255,255,255,.55);}
+}
+.nut-btn.building{animation:btn-shimmer 1.6s ease infinite,build-pulse .75s ease-in-out infinite !important;filter:brightness(1.12);}
+.nut-btn.building::before{content:'';position:absolute;inset:-4px;border-radius:24px;border:2px solid rgba(200,169,110,.55);animation:ring-ripple .75s ease-in-out infinite;}
+@keyframes ring-ripple{0%,100%{transform:scale(1);opacity:.7;}50%{transform:scale(1.05);opacity:.15;}}
+
+/* Sweat drops on button while building */
+.sweat{
+  position:absolute;pointer-events:none;
+  width:5px;height:8px;
+  border-radius:50% 50% 50% 50%/30% 30% 70% 70%;
+  background:rgba(200,225,255,.88);
+  animation:sweat-fall var(--d,1.4s) ease-in var(--del2,0s) infinite;
+}
+@keyframes sweat-fall{
+  0%{top:0;opacity:0;transform:scaleY(.5);}
+  10%{opacity:1;transform:scaleY(1);}
+  100%{top:100%;opacity:0;transform:scaleY(.7);}
+}
+
+/* Climax splash ring */
+.splash-ring{
+  position:fixed;border-radius:50%;border:3px solid rgba(255,252,235,.65);
+  pointer-events:none;z-index:9997;transform:translate(-50%,-50%);
+  animation:splash-expand .6s ease-out forwards;
+}
+@keyframes splash-expand{
+  0%{width:0;height:0;opacity:.9;}
+  100%{width:180px;height:180px;opacity:0;}
+}
+
+/* Mobile bottom nav */
+.mobile-nav{display:none;}
+
+/* ════════════════════════════════════════
+   MOBILE LAYOUT — max-width 600px
+   ════════════════════════════════════════ */
+@media(max-width:600px){
+  /* Bottom nav */
+  .mobile-nav{
+    display:flex;position:fixed;bottom:0;left:0;right:0;z-index:650;
+    background:rgba(7,4,1,.97);border-top:1px solid rgba(200,169,110,.2);
+    backdrop-filter:blur(28px);
+    padding:6px 2px calc(6px + env(safe-area-inset-bottom,0px));
+    justify-content:space-around;
+  }
+  .mnav-btn{
+    flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;
+    padding:7px 2px 5px;background:transparent;border:none;cursor:pointer;
+    border-radius:10px;transition:background .12s;-webkit-tap-highlight-color:transparent;
+  }
+  .mnav-btn:active{background:rgba(200,169,110,.1);}
+  .mnav-icon{font-size:20px;line-height:1;transition:transform .2s,filter .2s;}
+  .mnav-btn.active .mnav-icon{filter:drop-shadow(0 0 8px rgba(200,169,110,.8));transform:scale(1.15);}
+  .mnav-lbl{font-family:'Cinzel',serif;font-size:7.5px;letter-spacing:.07em;color:var(--muted);text-transform:uppercase;transition:color .2s;}
+  .mnav-btn.active .mnav-lbl{color:var(--gold);}
+
+  /* Buy banner */
+  .buy-banner{flex-wrap:wrap;gap:6px;padding:5px 10px;font-size:9.5px;}
+  .buy-banner .contract{display:none;}
+  .buy-btn-sm{padding:5px 14px;font-size:10px;}
+
+  /* Drips — bigger, more dramatic */
+  .drip-wrap{height:100px;}
+
+  /* Hero */
+  .hero{padding:88px 16px 32px;min-height:280px;}
+  .crown{width:68px !important;height:68px !important;}
+  .tagline{font-size:10.5px;letter-spacing:.1em;}
+  .hero-actions{gap:8px;}
+  .buy-btn-hero{padding:12px 22px;font-size:12px;}
+  .chart-btn{padding:10px 14px;font-size:10px;letter-spacing:.1em;}
+  .ca-pill{font-size:9px;padding:5px 10px;}
+
+  /* Wrap */
+  .wrap{padding:0 10px 80px;}
+  .ornament{margin:2px 0 12px;font-size:14px;letter-spacing:.22em;}
+
+  /* Global bar */
+  .global-bar{padding:14px 16px;gap:0;}
+  .global-val{font-size:28px;}
+  .global-lbl{font-size:7.5px;}
+  .global-sub{font-size:7.5px;}
+  .live-chip{font-size:7.5px;}
+
+  /* Nick bar */
+  .nick-bar{padding:9px 12px;gap:8px;}
+  .nick-btn{padding:5px 10px;font-size:9px;}
+
+  /* Clock */
+  .clock-bar{font-size:10.5px;padding:6px 0 14px;letter-spacing:.07em;}
+
+  /* Counter card */
+  .counter-card{padding:26px 14px 22px;border-radius:20px;}
+  .counter-label{font-size:8.5px;letter-spacing:.18em;margin-bottom:12px;}
+  .big-count{font-size:clamp(86px,23vw,118px);margin-bottom:2px;}
+  .reset-sub{font-size:12px;margin-bottom:20px;}
+
+  /* NUT BUTTON — FULL WIDTH, THICK, THUMB ZONE */
+  .nut-btn{
+    width:100%;padding:28px 16px;font-size:22px;border-radius:18px;letter-spacing:.1em;
+  }
+  .my-row{font-size:10.5px;margin-top:14px;}
+  .card-actions{gap:8px;margin-top:12px;}
+  .cert-btn,.share-btn{padding:9px 14px;font-size:9.5px;letter-spacing:.12em;}
+
+  /* Cooldown */
+  .cd-header{font-size:8.5px;}
+  .cooldown-bar-wrap{margin-top:14px;}
+
+  /* Panels */
+  .panels-wrap{margin-bottom:12px;}
+  .panel-indicators{gap:7px;margin-bottom:12px;}
+  .pind{width:5px;height:5px;}
+  .panel{padding:18px 12px;border-radius:18px;}
+  .panel-title{font-size:8.5px;letter-spacing:.2em;margin-bottom:14px;}
+
+  /* Stat grid */
+  .stat-grid{grid-template-columns:1fr 1fr;gap:8px;}
+  .stat-block{padding:12px 10px;}
+  .stat-block .lbl{font-size:8px;}
+  .stat-block .val{font-size:24px;}
+  .stat-block .hint{font-size:11px;}
+
+  /* Fact */
+  .fact-text{font-size:17px;}
+  .fact-category{font-size:8.5px;}
+
+  /* Timeline */
+  .tl-text{font-size:13px;}
+  .tl-time{font-size:10px;}
+
+  /* Leaderboard */
+  .lb-list{max-height:340px;}
+  .lb-row{padding:9px 10px;gap:8px;}
+  .lb-row-name{font-size:15px;}
+  .lb-row-count{font-size:13px;}
+  .lb-row-nuts{font-size:7px;}
+  .lb-count-label{font-size:8px;}
+
+  /* Badges */
+  .badge-grid{grid-template-columns:repeat(4,1fr);gap:8px;}
+  .badge-icon{font-size:22px;}
+  .badge-name{font-size:6px;}
+
+  /* Prophecy */
+  .prophecy-text{font-size:16px;}
+  .prophecy-eye{font-size:40px;}
+
+  /* Flame */
+  .flame-num{font-size:42px;}
+  .flame-tier{font-size:16px;}
+
+  /* Chrono */
+  .chrono-svg{max-width:220px;}
+  .chrono-peak{font-size:20px;}
+  .chrono-archetype{font-size:14px;}
+
+  /* Modals */
+  .modal-box{padding:30px 22px;width:94%;}
+  .modal-emoji{font-size:50px;margin-bottom:12px;}
+  .modal-title{font-size:16px;}
+  .modal-joke{font-size:15px;margin-bottom:16px;}
+  .modal-close{padding:10px 26px;}
+  .nick-modal-box{padding:30px 22px;width:94%;}
+  .nick-input{font-size:16px;padding:14px 16px;}
+  .milestone-box{padding:32px 22px;}
+  .milestone-emoji{font-size:58px;}
+  .milestone-title{font-size:20px;}
+  .cert-inner{padding:18px 12px;border-radius:16px;}
+  .cert-btns{gap:8px;}
+  .mood-box{padding:28px 20px;width:94%;}
+  .mood-btn{min-width:52px;padding:11px 7px 8px;}
+  .mood-e{font-size:24px;}
+
+  /* Log section */
+  .log-section{padding:18px 12px;border-radius:18px;}
+  .section-title{font-size:8.5px;letter-spacing:.18em;}
+
+  /* Ticker */
+  .ticker-item{font-size:9px;padding:0 24px;}
+
+  /* Footer */
+  .footer{font-size:9px;padding:18px 0 70px;line-height:2.2;}
+
+  /* Scroll NUT button — above nav */
+  .scroll-nut-btn{
+    left:12px;right:12px;bottom:72px;border-radius:15px;
+    justify-content:center;padding:15px;font-size:13px;
+  }
+
+  /* Toast — above nav */
+  .toast{bottom:78px;font-size:10.5px;padding:10px 20px;max-width:88vw;white-space:normal;text-align:center;line-height:1.4;}
+}
 </style>
 </head>
 <body>
@@ -1248,6 +1475,9 @@ function nut() {
 
   updateUI();
   spawnConfetti();
+  spawnSquirt();
+  shakeCard();
+  haptic([60, 18, 100, 18, 160]);
   addLogEntry(t, countToday);
   addTimelineEntry(t, countToday);
   if (Math.random()<1) showToast(TOASTS[Math.floor(Math.random()*TOASTS.length)]);
@@ -1298,6 +1528,7 @@ function updateCooldown() {
   const mLeft=ready?0:Math.ceil((TEN_MIN-el)/60000);
   document.getElementById('cdFill').style.width=pct+'%';
   document.getElementById('cdLabel').textContent=ready?'Ready':`${mLeft}m remaining`;
+  updateBuildUp();
 }
 
 // ═══════════════════════════════
@@ -1555,6 +1786,155 @@ function showMilestone(emoji,title,sub) {
 }
 
 // ═══════════════════════════════
+// MOBILE ENHANCEMENTS
+// ═══════════════════════════════
+
+// Haptic feedback — ignored silently on desktop
+function haptic(pattern) {
+  try { if (navigator.vibrate) navigator.vibrate(pattern || [70, 20, 110]); } catch(e){}
+}
+
+// Squirt particle physics — cream drops fan out from the NUT button
+function spawnSquirt() {
+  if (window.innerWidth > 700) return; // desktop skip
+  const btn = document.querySelector('.nut-btn');
+  if (!btn) return;
+  const r = btn.getBoundingClientRect();
+  const cx = r.left + r.width / 2;
+  const cy = r.top + r.height * 0.2;
+  const count = 16;
+  for (let i = 0; i < count; i++) {
+    // Fan angle: mostly upward, spreading ~160 degrees
+    const frac = i / (count - 1);
+    const baseAngle = -Math.PI / 2; // straight up
+    const spread = Math.PI * 0.9;
+    const angle = baseAngle - spread / 2 + frac * spread;
+    const speed = 65 + Math.random() * 100;
+    const tx = Math.cos(angle) * speed;
+    const ty = Math.sin(angle) * speed - 20;
+    const size = 4 + Math.random() * 9;
+    // Cream to white color range
+    const b = Math.floor(195 + Math.random() * 60);
+    const color = `rgba(${b},${b-5},${Math.floor(b*0.88)},${0.75 + Math.random()*.25})`;
+    const d = document.createElement('div');
+    d.className = 'squirt-dot';
+    d.style.cssText = `left:${cx}px;top:${cy}px;width:${size}px;height:${Math.floor(size*1.7)}px;background:${color};--tx:${tx.toFixed(1)}px;--ty:${ty.toFixed(1)}px;--ang:${(Math.random()*260-130).toFixed(1)}deg;--dur:${(0.45+Math.random()*0.35).toFixed(2)}s;--del:${(Math.random()*0.08).toFixed(2)}s;`;
+    document.body.appendChild(d);
+    setTimeout(() => d.remove(), 1100);
+  }
+  // Splash ring at tap point
+  const ring = document.createElement('div');
+  ring.className = 'splash-ring';
+  ring.style.cssText = `left:${cx}px;top:${cy + r.height/2}px;`;
+  document.body.appendChild(ring);
+  setTimeout(() => ring.remove(), 700);
+}
+
+// Counter card shake on nut
+function shakeCard() {
+  const card = document.querySelector('.counter-card');
+  if (!card) return;
+  card.classList.add('shaking');
+  setTimeout(() => card.classList.remove('shaking'), 520);
+}
+
+// Sweat drops appear on button as build-up
+let _sweatDrops = [];
+function addSweatDrops() {
+  const btn = document.querySelector('.nut-btn');
+  if (!btn || _sweatDrops.length) return;
+  for (let i = 0; i < 3; i++) {
+    const s = document.createElement('div');
+    s.className = 'sweat';
+    s.style.cssText = `left:${20+Math.random()*60}%;--d:${(1.2+Math.random()*.8).toFixed(2)}s;--del2:${(Math.random()*1.5).toFixed(2)}s;`;
+    btn.appendChild(s);
+    _sweatDrops.push(s);
+  }
+}
+function clearSweatDrops() {
+  _sweatDrops.forEach(s => s.remove());
+  _sweatDrops = [];
+}
+
+// Build-up state — button glistens + sweats as cooldown expires
+function updateBuildUp() {
+  const btn = document.querySelector('.nut-btn');
+  if (!btn) return;
+  if (lastClick <= 0) { btn.classList.remove('building'); clearSweatDrops(); return; }
+  const remaining = TEN_MIN - (Date.now() - lastClick);
+  if (remaining <= 90000 && remaining > 0) {
+    btn.classList.add('building');
+    addSweatDrops();
+  } else {
+    btn.classList.remove('building');
+    clearSweatDrops();
+  }
+}
+
+// Shake detection — detect phone shake, fire a joke
+let _lastShake = 0, _shakeAccum = 0, _lastAcc = {x:0,y:0,z:0};
+function initShakeDetect() {
+  if (!window.DeviceMotionEvent) return;
+  const SHAKE_MSGS = [
+    'PUT IT DOWN',
+    'bro why are you shaking the phone',
+    'the phone cannot consent',
+    'that is NOT how this works',
+    'stop. just tap the button.',
+    'this is a tracker not a fleshlight',
+    'your wrist is filing a restraining order',
+  ];
+  window.addEventListener('devicemotion', e => {
+    const a = e.accelerationIncludingGravity;
+    if (!a) return;
+    const dx = Math.abs(a.x - _lastAcc.x), dy = Math.abs(a.y - _lastAcc.y), dz = Math.abs(a.z - _lastAcc.z);
+    _lastAcc = {x:a.x, y:a.y, z:a.z};
+    _shakeAccum += dx + dy + dz;
+    const now = Date.now();
+    if (now - _lastShake < 500) return;
+    if (_shakeAccum > 120) {
+      _lastShake = now;
+      _shakeAccum = 0;
+      showToast(SHAKE_MSGS[Math.floor(Math.random() * SHAKE_MSGS.length)]);
+      haptic([200, 80, 200, 80, 300]);
+    } else if (now % 500 < 16) { _shakeAccum *= 0.7; }
+  });
+}
+
+// Mobile nav — switches panel and scrolls to panels section
+const MNAV_MAP = {0:null, 1:0, 5:5, 6:6, 9:9}; // navId → panelIdx (null = scroll to top)
+function mnavGo(panelIdx, e) {
+  haptic(28);
+  // Update active state — find which nav button was tapped
+  document.querySelectorAll('.mnav-btn').forEach(b => {
+    const pid = parseInt(b.id.replace('mnav',''));
+    b.classList.toggle('active', pid === panelIdx);
+  });
+  if (panelIdx === 0) {
+    window.scrollTo({top: 0, behavior: 'smooth'});
+    return;
+  }
+  showPanel(panelIdx);
+  // Scroll panels into view
+  const pw = document.querySelector('.panels-wrap');
+  if (pw) setTimeout(() => pw.scrollIntoView({behavior:'smooth', block:'start'}), 50);
+}
+
+// Init mobile features
+function initMobile() {
+  if (window.innerWidth > 700) return;
+  initShakeDetect();
+  // Request motion permission on iOS 13+
+  if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
+    document.querySelector('.nut-btn')?.addEventListener('click', () => {
+      DeviceMotionEvent.requestPermission().then(state => {
+        if (state === 'granted') initShakeDetect();
+      }).catch(() => {});
+    }, {once: true});
+  }
+}
+
+// ═══════════════════════════════
 // CONFETTI
 // ═══════════════════════════════
 function spawnConfetti() {
@@ -1779,6 +2159,7 @@ updateUI();
 updateClock();
 setInterval(updateClock,1000);
 setInterval(updateCooldown,10000);
+initMobile();
 fetchGlobalCounts();
 fetchLeaderboard();
 setInterval(fetchGlobalCounts,30000);
@@ -2028,5 +2409,24 @@ scrollNutBtn.addEventListener('click', () => {
 <button class="scroll-nut-btn" id="scrollNutBtn" aria-label="Scroll to nut button">
   🥜 NUT
 </button>
+
+<!-- MOBILE BOTTOM NAV -->
+<nav class="mobile-nav" id="mobileNav">
+  <button class="mnav-btn active" id="mnav0" onclick="mnavGo(0,event)">
+    <span class="mnav-icon">🥜</span><span class="mnav-lbl">Nut</span>
+  </button>
+  <button class="mnav-btn" id="mnav1" onclick="mnavGo(1,event)">
+    <span class="mnav-icon">📊</span><span class="mnav-lbl">Stats</span>
+  </button>
+  <button class="mnav-btn" id="mnav5" onclick="mnavGo(5,event)">
+    <span class="mnav-icon">🏆</span><span class="mnav-lbl">Board</span>
+  </button>
+  <button class="mnav-btn" id="mnav6" onclick="mnavGo(6,event)">
+    <span class="mnav-icon">🔥</span><span class="mnav-lbl">Streak</span>
+  </button>
+  <button class="mnav-btn" id="mnav9" onclick="mnavGo(9,event)">
+    <span class="mnav-icon">🔮</span><span class="mnav-lbl">Oracle</span>
+  </button>
+</nav>
 </body>
 </html>
