@@ -651,9 +651,9 @@ position:relative;overflow-y:auto;
 .cert-modal-hdr{text-align:center;margin-bottom:18px;}
 .cert-modal-title{font-family:'Cinzel',serif;font-size:18px;font-weight:700;color:var(--gold);margin-bottom:6px;text-shadow:0 0 14px rgba(200,169,110,0.3);}
 .cert-modal-sub{font-family:'Crimson Text',serif;font-size:15px;color:var(--muted);font-style:italic;}
-.cert-canvas-wrap{position:relative;width:100%;border-radius:10px;overflow:hidden;background:var(--cream);min-height:100px;box-shadow:0 8px 40px rgba(0,0,0,0.32);}
+.cert-canvas-wrap{position:relative;width:100%;max-width:420px;margin:0 auto;border-radius:16px;overflow:hidden;background:#050301;min-height:200px;box-shadow:0 12px 48px rgba(0,0,0,0.55),0 0 0 1px rgba(200,169,110,0.25);}
 .cert-canvas-wrap canvas{width:100%;height:auto;display:block;}
-.cert-loading{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Cinzel',serif;font-size:14px;letter-spacing:.15em;color:var(--muted);background:#FFF8EE;}
+.cert-loading{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:inherit;font-size:13px;font-weight:600;letter-spacing:.08em;color:var(--gold);background:#050301;}
 .cert-btns{display:flex;gap:10px;justify-content:center;margin-top:18px;flex-wrap:wrap;}
 .cert-dl-btn{
   background:var(--btn-ghost);
@@ -1412,8 +1412,8 @@ position:relative;overflow:hidden;
 <div class="modal-overlay" id="certModal">
   <div class="cert-inner">
     <div class="cert-modal-hdr">
-      <div class="cert-modal-title">Your Official Nut Receipt</div>
-      <div class="cert-modal-sub">legally dubious proof you nutted. download it. post it. let them cope.</div>
+      <div class="cert-modal-title">Nut Receipt — X Edition</div>
+      <div class="cert-modal-sub">dark mode proof · method on file · built to start arguments on the timeline</div>
     </div>
     <div class="cert-canvas-wrap">
       <canvas id="certCanvas"></canvas>
@@ -1465,6 +1465,7 @@ const PUMP_FUN_URL     = CONTRACT_ADDR ? `https://pump.fun/coin/${CONTRACT_ADDR}
 const DEXSCREENER_URL  = CONTRACT_ADDR ? `https://dexscreener.com/solana/${CONTRACT_ADDR}` : 'https://dexscreener.com/solana';
 const SITE_URL         = 'https://nutcoin-alpha.vercel.app';
 const SITE_CANONICAL   = SITE_URL; // after adding nutcoin.vercel.app in Vercel → switch URL + vercel.json redirect
+const RECEIPT_BG_IMAGE = './img/receipt-share.png'; // optional ChatGPT bg — see CHATGPT_IMAGES.md
 const PERF_LITE        = window.matchMedia('(max-width: 900px), (prefers-reduced-motion: reduce)').matches;
 
 // ═══════════════════════════════
@@ -2119,7 +2120,7 @@ async function openXWithCert(text) {
 
   // Open tweet composer after a brief delay so the download dialog registers first
   setTimeout(() => window.open(tweetUrl, '_blank'), 400);
-  showToast('Receipt saved — attach it and let the timeline cook.');
+  showToast('Receipt PNG saved — attach to your tweet and start drama.');
 }
 
 function pickStirTweet() {
@@ -2421,8 +2422,40 @@ function showToast(msg) {
 }
 
 // ═══════════════════════════════
-// CERTIFICATE
+// RECEIPT (download + X share) — 1080×1350 viral card
 // ═══════════════════════════════
+function getReceiptPayload() {
+  const lastType = todayLog.length ? logType(todayLog[todayLog.length - 1]) : selectedNutType;
+  const lm = NUT_TYPES[lastType] || NUT_TYPES.solo;
+  const ct = countTypesToday();
+  const topKey = Object.keys(ct).sort((a, b) => ct[b] - ct[a])[0] || lastType;
+  const top = NUT_TYPES[topKey] || lm;
+  const methodsLine = Object.keys(ct)
+    .sort((a, b) => ct[b] - ct[a])
+    .slice(0, 4)
+    .map(k => `${NUT_TYPES[k]?.em || '🥜'} ${ct[k]}`)
+    .join('  ·  ');
+  return {
+    today: countToday,
+    allTime: countAllTime,
+    partneredToday: countPartneredToday(),
+    session: countSession,
+    streak: currentStreak || 0,
+    bestDay,
+    nickname: nickname || 'Anonymous',
+    lastMethod: lm.label,
+    lastEmoji: lm.em,
+    topMethod: top.label,
+    topEmoji: top.em,
+    methodsLine: methodsLine || `${lm.em} ${lm.label}`,
+    variety: uniqueMethodsToday(),
+    verdict: getAchievementText(countToday),
+    date: dateStr,
+    site: SITE_URL,
+    x: X_HANDLE,
+  };
+}
+
 function getAchievementText(n) {
   if(n===0) return "has not nutted yet. suspicious. report to the nut council immediately.";
   if(n===1) return "one nut. the receipt has been printed. your group chat will hear about this.";
@@ -2452,150 +2485,158 @@ function wrapText(ctx,text,x,y,maxW,lineH) {
   rows.forEach((r,i)=>ctx.fillText(r,x,sy+i*lineH));
 }
 
+function drawReceiptBarcode(ctx, x, y, w, h) {
+  ctx.fillStyle = '#EDE8DF';
+  let px = x + 12;
+  while (px < x + w - 12) {
+    const bw = 2 + Math.floor(Math.random() * 5);
+    ctx.fillRect(px, y + 8, bw, h - 16);
+    px += bw + 2 + Math.floor(Math.random() * 4);
+  }
+}
+
 async function renderCertificate(canvas) {
   await document.fonts.ready;
-  const W=1400,H=1000;
-  canvas.width=W;canvas.height=H;
-  const ctx=canvas.getContext('2d');
+  const p = getReceiptPayload();
+  const W = 1080, H = 1350;
+  canvas.width = W;
+  canvas.height = H;
+  const ctx = canvas.getContext('2d');
+  const GOLD = '#FFD97D';
+  const CREAM = '#EDE8DF';
+  const MUTED = '#8A7868';
+  const EMBER = '#E88820';
 
-  // Draw parchment background — minimal dark overlay so parchment stays light
+  const drawDarkBg = () => {
+    const g = ctx.createLinearGradient(0, 0, 0, H);
+    g.addColorStop(0, '#1a0e04');
+    g.addColorStop(0.35, '#050301');
+    g.addColorStop(1, '#030201');
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, W, H);
+    const glow = ctx.createRadialGradient(W / 2, 0, 0, W / 2, 0, W * 0.7);
+    glow.addColorStop(0, 'rgba(232,136,32,0.22)');
+    glow.addColorStop(1, 'transparent');
+    ctx.fillStyle = glow;
+    ctx.fillRect(0, 0, W, H);
+  };
+
   await new Promise(resolve => {
     const img = new Image();
+    img.crossOrigin = 'anonymous';
     img.onload = () => {
       ctx.drawImage(img, 0, 0, W, H);
-      // Very light tint only — keep parchment bright for contrast
-      ctx.fillStyle = 'rgba(255,245,220,0.18)';
+      ctx.fillStyle = 'rgba(5,3,1,0.72)';
       ctx.fillRect(0, 0, W, H);
       resolve();
     };
-    img.onerror = () => {
-      const bg=ctx.createLinearGradient(0,0,W,H);
-      bg.addColorStop(0,'#FFF8EE');bg.addColorStop(.4,'#FFFDF8');bg.addColorStop(.7,'#FFFAF2');bg.addColorStop(1,'#FFF0D8');
-      ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
-      resolve();
-    };
-    img.src='./img/parchment.png';
+    img.onerror = () => { drawDarkBg(); resolve(); };
+    img.src = RECEIPT_BG_IMAGE;
   });
 
-  // Subtle cream reading-area wash across the content zone for extra legibility
-  const readWash = ctx.createRadialGradient(W/2,H/2,80,W/2,H/2,680);
-  readWash.addColorStop(0,'rgba(255,250,235,0.38)');
-  readWash.addColorStop(1,'rgba(255,245,215,0)');
-  ctx.fillStyle=readWash;ctx.fillRect(0,0,W,H);
+  ctx.strokeStyle = 'rgba(200,169,110,0.55)';
+  ctx.lineWidth = 3;
+  rrect(ctx, 24, 24, W - 48, H - 48, 20);
+  ctx.stroke();
+  ctx.strokeStyle = 'rgba(255,160,40,0.2)';
+  ctx.lineWidth = 1;
+  rrect(ctx, 36, 36, W - 72, H - 72, 16);
+  ctx.stroke();
 
-  ctx.strokeStyle='#3A1E00';ctx.lineWidth=8;rrect(ctx,16,16,W-32,H-32,3);ctx.stroke();
-  ctx.strokeStyle='#8B5C00';ctx.lineWidth=2.5;rrect(ctx,30,30,W-60,H-60,2);ctx.stroke();
-  ctx.strokeStyle='#6B4800';ctx.lineWidth=1;rrect(ctx,44,44,W-88,H-88,1);ctx.stroke();
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
 
-  [[65,65],[W-65,65],[65,H-65],[W-65,H-65]].forEach(([cx,cy])=>{
-    const sx=cx<W/2?1:-1,sy=cy<H/2?1:-1;
-    ctx.strokeStyle='#C8A96E';ctx.lineWidth=2;
-    ctx.beginPath();ctx.moveTo(cx-sx*48,cy);ctx.lineTo(cx,cy);ctx.lineTo(cx,cy-sy*48);ctx.stroke();
-    ctx.beginPath();ctx.arc(cx,cy,5,0,Math.PI*2);ctx.fillStyle='#C8A96E';ctx.fill();
-    ctx.strokeStyle='rgba(200,169,110,0.4)';ctx.lineWidth=1;
-    ctx.beginPath();ctx.moveTo(cx-sx*24,cy+sy*7);ctx.lineTo(cx-sx*24,cy);ctx.lineTo(cx-sx*30,cy);ctx.stroke();
-    ctx.beginPath();ctx.moveTo(cx+sx*7,cy-sy*24);ctx.lineTo(cx,cy-sy*24);ctx.lineTo(cx,cy-sy*30);ctx.stroke();
+  ctx.font = '700 22px Inter,system-ui,sans-serif';
+  ctx.fillStyle = MUTED;
+  ctx.fillText('OFFICIAL NUT RECEIPT · FORM 69-A · ALL METHODS COUNT', W / 2, 78);
+
+  ctx.font = '900 118px Inter,system-ui,sans-serif';
+  ctx.fillStyle = '#fff';
+  ctx.fillText('$NUT', W / 2, 175);
+
+  ctx.font = '800 200px "Space Mono",monospace';
+  ctx.fillStyle = GOLD;
+  ctx.shadowColor = 'rgba(232,136,32,0.45)';
+  ctx.shadowBlur = 40;
+  ctx.fillText(String(p.today), W / 2, 360);
+  ctx.shadowBlur = 0;
+
+  ctx.font = '700 28px Inter,system-ui,sans-serif';
+  ctx.fillStyle = CREAM;
+  ctx.fillText('NUTS LOGGED TODAY', W / 2, 455);
+
+  ctx.font = '600 36px Inter,system-ui,sans-serif';
+  ctx.fillStyle = EMBER;
+  ctx.fillText(`${p.lastEmoji}  LAST: ${p.lastMethod.toUpperCase()}`, W / 2, 520);
+
+  ctx.font = '500 22px Inter,system-ui,sans-serif';
+  ctx.fillStyle = MUTED;
+  ctx.fillText('solo · partnered · quickie · hotel · chaos — all count', W / 2, 562);
+
+  const stats = [
+    { l: 'ALL-TIME', v: p.allTime },
+    { l: 'PARTNERED', v: p.partneredToday },
+    { l: 'STREAK', v: p.streak },
+    { l: 'SESSION', v: p.session },
+  ];
+  const boxY = 610, boxH = 120, gap = 16;
+  const boxW = (W - 80 - gap * 3) / 4;
+  stats.forEach((s, i) => {
+    const bx = 40 + i * (boxW + gap);
+    ctx.fillStyle = 'rgba(12,8,4,0.85)';
+    rrect(ctx, bx, boxY, boxW, boxH, 12);
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(200,169,110,0.35)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    ctx.font = '700 38px "Space Mono",monospace';
+    ctx.fillStyle = GOLD;
+    ctx.fillText(String(s.v), bx + boxW / 2, boxY + 48);
+    ctx.font = '600 14px Inter,system-ui,sans-serif';
+    ctx.fillStyle = MUTED;
+    ctx.fillText(s.l, bx + boxW / 2, boxY + 88);
   });
 
-  ctx.textAlign='center';ctx.textBaseline='middle';
-  // Draw coin icon flanking the title
-  await new Promise(resolve => {
-    const coinImg = new Image();
-    coinImg.onload = () => {
-      const cs = 68;
-      ctx.save();
-      ctx.beginPath();ctx.arc(W/2-230,128,cs/2,0,Math.PI*2);ctx.clip();
-      ctx.drawImage(coinImg,W/2-230-cs/2,128-cs/2,cs,cs);
-      ctx.restore();
-      ctx.save();
-      ctx.beginPath();ctx.arc(W/2+230,128,cs/2,0,Math.PI*2);ctx.clip();
-      ctx.drawImage(coinImg,W/2+230-cs/2,128-cs/2,cs,cs);
-      ctx.restore();
-      resolve();
-    };
-    coinImg.onerror = () => {
-      ctx.font='52px serif';ctx.fillText('🥜',W/2-230,128);ctx.fillText('🥜',W/2+230,128);
-      resolve();
-    };
-    coinImg.src='./nut-coin.jpg';
-  });
-  // PALETTE — all near-black or dark brown for maximum parchment contrast
-  const INK     = '#0A0400';   // near-black for primary text
-  const INK2    = '#1C0A00';   // dark brown for secondary text
-  const GOLDINC = '#5C3000';   // dark gold for decorative labels
-  const GOLDMED = '#7A4500';   // medium-dark gold for smaller labels
+  ctx.fillStyle = 'rgba(12,8,4,0.9)';
+  rrect(ctx, 48, 760, W - 96, 100, 12);
+  ctx.fill();
+  ctx.font = '600 24px Inter,system-ui,sans-serif';
+  ctx.fillStyle = CREAM;
+  ctx.fillText(`ISSUED TO: ${p.nickname}`, W / 2, 800);
+  ctx.font = '500 20px Inter,system-ui,sans-serif';
+  ctx.fillStyle = MUTED;
+  ctx.fillText(`TOP METHOD TODAY: ${p.topEmoji} ${p.topMethod}  ·  ${p.variety} methods  ·  ${p.date}`, W / 2, 835);
 
-  ctx.font='900 98px "Cinzel Decorative",serif';ctx.fillStyle=INK;
-  ctx.shadowColor='rgba(180,120,20,0.5)';ctx.shadowBlur=22;
-  ctx.fillText('$NUT',W/2,128);ctx.shadowBlur=0;
-  ctx.font='700 18px "Cinzel",serif';ctx.fillStyle=GOLDINC;
-  ctx.letterSpacing='0.12em';
-  ctx.fillText('O F F I C I A L   N U T   R E C E I P T   ·   F O R M   6 9 - A',W/2,196);
+  ctx.fillStyle = 'rgba(200,100,10,0.12)';
+  rrect(ctx, 56, 890, W - 112, 200, 14);
+  ctx.fill();
+  ctx.strokeStyle = 'rgba(255,160,40,0.35)';
+  ctx.stroke();
+  ctx.font = 'italic 26px Inter,system-ui,sans-serif';
+  ctx.fillStyle = CREAM;
+  wrapText(ctx, `"${p.verdict}"`, W / 2, 990, W - 160, 34);
 
-  ornLine(ctx,W/2,228,560);
+  ctx.fillStyle = 'rgba(255,255,255,0.06)';
+  rrect(ctx, 80, 1120, W - 160, 56, 6);
+  ctx.fill();
+  drawReceiptBarcode(ctx, 80, 1120, W - 160, 56);
 
-  ctx.font='italic 28px "Crimson Text",Georgia,serif';ctx.fillStyle=INK2;
-  ctx.fillText('Be it known that the undersigned has busted',W/2,284);
+  ctx.font = '700 24px Inter,system-ui,sans-serif';
+  ctx.fillStyle = GOLD;
+  ctx.fillText(p.x, W / 2, 1210);
+  ctx.font = '600 18px Inter,system-ui,sans-serif';
+  ctx.fillStyle = MUTED;
+  ctx.fillText('POST AT YOUR OWN RISK · NOT FINANCIAL ADVICE', W / 2, 1245);
+  ctx.font = '500 16px "Space Mono",monospace';
+  ctx.fillStyle = 'rgba(200,169,110,0.5)';
+  ctx.fillText(p.site.replace('https://', ''), W / 2, 1285);
 
-  ctx.font='900 160px "Cinzel Decorative",serif';ctx.fillStyle=INK;
-  ctx.shadowColor='rgba(150,80,0,0.45)';ctx.shadowBlur=28;
-  ctx.fillText(countToday.toLocaleString(),W/2,408);ctx.shadowBlur=0;
-
-  ctx.font='700 30px "Cinzel",serif';ctx.fillStyle=GOLDINC;
-  ctx.fillText('D O C U M E N T E D   N U T S',W/2,512);
-
-  ctx.font='italic 25px "Crimson Text",Georgia,serif';ctx.fillStyle=INK2;
-  const df=new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
-  ctx.fillText(`on ${df} — timestamped for maximum timeline damage`,W/2,556);
-  if(nickname){ctx.font='italic 20px "Crimson Text",Georgia,serif';ctx.fillStyle=GOLDMED;ctx.fillText(`Issued to: ${nickname} (do not show HR)`,W/2,586);}
-  const lastType = todayLog.length ? logType(todayLog[todayLog.length-1]) : selectedNutType;
-  const lm = NUT_TYPES[lastType] || NUT_TYPES.solo;
-  ctx.font='italic 18px "Crimson Text",Georgia,serif';ctx.fillStyle=GOLDMED;
-  ctx.fillText(`Method: ${lm.em} ${lm.label} — solo, sex, chaos — all count`,W/2,612);
-
-  ornLine(ctx,W/2,615,540);
-
-  const stats=[{l:'ALL-TIME TOTAL',v:countAllTime.toLocaleString()},{l:'PERSONAL RECORD',v:bestDay.toLocaleString()},{l:'DAYS TRACKED',v:daysTracked.toLocaleString()},{l:'SESSION',v:countSession.toLocaleString()}];
-  const cw=(W-180)/4;
-  stats.forEach(({l,v},i)=>{
-    const x=90+cw/2+i*cw;
-    ctx.fillStyle='rgba(100,55,0,0.08)';rrect(ctx,x-cw/2+10,640,cw-20,92,5);ctx.fill();
-    ctx.strokeStyle='rgba(100,55,0,0.45)';ctx.lineWidth=1.5;ctx.stroke();
-    ctx.font='700 40px "Space Mono",monospace';ctx.fillStyle=INK;ctx.fillText(v,x,690);
-    ctx.font='700 13px "Cinzel",serif';ctx.fillStyle=GOLDINC;ctx.fillText(l,x,720);
-  });
-
-  ctx.font='italic 25px "Crimson Text",Georgia,serif';ctx.fillStyle=INK2;
-  wrapText(ctx,`"${getAchievementText(countToday)}"`,W/2,808,W-200,34);
-
-  ornLine(ctx,W/2,850,500);
-
-  const sx=158,sy=908,sr=66;
-  ctx.beginPath();ctx.arc(sx,sy,sr,0,Math.PI*2);ctx.strokeStyle='#6B4000';ctx.lineWidth=3;ctx.stroke();
-  ctx.beginPath();ctx.arc(sx,sy,sr-14,0,Math.PI*2);ctx.strokeStyle='rgba(100,60,0,0.5)';ctx.lineWidth=1;ctx.stroke();
-  await new Promise(resolve => {
-    const si = new Image();
-    si.onload = () => {
-      ctx.save();ctx.beginPath();ctx.arc(sx,sy,sr-18,0,Math.PI*2);ctx.clip();
-      ctx.drawImage(si,sx-(sr-18),sy-(sr-18),(sr-18)*2,(sr-18)*2);ctx.restore();
-      resolve();
-    };
-    si.onerror = () => { ctx.font='42px serif';ctx.fillText('🥜',sx,sy+2);resolve(); };
-    si.src='./nut-coin.jpg';
-  });
-  ctx.font='700 11px "Cinzel",serif';ctx.fillStyle='#4A2800';ctx.fillText('NUT DISCLOSURE BOARD',sx,sy+sr+16);
-
-  ctx.textAlign='right';
-  ctx.strokeStyle='rgba(50,25,0,0.55)';ctx.lineWidth=1.5;
-  ctx.beginPath();ctx.moveTo(W-380,920);ctx.lineTo(W-78,920);ctx.stroke();
-  ctx.font='italic 32px "Crimson Text",Georgia,serif';ctx.fillStyle='#0A0400';ctx.fillText('Chief Nut Officer',W-80,908);
-  ctx.font='700 12px "Cinzel",serif';ctx.fillStyle='#5C3000';ctx.fillText('AUTHENTICATED · POST AT YOUR OWN RISK',W-80,932);
-
-  ctx.textAlign='center';ctx.font='11px "Cinzel",serif';ctx.fillStyle='rgba(80,40,0,0.45)';
-  ctx.fillText(`$NUT · OFFICIAL RECEIPT · ${dateStr} · ${SITE_URL} · NOT FINANCIAL ADVICE`,W/2,H-18);
-
-  document.getElementById('certLoading').style.display='none';
+  const loading = document.getElementById('certLoading');
+  if (loading) loading.style.display = 'none';
 }
+
+/** Expose for Claude / ChatGPT prompt filling */
+window.getReceiptPayload = getReceiptPayload;
 
 async function openCertificate() {
   document.getElementById('certModal').classList.add('show');

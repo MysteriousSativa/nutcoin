@@ -1,0 +1,20 @@
+# Paste into ChatGPT after filling values from getReceiptPayload() on live site
+
+Create a shareable social media receipt poster for parody memecoin $NUT.
+
+Canvas: 1080x1350 portrait. Background #050301 with orange-gold top glow. NO parchment. NO religious symbols.
+
+- Header: OFFICIAL NUT RECEIPT · FORM 69-A
+- Huge: $NUT in gold
+- Giant number: {TODAY} — NUTS TODAY
+- LAST LOGGED: {METHOD_EMOJI} {METHOD}
+- Subline: solo · partnered · all methods count
+- Stats row: ALL-TIME {ALLTIME} | PARTNERED {PARTNERED} | STREAK {STREAK} | SESSION {SESSION}
+- Issued to: {NICK}
+- Quote card: "{VERDICT}"
+- Methods today: {METHODS_LINE}
+- Footer: barcode, @TheNutTracker, POST AT YOUR OWN RISK
+
+Style: pump.fun degen Twitter, gold on black, bold sans serif, meme energy, opaque PNG.
+
+Save as img/receipt-share.png in repo.
