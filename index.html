@@ -503,6 +503,10 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 /* ── ETERNAL FLAME ── */
 .flame-panel{text-align:center;padding:10px 0;}
 .flame-container{display:inline-flex;flex-direction:column;align-items:center;margin:0 auto 18px;position:relative;}
+.flame-icon-img{width:clamp(64px,16vw,110px);height:auto;margin-bottom:-4px;
+  filter:drop-shadow(0 0 22px rgba(255,100,0,0.7)) drop-shadow(0 0 50px rgba(200,60,0,0.45));
+  animation:flicker .55s ease-in-out infinite alternate, float 3s ease-in-out infinite;
+}
 .flame-num{font-family:'Cinzel Decorative',serif;font-size:56px;font-weight:900;line-height:1;margin:6px 0 2px;transition:color 1s;}
 .flame-day-label{font-family:'Cinzel',serif;font-size:10px;letter-spacing:.22em;color:var(--muted);text-transform:uppercase;}
 .flame-tier{font-family:'Crimson Text',serif;font-size:18px;color:var(--cream);font-style:italic;margin:16px 0 6px;min-height:28px;}
@@ -537,7 +541,11 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 
 /* ── PROPHECY ORACLE ── */
 .prophecy-wrap{text-align:center;padding:8px 0;}
-.prophecy-eye{font-size:50px;display:block;margin-bottom:14px;animation:float 4s ease-in-out infinite;filter:drop-shadow(0 0 18px rgba(200,169,110,0.45));}
+.prophecy-eye{
+  display:block;width:clamp(100px,25vw,160px);height:auto;margin:0 auto 14px;
+  animation:float 4s ease-in-out infinite;
+  filter:drop-shadow(0 0 28px rgba(200,140,0,0.65)) drop-shadow(0 0 60px rgba(180,80,0,0.35));
+}
 .prophecy-heading{font-family:'Cinzel',serif;font-size:9px;letter-spacing:.28em;color:var(--gold);text-transform:uppercase;margin-bottom:18px;}
 .prophecy-text{font-family:'Crimson Text',serif;font-size:20px;line-height:1.7;color:var(--cream);font-style:italic;max-width:700px;margin:0 auto 18px;min-height:80px;}
 .prophecy-omen{font-family:'Cinzel',serif;font-size:10px;letter-spacing:.2em;color:var(--muted);text-transform:uppercase;}
@@ -775,7 +783,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 
   /* Prophecy */
   .prophecy-text{font-size:16px;}
-  .prophecy-eye{font-size:40px;}
+  .prophecy-eye{width:clamp(80px,22vw,120px);}
 
   /* Flame */
   .flame-num{font-size:42px;}
@@ -1005,6 +1013,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
       <div class="panel-title">The Eternal Flame</div>
       <div class="flame-panel">
         <div class="flame-container">
+          <img class="flame-icon-img" src="./img/flame-icon.png" alt="">
           <div id="flameSvgWrap"></div>
           <div class="flame-num" id="flameNum">0</div>
           <div class="flame-day-label">Day Streak</div>
@@ -1041,7 +1050,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
     <div class="panel" id="panel-9">
       <div class="panel-title">The Prophecy Oracle</div>
       <div class="prophecy-wrap">
-        <span class="prophecy-eye">🔮</span>
+        <img class="prophecy-eye" src="./img/oracle-eye.png" alt="Oracle Eye">
         <div class="prophecy-heading">The Oracle Speaks</div>
         <div class="prophecy-text" id="prophecyText">go nut first. then the oracle will talk to you.</div>
         <div class="prophecy-omen" id="prophecyOmen"></div>
