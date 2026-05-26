@@ -295,22 +295,35 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .tl-time{font-family:'Space Mono',monospace;font-size:11px;color:var(--muted);}
 .tl-empty{font-family:'Crimson Text',serif;font-size:17px;color:var(--muted);font-style:italic;text-align:center;padding:20px 0;}
 
-/* leaderboard panel */
-.lb-table{width:100%;border-collapse:collapse;}
-.lb-table th{font-family:'Cinzel',serif;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);padding:0 8px 14px;text-align:left;border-bottom:1px solid var(--border);}
-.lb-table th:last-child{text-align:right;}
-.lb-table td{padding:11px 8px;border-bottom:1px solid rgba(200,169,110,0.06);vertical-align:middle;}
-.lb-table td:last-child{text-align:right;font-family:'Space Mono',monospace;font-size:16px;color:var(--gold);text-shadow:0 0 9px rgba(200,169,110,0.3);}
-.lb-rank{font-family:'Cinzel',serif;font-size:11px;color:var(--muted);width:28px;}
-.lb-rank.top{color:var(--gold);text-shadow:0 0 9px rgba(200,169,110,0.4);}
-.lb-name{font-family:'Crimson Text',serif;font-size:17px;color:var(--cream);}
-.lb-name.you{color:var(--green);text-shadow:0 0 10px rgba(78,201,122,0.3);}
+/* leaderboard panel — mobile-first card rows */
+.lb-list{display:flex;flex-direction:column;gap:5px;max-height:480px;overflow-y:auto;padding-right:2px;}
+.lb-list::-webkit-scrollbar{width:4px;}
+.lb-list::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+.lb-row{display:flex;align-items:center;gap:10px;padding:11px 14px;border-radius:12px;background:rgba(20,14,6,0.75);border:1px solid rgba(200,169,110,0.09);transition:border-color .2s,background .2s;}
+.lb-row.you{background:rgba(78,201,122,0.07);border-color:rgba(78,201,122,0.28);}
+.lb-row.top1{background:rgba(200,169,110,0.11);border-color:rgba(200,169,110,0.35);}
+.lb-row.top2{background:rgba(192,192,192,0.07);border-color:rgba(192,192,192,0.22);}
+.lb-row.top3{background:rgba(180,100,40,0.07);border-color:rgba(180,100,40,0.2);}
+.lb-row-rank{font-family:'Cinzel Decorative',serif;font-size:15px;width:32px;flex-shrink:0;text-align:center;line-height:1;}
+.lb-row-rank.gold{color:#FFD700;text-shadow:0 0 10px rgba(255,215,0,0.55);}
+.lb-row-rank.silver{color:#C0C0C0;text-shadow:0 0 8px rgba(192,192,192,0.4);}
+.lb-row-rank.bronze{color:#CD7F32;text-shadow:0 0 8px rgba(205,127,50,0.4);}
+.lb-row-rank.plain{font-family:'Space Mono',monospace;font-size:12px;color:var(--muted);}
+.lb-row-name{flex:1;font-family:'Crimson Text',serif;font-size:18px;color:var(--cream);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.lb-row.you .lb-row-name{color:var(--green);}
+.lb-row-count{font-family:'Space Mono',monospace;font-size:16px;color:var(--gold);flex-shrink:0;text-shadow:0 0 9px rgba(200,169,110,0.3);}
+.lb-row.you .lb-row-count{color:var(--green);text-shadow:0 0 9px rgba(78,201,122,0.3);}
+.lb-row-nuts{font-family:'Cinzel',serif;font-size:8px;letter-spacing:.1em;color:var(--muted);text-transform:uppercase;flex-shrink:0;align-self:flex-end;margin-bottom:2px;}
+.lb-you-badge{font-family:'Cinzel',serif;font-size:8px;letter-spacing:.1em;color:var(--green);background:rgba(78,201,122,0.12);border:1px solid rgba(78,201,122,0.25);border-radius:4px;padding:1px 6px;flex-shrink:0;}
 .lb-empty{text-align:center;font-family:'Crimson Text',serif;font-size:17px;color:var(--muted);font-style:italic;padding:20px 0;}
 .lb-join{margin-top:16px;text-align:center;}
 .lb-join-btn{background:rgba(200,169,110,0.08);border:1px solid var(--gold-dim);border-radius:10px;
   padding:11px 32px;font-family:'Cinzel',serif;font-size:11px;letter-spacing:.14em;color:var(--gold);cursor:pointer;
   transition:background .2s,box-shadow .2s,transform .1s;}
 .lb-join-btn:hover{background:rgba(200,169,110,0.15);box-shadow:0 0 20px rgba(200,169,110,0.14);transform:translateY(-1px);}
+.lb-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+.lb-count-label{font-family:'Cinzel',serif;font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);}
+.lb-count-label span{color:var(--gold);}
 
 /* ── ACTIVITY LOG ── */
 .log-section{background:rgba(12,8,4,0.82);border:1px solid var(--border);border-radius:22px;padding:28px 24px;margin-bottom:18px;backdrop-filter:blur(22px);box-shadow:var(--shadow-gold);}
@@ -1076,14 +1089,24 @@ let lbCache = [];
 async function fetchLeaderboard() {
   if (!db) {
     document.getElementById('lbContent').innerHTML = `<div class="lb-empty">Configure Supabase to enable the global leaderboard.<br><br>
-      <span style="font-size:13px;font-family:\'Cinzel\',serif;letter-spacing:.1em;color:var(--muted)">Run the SQL schema from the config block to get started.</span></div>`;
+      <span style="font-size:13px;font-family:'Cinzel',serif;letter-spacing:.1em;color:var(--muted)">Run the SQL schema from the config block to get started.</span></div>`;
     if (!nickname) document.getElementById('lbJoin').style.display='block';
     return;
   }
   try {
-    const {data,error} = await db.rpc('leaderboard',{target_date:dateStr});
+    // Query all rows for today directly — bypasses the RPC's hardcoded LIMIT 10
+    const {data,error} = await db
+      .from('nut_logs')
+      .select('nickname')
+      .eq('deed_date', dateStr)
+      .not('nickname', 'is', null);
     if (error) throw error;
-    lbCache = data || [];
+    // Aggregate counts in JS
+    const counts = {};
+    (data || []).forEach(row => { counts[row.nickname] = (counts[row.nickname] || 0) + 1; });
+    lbCache = Object.entries(counts)
+      .map(([nickname, deeds]) => ({nickname, deeds}))
+      .sort((a, b) => b.deeds - a.deeds);
     renderLeaderboard(lbCache);
     updateNickRank(lbCache);
   } catch(e) {
@@ -1098,19 +1121,33 @@ function renderLeaderboard(rows) {
     if (!nickname) document.getElementById('lbJoin').style.display='block';
     return;
   }
-  const medals=['🥇','🥈','🥉'];
-  let html=`<table class="lb-table"><thead><tr><th></th><th>Name</th><th>Today</th></tr></thead><tbody>`;
+  const rankIcons = [
+    {cls:'gold',  txt:'🥇'},
+    {cls:'silver',txt:'🥈'},
+    {cls:'bronze',txt:'🥉'},
+  ];
+  const rowClass = i => i===0?'top1':i===1?'top2':i===2?'top3':'';
+  let html = `<div class="lb-header">
+    <span class="lb-count-label">ALL USERS TODAY &nbsp;<span>${rows.length} NUTTERS</span></span>
+  </div>`;
+  html += `<div class="lb-list">`;
   rows.forEach((r,i)=>{
     const isYou = r.nickname===nickname;
-    html+=`<tr>
-      <td class="lb-rank ${i<3?'top':''}">${medals[i]||i+1}</td>
-      <td class="lb-name ${isYou?'you':''}">${escHtml(r.nickname)}${isYou?' (you)':''}</td>
-      <td>${Number(r.deeds).toLocaleString()}</td>
-    </tr>`;
+    const ri = i < 3 ? rankIcons[i] : null;
+    const rankEl = ri
+      ? `<span class="lb-row-rank ${ri.cls}">${ri.txt}</span>`
+      : `<span class="lb-row-rank plain">${i+1}</span>`;
+    html += `<div class="lb-row ${rowClass(i)} ${isYou?'you':''}">
+      ${rankEl}
+      <span class="lb-row-name">${escHtml(r.nickname)}</span>
+      ${isYou ? '<span class="lb-you-badge">YOU</span>' : ''}
+      <span class="lb-row-count">${Number(r.deeds).toLocaleString()}</span>
+      <span class="lb-row-nuts">NUTS</span>
+    </div>`;
   });
-  html+=`</tbody></table>`;
-  el.innerHTML=html;
-  document.getElementById('lbJoin').style.display=!nickname?'block':'none';
+  html += `</div>`;
+  el.innerHTML = html;
+  document.getElementById('lbJoin').style.display = !nickname ? 'block' : 'none';
 }
 
 function updateNickRank(rows) {
