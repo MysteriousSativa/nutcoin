@@ -736,16 +736,13 @@ position:relative;overflow-y:auto;
 .cert-tweet-btn:hover{background:rgba(29,161,242,0.2);box-shadow:0 0 20px rgba(29,161,242,0.2);transform:translateY(-1px);}
 
 /* ── ETERNAL FLAME ── */
-.flame-panel{text-align:center;padding:10px 0;}
-.flame-container{display:inline-flex;flex-direction:column;align-items:center;margin:0 auto 18px;position:relative;}
-.flame-icon-img{width:clamp(64px,16vw,110px);height:auto;margin-bottom:-4px;
-  filter:drop-shadow(0 0 22px rgba(255,100,0,0.7)) drop-shadow(0 0 50px rgba(200,60,0,0.45));
-  animation:flicker .55s ease-in-out infinite alternate, float 3s ease-in-out infinite;
-}
-.flame-num{font-family:'Cinzel',serif;font-size:56px;font-weight:900;line-height:1;margin:6px 0 2px;transition:color 1s;}
-.flame-day-label{font-family:'Cinzel',serif;font-size:10px;letter-spacing:.22em;color:var(--muted);text-transform:uppercase;}
-.flame-tier{font-family:'Crimson Text',serif;font-size:18px;color:var(--cream);font-style:italic;margin:16px 0 6px;min-height:28px;}
-.flame-sub{font-family:'Cinzel',serif;font-size:10px;letter-spacing:.14em;color:var(--muted);}
+.flame-panel{text-align:center;padding:16px 0 8px;}
+.flame-container{display:inline-flex;flex-direction:column;align-items:center;margin:0 auto 20px;gap:4px;}
+#flameSvgWrap{display:flex;align-items:flex-end;justify-content:center;min-height:100px;margin-bottom:4px;}
+.flame-num{font-family:'Cinzel',serif;font-size:52px;font-weight:900;line-height:1;margin:0;transition:color .4s;}
+.flame-day-label{font-family:'Cinzel',serif;font-size:10px;letter-spacing:.2em;color:var(--muted);text-transform:uppercase;margin-top:2px;}
+.flame-tier{font-family:'Crimson Text',serif;font-size:17px;line-height:1.45;color:var(--cream);margin:0 0 8px;max-width:340px;margin-left:auto;margin-right:auto;}
+.flame-sub{font-family:'Cinzel',serif;font-size:10px;letter-spacing:.12em;color:var(--muted);text-transform:uppercase;}
 @keyframes flicker{0%,100%{transform:scaleX(1) scaleY(1);}25%{transform:scaleX(.97) scaleY(1.03);}50%{transform:scaleX(1.02) scaleY(.97);}75%{transform:scaleX(.98) scaleY(1.02);}}
 .flame-alive{animation:flicker .38s ease-in-out infinite;transform-origin:bottom center;}
 
@@ -1061,8 +1058,9 @@ position:relative;overflow:hidden;
   .prophecy-eye{width:clamp(80px,22vw,120px);}
 
   /* Flame */
-  .flame-num{font-size:42px;}
-  .flame-tier{font-size:16px;}
+  .flame-num{font-size:40px;}
+  .flame-tier{font-size:15px;}
+  #flameSvgWrap{min-height:80px;}
 
   /* Chrono */
   .chrono-svg{max-width:220px;}
@@ -1336,13 +1334,12 @@ position:relative;overflow:hidden;
       <div class="panel-title">The Eternal Flame</div>
       <div class="flame-panel">
         <div class="flame-container">
-          <img class="flame-icon-img" src="./img/flame-icon.png" alt="">
           <div id="flameSvgWrap"></div>
           <div class="flame-num" id="flameNum">0</div>
-          <div class="flame-day-label">Day Streak</div>
+          <div class="flame-day-label">Day streak</div>
         </div>
-        <div class="flame-tier" id="flameTier">No streak yet. Go nut once to start the flame.</div>
-        <div class="flame-sub" id="flameSub">Nut today to ignite the eternal flame</div>
+        <div class="flame-tier" id="flameTier">No streak yet. Log a nut today to start.</div>
+        <div class="flame-sub" id="flameSub">Come back tomorrow to keep it going</div>
       </div>
     </div>
 
@@ -2929,11 +2926,27 @@ function updateStreak() {
 }
 
 function getFlameConfig(s) {
-  if (s===0) return {c:'#3a3020',h:0,tier:'no streak. get your shit together and go nut.',sub:'come back tomorrow and start the damn flame'};
-  if (s<=2)  return {c:'#ff8c00',h:75,tier:'barely a streak but the flame remembers. keep going you degenerate.',sub:`do not blow it tomorrow`};
-  if (s<=6)  return {c:'#ff3300',h:105,tier:'a real streak going. the flame is impressed and slightly worried about you.',sub:`${7-s} more days to reach inferno tier`};
-  if (s<=13) return {c:'#4488ff',h:135,tier:'BLUE INFERNO. what the hell. this is not normal behavior and we mean that sincerely.',sub:`${14-s} more days to the godflame. seek help.`};
-  return {c:'#C8A96E',h:155,tier:'THE GODFLAME. 14 days straight. what the fuck is wrong with you. also respect.',sub:`${s} days of unbroken and deeply concerning discipline`};
+  if (s===0) return {c:'#5a5040',h:70,tier:'No streak yet. Log a nut today to start.',sub:'Come back tomorrow to keep it going'};
+  if (s<=2)  return {c:'#ff8c00',h:75,tier:'Early streak. One day at a time.',sub:'Log again tomorrow to extend it'};
+  if (s<=6)  return {c:'#ff3300',h:105,tier:'Solid run. The flame is holding.',sub:`${7-s} more day${7-s===1?'':'s'} to blue tier`};
+  if (s<=13) return {c:'#4488ff',h:135,tier:'Blue tier. Seven days and counting.',sub:`${14-s} more day${14-s===1?'':'s'} to gold tier`};
+  return {c:'#C8A96E',h:155,tier:'Gold tier. Long streak unlocked.',sub:`${s} days and still going`};
+}
+
+function renderFlameSvg(cfg, streak, dim) {
+  const h=cfg.h, c=cfg.c;
+  const c2=streak>=14?'#fffaee':streak>=7?'#aabbff':streak>=3?'#ff8833':'#ffdd44';
+  const opacity=dim?0.35:1;
+  const anim=dim?'':' class="flame-alive"';
+  return `<svg width="96" height="${h+18}" viewBox="0 0 110 ${h+18}" style="overflow:visible;opacity:${opacity};filter:drop-shadow(0 0 14px ${c})">
+    <defs><radialGradient id="fg${streak}" cx="50%" cy="90%" r="55%">
+      <stop offset="0%" stop-color="${c2}"/><stop offset="55%" stop-color="${c}" stop-opacity=".9"/><stop offset="100%" stop-color="${c}" stop-opacity="0"/>
+    </radialGradient></defs>
+    <g${anim} style="transform-origin:55px ${h+10}px">
+      <ellipse cx="55" cy="${h+8}" rx="25" ry="10" fill="${c}" opacity=".6"/>
+      <path d="M55,8 C47,${h*.4} 33,${h*.52} 35,${h*.76} C37,${h*.9} 45,${h} 55,${h+8} C65,${h} 73,${h*.9} 75,${h*.76} C77,${h*.52} 63,${h*.4} 55,8Z" fill="url(#fg${streak})"/>
+      <path d="M55,${h*.28} C51,${h*.54} 46,${h*.6} 47,${h*.75} C48,${h*.88} 52,${h*.95} 55,${h+4} C58,${h*.95} 62,${h*.88} 63,${h*.75} C64,${h*.6} 59,${h*.54} 55,${h*.28}Z" fill="${c2}" opacity=".65"/>
+    </g></svg>`;
 }
 
 function renderFlame() {
@@ -2943,17 +2956,7 @@ function renderFlame() {
   document.getElementById('flameTier').textContent = cfg.tier;
   document.getElementById('flameSub').textContent = cfg.sub;
   const wrap = document.getElementById('flameSvgWrap');
-  if (currentStreak === 0) { wrap.innerHTML='<div style="font-size:56px;opacity:.22;margin-bottom:6px">🪨</div>'; return; }
-  const h=cfg.h, c=cfg.c, c2=currentStreak>=14?'#fffaee':currentStreak>=7?'#aabbff':currentStreak>=3?'#ff8833':'#ffdd44';
-  wrap.innerHTML=`<svg width="110" height="${h+18}" viewBox="0 0 110 ${h+18}" style="overflow:visible;filter:drop-shadow(0 0 16px ${c})">
-    <defs><radialGradient id="fg${currentStreak}" cx="50%" cy="90%" r="55%">
-      <stop offset="0%" stop-color="${c2}"/><stop offset="55%" stop-color="${c}" stop-opacity=".9"/><stop offset="100%" stop-color="${c}" stop-opacity="0"/>
-    </radialGradient></defs>
-    <g class="flame-alive" style="transform-origin:55px ${h+10}px">
-      <ellipse cx="55" cy="${h+8}" rx="25" ry="10" fill="${c}" opacity=".6"/>
-      <path d="M55,8 C47,${h*.4} 33,${h*.52} 35,${h*.76} C37,${h*.9} 45,${h} 55,${h+8} C65,${h} 73,${h*.9} 75,${h*.76} C77,${h*.52} 63,${h*.4} 55,8Z" fill="url(#fg${currentStreak})"/>
-      <path d="M55,${h*.28} C51,${h*.54} 46,${h*.6} 47,${h*.75} C48,${h*.88} 52,${h*.95} 55,${h+4} C58,${h*.95} 62,${h*.88} 63,${h*.75} C64,${h*.6} 59,${h*.54} 55,${h*.28}Z" fill="${c2}" opacity=".65"/>
-    </g></svg>`;
+  wrap.innerHTML = renderFlameSvg(cfg, currentStreak, currentStreak === 0);
 }
 
 // ════════════════════════════════════════
