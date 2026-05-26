@@ -3,18 +3,18 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>$NUT — World Nut Tracking Memecoin</title>
+<title>$NUT, World Nut Tracking Memecoin</title>
 <link rel="icon" href="/img/favicon.ico" sizes="32x32"/>
 <link rel="apple-touch-icon" href="/img/apple-touch-icon.png"/>
-<meta property="og:title" content="$NUT — The World Nut Tracking Memecoin"/>
-<meta property="og:description" content="$NUT — world nut tracking on Solana. Tap. Count. Flex. Not financial advice."/>
+<meta property="og:title" content="$NUT, The World Nut Tracking Memecoin"/>
+<meta property="og:description" content="$NUT, world nut tracking on Solana. Tap. Count. Flex. Not financial advice."/>
 <link rel="canonical" href="https://nutcoin-alpha.vercel.app/"/>
 <meta property="og:image" content="https://nutcoin-alpha.vercel.app/img/og.png"/>
 <meta property="og:url" content="https://nutcoin-alpha.vercel.app/"/>
 <meta property="og:type" content="website"/>
 <meta name="twitter:card" content="summary_large_image"/>
-<meta name="twitter:title" content="$NUT — The World Nut Tracking Memecoin"/>
-<meta name="twitter:description" content="$NUT — world nut tracking on Solana. Tap. Count. Flex. Not financial advice."/>
+<meta name="twitter:title" content="$NUT, The World Nut Tracking Memecoin"/>
+<meta name="twitter:description" content="$NUT, world nut tracking on Solana. Tap. Count. Flex. Not financial advice."/>
 <meta name="twitter:image" content="https://nutcoin-alpha.vercel.app/img/og.png"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800;900&family=Space+Mono:wght@500;700&display=swap" rel="stylesheet"/>
@@ -77,7 +77,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 }
 .buy-btn-sm.tba{opacity:0.45;cursor:default;}
 
-/* ── DRIPS (disabled — goo filter + 30+ animations killed scroll perf) ── */
+/* ── DRIPS (disabled, goo filter + 30+ animations killed scroll perf) ── */
 .drip-wrap{display:none !important;}
 .drip-wrap-off{position:fixed;top:0;left:0;right:0;height:140px;pointer-events:none;z-index:300;filter:url('#goo');}
 .drip-wrap.bottom{top:auto;bottom:0;transform:scaleY(-1);}
@@ -215,7 +215,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 }
 .hero-proof-item{font-size:12px;color:var(--muted);font-weight:500;}
 .hero-proof-item strong{display:block;font-size:22px;font-weight:800;color:var(--stat);font-family:'Space Mono',monospace;margin-top:2px;}
-/* sticky trade — mobile buyers */
+/* sticky trade, mobile buyers */
 .sticky-trade{
   display:none;position:fixed;left:0;right:0;z-index:640;
   bottom:calc(58px + env(safe-area-inset-bottom,0px));
@@ -490,7 +490,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .tl-time{font-family:'Space Mono',monospace;font-size:11px;color:var(--muted);}
 .tl-empty{font-family:'Crimson Text',serif;font-size:17px;color:var(--muted);font-style:italic;text-align:center;padding:20px 0;}
 
-/* leaderboard panel — mobile-first card rows */
+/* leaderboard panel, mobile-first card rows */
 .lb-list{display:flex;flex-direction:column;gap:5px;max-height:480px;overflow-y:auto;padding-right:2px;}
 .lb-list::-webkit-scrollbar{width:4px;}
 .lb-list::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
@@ -852,7 +852,7 @@ position:relative;overflow:hidden;
 .mobile-nav{display:none;}
 
 /* ════════════════════════════════════════
-   MOBILE LAYOUT — max-width 600px
+   MOBILE LAYOUT, max-width 600px
    ════════════════════════════════════════ */
 @media(max-width:600px){
   .sticky-trade{display:flex;}
@@ -950,7 +950,7 @@ position:relative;overflow:hidden;
   .big-count{font-size:clamp(86px,23vw,118px);margin-bottom:2px;}
   .reset-sub{font-size:12px;margin-bottom:20px;}
 
-  /* NUT BUTTON — FULL WIDTH, THICK, THUMB ZONE */
+  /* NUT BUTTON, FULL WIDTH, THICK, THUMB ZONE */
   .nut-method-grid{gap:5px;}
   .nut-method-chip{padding:8px 10px;font-size:9.5px;}
   .nut-verdict{font-size:11px;margin-bottom:10px;}
@@ -1040,16 +1040,16 @@ position:relative;overflow:hidden;
   /* Footer */
   .footer{font-size:10px;padding:12px 0 calc(12px + env(safe-area-inset-bottom,0px));line-height:2;}
 
-  /* Ticker — tighter on mobile */
+  /* Ticker, tighter on mobile */
   .ticker-wrap{margin-bottom:8px;}
 
-  /* Scroll NUT button — above nav */
+  /* Scroll NUT button, above nav */
   .scroll-nut-btn{
     left:12px;right:12px;bottom:72px;border-radius:15px;
     justify-content:center;padding:15px;font-size:13px;
   }
 
-  /* Toast — above nav */
+  /* Toast, above nav */
   .toast{bottom:78px;font-size:10.5px;padding:10px 20px;max-width:88vw;white-space:normal;text-align:center;line-height:1.4;}
 }
 
@@ -1081,7 +1081,7 @@ position:relative;overflow:hidden;
 <!-- BUY BANNER -->
 <div class="buy-banner" id="buyBanner">
   <span style="color:var(--gold);font-weight:700;">🚀 $NUT</span>
-  <span class="contract">CA: <span id="bannerCA">TBA — deploy on pump.fun to activate</span></span>
+  <span class="contract">CA: <span id="bannerCA">TBA, deploy on pump.fun to activate</span></span>
   <button class="buy-btn-sm tba" id="bannerBuyBtn" onclick="openBuy()">BUY $NUT</button>
 </div>
 
@@ -1109,14 +1109,14 @@ position:relative;overflow:hidden;
   <div class="drip" style="left:95%; --h:48px; width:26px;animation-duration:3.0s;animation-delay:1.2s;"></div>
 </div>
 
-<!-- HERO — memecoin landing (no nut-logo.png) -->
+<!-- HERO, memecoin landing (no nut-logo.png) -->
 <div class="hero">
   <div class="hero-badge" id="launchBadge">PRE-LAUNCH · pump.fun soon</div>
   <h1 class="hero-title" aria-label="$NUT"><span class="sym">$</span>NUT</h1>
-  <p class="hero-pitch">Every nut counts — solo, sex, quickie, revenge nut, 2am chaos. Log it on-chain energy. Tap. Receipt. Post. Cause a scene.</p>
+  <p class="hero-pitch">Every nut counts, solo, sex, quickie, revenge nut, 2am chaos. Log it on-chain energy. Tap. Receipt. Post. Cause a scene.</p>
   <div class="ca-box" id="caBox">
     <span class="ca-label">CA</span>
-    <code class="ca-addr" id="caAddr">Deploying on pump.fun — check back</code>
+    <code class="ca-addr" id="caAddr">Deploying on pump.fun, check back</code>
     <button type="button" class="ca-copy" id="caCopyBtn" onclick="copyCA()">COPY</button>
   </div>
   <div class="cta-row">
@@ -1128,8 +1128,8 @@ position:relative;overflow:hidden;
     <a href="https://x.com/TheNutTracker" target="_blank" rel="noopener noreferrer" id="linkTwitter" class="social-x">𝕏 @TheNutTracker</a>
   </div>
   <div class="hero-proof" id="heroProof">
-    <div class="hero-proof-item"><span>nuts today (global)</span><strong id="heroToday">—</strong></div>
-    <div class="hero-proof-item"><span>all time (global)</span><strong id="heroAll">—</strong></div>
+    <div class="hero-proof-item"><span>nuts today (global)</span><strong id="heroToday">-</strong></div>
+    <div class="hero-proof-item"><span>all time (global)</span><strong id="heroAll">-</strong></div>
   </div>
 </div>
 
@@ -1140,12 +1140,12 @@ position:relative;overflow:hidden;
     <div class="live-chip"><span class="live-dot"></span>LIVE</div>
     <div class="global-half">
       <div class="global-lbl">Global Nut Points Today</div>
-      <div class="global-val loading" id="globalToday">—</div>
+      <div class="global-val loading" id="globalToday">-</div>
       <div class="global-sub" id="globalTodaySub">connecting...</div>
     </div>
     <div class="global-half">
       <div class="global-lbl">Global All-Time</div>
-      <div class="global-val loading" id="globalAllTime">—</div>
+      <div class="global-val loading" id="globalAllTime">-</div>
       <div class="global-sub">across all users, ever</div>
     </div>
   </div>
@@ -1161,11 +1161,11 @@ position:relative;overflow:hidden;
   </div>
 
   <div class="clock-bar" id="clockBar">Loading...</div>
-  <p class="section-kicker">solo · partnered · unhinged — all nuts count</p>
+  <p class="section-kicker">solo · partnered · unhinged, all nuts count</p>
 
   <!-- COUNTER CARD -->
   <div class="counter-card" id="nutCard">
-    <div class="counter-label">Your Nut Points — Today</div>
+    <div class="counter-label">Your Nut Points, Today</div>
     <div class="big-count" id="bigCount">0</div>
     <div class="reset-sub">2× methods rotate each hour · any climax counts</div>
     <div class="bonus-hour" id="bonusHour" aria-live="polite"></div>
@@ -1202,7 +1202,7 @@ position:relative;overflow:hidden;
         <div class="stat-block"><div class="lbl">Personal Record</div><div class="val green" id="p0-best">0</div><div class="hint">most in a single day</div></div>
         <div class="stat-block"><div class="lbl">Days Recorded</div><div class="val" id="p0-days">0</div><div class="hint">days with at least 1</div></div>
         <div class="stat-block"><div class="lbl">Session Count</div><div class="val" id="p0-session">0</div><div class="hint">since page opened</div></div>
-        <div class="stat-block"><div class="lbl">Daily Average</div><div class="val" id="p0-avg">—</div><div class="hint">per active day</div></div>
+        <div class="stat-block"><div class="lbl">Daily Average</div><div class="val" id="p0-avg">-</div><div class="hint">per active day</div></div>
       </div>
       <div class="cooldown-bar-wrap">
         <div class="cd-header"><span>Cooldown</span><span id="cdLabel">Ready</span></div>
@@ -1214,7 +1214,7 @@ position:relative;overflow:hidden;
     <div class="panel" id="panel-1">
       <div class="panel-title">Ancient Wisdom</div>
       <div class="fact-box">
-        <div class="fact-category" id="factCat">—</div>
+        <div class="fact-category" id="factCat">-</div>
         <div class="fact-text" id="factText">Loading...</div>
         <div class="fact-src" id="factSrc"></div>
       </div>
@@ -1231,7 +1231,7 @@ position:relative;overflow:hidden;
     <div class="panel" id="panel-3">
       <div class="panel-title">The Gospel of Nuts</div>
       <div class="fact-box">
-        <div class="fact-category" id="factCat2">—</div>
+        <div class="fact-category" id="factCat2">-</div>
         <div class="fact-text" id="factText2">Loading...</div>
         <div class="fact-src" id="factSrc2"></div>
       </div>
@@ -1244,15 +1244,15 @@ position:relative;overflow:hidden;
         <div class="stat-block"><div class="lbl">Grand Total</div><div class="val gold" id="p4-alltime">0</div><div class="hint">all-time nuts</div></div>
         <div class="stat-block"><div class="lbl">Greatest Day</div><div class="val green" id="p4-best">0</div><div class="hint">personal record</div></div>
         <div class="stat-block"><div class="lbl">Active Days</div><div class="val" id="p4-days">0</div><div class="hint">days in codex</div></div>
-        <div class="stat-block"><div class="lbl">Avg / Day</div><div class="val" id="p4-avg">—</div><div class="hint">per active day</div></div>
-        <div class="stat-block"><div class="lbl">Today vs Best</div><div class="val" id="p4-pct">—</div><div class="hint">of personal record</div></div>
+        <div class="stat-block"><div class="lbl">Avg / Day</div><div class="val" id="p4-avg">-</div><div class="hint">per active day</div></div>
+        <div class="stat-block"><div class="lbl">Today vs Best</div><div class="val" id="p4-pct">-</div><div class="hint">of personal record</div></div>
         <div class="stat-block"><div class="lbl">Session</div><div class="val" id="p4-sesh">0</div><div class="hint">this tab</div></div>
       </div>
     </div>
 
     <!-- 5: Global Leaderboard -->
     <div class="panel" id="panel-5">
-      <div class="panel-title">Global Leaderboard — All Time Top 20</div>
+      <div class="panel-title">Global Leaderboard, All Time Top 20</div>
       <div id="lbContent">
         <div class="lb-empty">Connecting to the ledger...</div>
       </div>
@@ -1282,7 +1282,7 @@ position:relative;overflow:hidden;
       <div class="chrono-wrap">
         <svg class="chrono-svg" id="chronoSvg" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg"></svg>
         <div style="text-align:center;">
-          <div class="chrono-peak" id="chronoPeak">—</div>
+          <div class="chrono-peak" id="chronoPeak">-</div>
           <div class="chrono-peak-label">Peak Hour of Activity</div>
           <div class="chrono-archetype" id="chronoArchetype">go nut first. then we will judge what time of day you do this.</div>
         </div>
@@ -1319,8 +1319,8 @@ position:relative;overflow:hidden;
 
     <!-- 11: Method Ledger -->
     <div class="panel" id="panel-11">
-      <div class="panel-title">How You Nut — Today's Ledger</div>
-      <p style="font-size:13px;color:var(--muted);text-align:center;margin:-8px 0 16px;line-height:1.45;">Hand stuff. Sex. Hotel nut. Stress nut. The codex does not judge method — only volume.</p>
+      <div class="panel-title">How You Nut, Today's Ledger</div>
+      <p style="font-size:13px;color:var(--muted);text-align:center;margin:-8px 0 16px;line-height:1.45;">Hand stuff. Sex. Hotel nut. Stress nut. The codex does not judge method, only volume.</p>
       <div class="method-ledger" id="methodLedger"></div>
       <div class="aura-insight" id="methodInsight" style="margin-top:14px;"></div>
     </div>
@@ -1426,7 +1426,7 @@ position:relative;overflow:hidden;
 <div class="modal-overlay" id="certModal">
   <div class="cert-inner">
     <div class="cert-modal-hdr">
-      <div class="cert-modal-title">Nut Receipt — X Edition</div>
+      <div class="cert-modal-title">Nut Receipt, X Edition</div>
       <div class="cert-modal-sub">dark mode proof · method on file · built to start arguments on the timeline</div>
     </div>
     <div class="cert-canvas-wrap">
@@ -1462,10 +1462,10 @@ position:relative;overflow:hidden;
 
 <script>
 // ═══════════════════════════════════════════════════════
-//  ⚙️  CONFIG — FILL THESE IN TO ACTIVATE GLOBAL FEATURES
+//  ⚙️  CONFIG, FILL THESE IN TO ACTIVATE GLOBAL FEATURES
 // ═══════════════════════════════════════════════════════
 //
-//  Supabase: see SUPABASE.md — run supabase/schema.sql in SQL Editor, then paste anon key below.
+//  Supabase: see SUPABASE.md, run supabase/schema.sql in SQL Editor, then paste anon key below.
 //  Client uses RPCs only: log_nut, global_counts, leaderboard (not raw table insert/select).
 
 const SUPABASE_URL  = 'https://ynzbwnlltqrprnrlbtna.supabase.co';
@@ -1479,7 +1479,7 @@ const PUMP_FUN_URL     = CONTRACT_ADDR ? `https://pump.fun/coin/${CONTRACT_ADDR}
 const DEXSCREENER_URL  = CONTRACT_ADDR ? `https://dexscreener.com/solana/${CONTRACT_ADDR}` : 'https://dexscreener.com/solana';
 const SITE_URL         = 'https://nutcoin-alpha.vercel.app';
 const SITE_CANONICAL   = SITE_URL; // after adding nutcoin.vercel.app in Vercel → switch URL + vercel.json redirect
-const RECEIPT_BG_IMAGE = './img/receipt-share.png'; // optional ChatGPT bg — see CHATGPT_IMAGES.md
+const RECEIPT_BG_IMAGE = './img/receipt-share.png'; // optional ChatGPT bg, see CHATGPT_IMAGES.md
 const PERF_LITE        = window.matchMedia('(max-width: 900px), (prefers-reduced-motion: reduce)').matches;
 
 // ═══════════════════════════════
@@ -1530,7 +1530,7 @@ const NUT_TYPES = {
 const NUT_VERDICTS = [
   'certified bust. receipt printing. timeline not ready.',
   'another nut in the ledger. historians will discuss this.',
-  'partnered or solo — irrelevant. the count went up. beautiful.',
+  'partnered or solo, irrelevant. the count went up. beautiful.',
   'the council has received your disclosure. no further questions.',
   'logged with zero shame and maximum transparency. respect.',
   'this nut will be studied in future memecoin anthropology.',
@@ -1616,7 +1616,7 @@ function showNutVerdict(typeId) {
   const el = document.getElementById('nutVerdict');
   const m = NUT_TYPES[typeId] || NUT_TYPES.solo;
   const v = NUT_VERDICTS[Math.floor(Math.random() * NUT_VERDICTS.length)];
-  if (el) el.textContent = `${m.em} ${m.verb} — ${v}`;
+  if (el) el.textContent = `${m.em} ${m.verb}, ${v}`;
 }
 function renderMethodLedger() {
   const el = document.getElementById('methodLedger');
@@ -1663,30 +1663,30 @@ function save() {
 // CONTENT DATA
 // ═══════════════════════════════
 const FACTS = [
-  {cat:'KINSEY INSTITUTE',text:'Most adults orgasm solo and with partners — both count as sexual release. $NUT counts both because honesty is the brand.',src:'— Kinsey Institute Survey Data'},
-  {cat:'NEUROSCIENCE',text:'Orgasm releases dopamine, oxytocin, and endorphins — whether you got there alone, with someone, or in a hotel at 2am. Same chemicals. Same nut.',src:'— Journal of Neuroscience Research'},
-  {cat:'SLEEP SCIENCE',text:'Post-nut prolactin hits after partnered sex too — which is why people pass out after and pretend it was "just cuddling."',src:'— Sleep Research Society'},
-  {cat:'RELATIONSHIP DATA',text:'Couples who talk openly about sex report higher satisfaction. Couples who log $NUT report higher shamelessness. Correlation unclear.',src:'— Totally Real Studies Dept'},
-  {cat:'BOTANICAL FACT',text:'Peanuts are technically legumes, not nuts. They grow underground in pods — unlike true tree nuts such as walnuts or pecans.',src:'— American Botanical Society'},
-  {cat:'ANCIENT HISTORY',text:'Depictions of self-pleasure appear in ancient Sumerian texts circa 3000 BCE, where it was associated with the god Enki creating the Tigris River.',src:'— Ancient Near Eastern Studies'},
-  {cat:'ETYMOLOGY',text:'The word "masturbation" likely derives from the Latin "manu stuprare" — meaning to defile with the hand. Romans were direct people.',src:'— Oxford Latin Dictionary'},
-  {cat:'SQUIRREL SCIENCE',text:'Squirrels can locate buried nuts under more than a foot of snow using both spatial memory and an exceptionally acute sense of smell.',src:'— Journal of Wildlife Management'},
-  {cat:'IMMUNE SYSTEM',text:'Some research indicates sexual climax may temporarily boost immunoglobulin A antibody levels — the body\'s first line of immune defense.',src:'— Psychoneuroimmunology Studies'},
-  {cat:'WALNUT WISDOM',text:'Ancient Romans called walnuts "Jupiter\'s acorns" and believed their brain-like appearance meant they enhanced human intelligence.',src:'— Historia Naturalis, Pliny the Elder'},
-  {cat:'MEDICAL HISTORY',text:'19th-century physicians prescribed "pelvic massage" for a condition called hysteria — inadvertently inventing early vibration devices.',src:'— History of Medicine Archives'},
-  {cat:'CASHEW FACT',text:'Cashews grow attached to the outside of a fruit called the cashew apple. The shell contains a caustic oil and must be processed before eating.',src:'— Royal Horticultural Society'},
-  {cat:'STRESS RESEARCH',text:'Regular sexual activity, including solo activity, has been linked to measurably lower cortisol levels and reduced perceived stress scores.',src:'— Psychosomatic Medicine Journal'},
-  {cat:'FREQUENCY DATA',text:'A 2020 international survey found adults reported an average of approximately 17 solo sessions per month — though self-reporting in this domain invites skepticism.',src:'— Global Sexuality Survey, 2020'},
-  {cat:'HAZELNUT HISTORY',text:'Hazelnut shells dating back 9,000 years have been found at Scottish archaeological sites, suggesting they were a vital caloric staple of early human diets.',src:'— Scottish Archaeological Journal'},
-  {cat:'CARDIOVASCULAR HEALTH',text:'An 18-year Harvard study found a correlation between higher ejaculation frequency and meaningfully reduced prostate cancer risk in men.',src:'— European Urology Journal, Harvard Data'},
-  {cat:'PISTACHIO PECULIARITY',text:'Pistachios naturally split open when ripe — a phenomenon so satisfying that ancient Persians called it "the smiling nut," served at royal feasts.',src:'— Persian Culinary History'},
-  {cat:'WORLD RECORD',text:'The documented record for the longest solo marathon stands at just under 10 hours. This is a real entry in the Record Holders Republic database. No further comment.',src:'— Record Holders Republic'},
-  {cat:'NUT PRODUCTION',text:'California\'s Central Valley produces roughly 80% of the world\'s almonds. Nearly half of all U.S. honeybee colonies migrate there each spring for pollination.',src:'— USDA Agricultural Statistics'},
+  {cat:'KINSEY INSTITUTE',text:'Most adults orgasm solo and with partners, both count as sexual release. $NUT counts both because honesty is the brand.',src: ' Kinsey Institute Survey Data'},
+  {cat:'NEUROSCIENCE',text:'Orgasm releases dopamine, oxytocin, and endorphins, whether you got there alone, with someone, or in a hotel at 2am. Same chemicals. Same nut.',src: ' Journal of Neuroscience Research'},
+  {cat:'SLEEP SCIENCE',text:'Post-nut prolactin hits after partnered sex too, which is why people pass out after and pretend it was "just cuddling."',src: ' Sleep Research Society'},
+  {cat:'RELATIONSHIP DATA',text:'Couples who talk openly about sex report higher satisfaction. Couples who log $NUT report higher shamelessness. Correlation unclear.',src: ' Totally Real Studies Dept'},
+  {cat:'BOTANICAL FACT',text:'Peanuts are technically legumes, not nuts. They grow underground in pods, unlike true tree nuts such as walnuts or pecans.',src: ' American Botanical Society'},
+  {cat:'ANCIENT HISTORY',text:'Depictions of self-pleasure appear in ancient Sumerian texts circa 3000 BCE, where it was associated with the god Enki creating the Tigris River.',src: ' Ancient Near Eastern Studies'},
+  {cat:'ETYMOLOGY',text:'The word "masturbation" likely derives from the Latin "manu stuprare", meaning to defile with the hand. Romans were direct people.',src: ' Oxford Latin Dictionary'},
+  {cat:'SQUIRREL SCIENCE',text:'Squirrels can locate buried nuts under more than a foot of snow using both spatial memory and an exceptionally acute sense of smell.',src: ' Journal of Wildlife Management'},
+  {cat:'IMMUNE SYSTEM',text:'Some research indicates sexual climax may temporarily boost immunoglobulin A antibody levels, the body\'s first line of immune defense.',src: ' Psychoneuroimmunology Studies'},
+  {cat:'WALNUT WISDOM',text:'Ancient Romans called walnuts "Jupiter\'s acorns" and believed their brain-like appearance meant they enhanced human intelligence.',src: ' Historia Naturalis, Pliny the Elder'},
+  {cat:'MEDICAL HISTORY',text:'19th-century physicians prescribed "pelvic massage" for a condition called hysteria, inadvertently inventing early vibration devices.',src: ' History of Medicine Archives'},
+  {cat:'CASHEW FACT',text:'Cashews grow attached to the outside of a fruit called the cashew apple. The shell contains a caustic oil and must be processed before eating.',src: ' Royal Horticultural Society'},
+  {cat:'STRESS RESEARCH',text:'Regular sexual activity, including solo activity, has been linked to measurably lower cortisol levels and reduced perceived stress scores.',src: ' Psychosomatic Medicine Journal'},
+  {cat:'FREQUENCY DATA',text:'A 2020 international survey found adults reported an average of approximately 17 solo sessions per month, though self-reporting in this domain invites skepticism.',src: ' Global Sexuality Survey, 2020'},
+  {cat:'HAZELNUT HISTORY',text:'Hazelnut shells dating back 9,000 years have been found at Scottish archaeological sites, suggesting they were a vital caloric staple of early human diets.',src: ' Scottish Archaeological Journal'},
+  {cat:'CARDIOVASCULAR HEALTH',text:'An 18-year Harvard study found a correlation between higher ejaculation frequency and meaningfully reduced prostate cancer risk in men.',src: ' European Urology Journal, Harvard Data'},
+  {cat:'PISTACHIO PECULIARITY',text:'Pistachios naturally split open when ripe, a phenomenon so satisfying that ancient Persians called it "the smiling nut," served at royal feasts.',src: ' Persian Culinary History'},
+  {cat:'WORLD RECORD',text:'The documented record for the longest solo marathon stands at just under 10 hours. This is a real entry in the Record Holders Republic database. No further comment.',src: ' Record Holders Republic'},
+  {cat:'NUT PRODUCTION',text:'California\'s Central Valley produces roughly 80% of the world\'s almonds. Nearly half of all U.S. honeybee colonies migrate there each spring for pollination.',src: ' USDA Agricultural Statistics'},
 ];
 
 const SPAM_JOKES = [
   {emoji:'🛑',text:'you literally just nutted. solo or otherwise. 10 minute cooldown. drink water. touch grass later.'},
-  {emoji:'🤝',text:'whether that was hand stuff or you got laid — either way. wait 10 minutes. the codex needs a breather.'},
+  {emoji:'🤝',text:'whether that was hand stuff or you got laid, either way. wait 10 minutes. the codex needs a breather.'},
   {emoji:'📋',text:'the cooldown exists because you have zero self control and we both know it. sit down. 10 minutes.'},
   {emoji:'🚦',text:'bro your balls are on strike. labor dispute. 10 minute negotiation period. non negotiable.'},
   {emoji:'⚖️',text:'your dick is not a vending machine. you cannot just spam it. cooldown required by law.'},
@@ -1710,7 +1710,7 @@ const MILESTONES = {
   100:['🏆','THE LEGEND','one hundred nuts. holy fucking shit. we have no words. please hydrate. please.'],
 };
 
-const TOASTS = ['nut logged — method on file ✦','partnered or solo, counted ✦','the codex does not judge ✦','another one for the ledger ✦','receipt printer go brr ✦','bodied. numerically. ✦'];
+const TOASTS = ['nut logged, method on file ✦','partnered or solo, counted ✦','the codex does not judge ✦','another one for the ledger ✦','receipt printer go brr ✦','bodied. numerically. ✦'];
 
 // ═══════════════════════════════
 // CONTRACT / BUY SETUP
@@ -1742,18 +1742,18 @@ function setupBuyButtons() {
     document.getElementById('bannerCA').textContent = CONTRACT_ADDR.slice(0,8)+'...'+CONTRACT_ADDR.slice(-6);
     document.querySelectorAll('.buy-btn-hero,.buy-btn-sm,.st-st-buy').forEach(b => b.classList.remove('tba'));
   } else {
-    if (addr) addr.textContent = 'Mint not live yet — follow @TheNutTracker on X';
+    if (addr) addr.textContent = 'Mint not live yet, follow @TheNutTracker on X';
     if (badge) badge.textContent = 'FOLLOW @TheNutTracker FOR LAUNCH';
   }
   setupSocialLinks();
 }
 function openBuy() {
   if (CONTRACT_ADDR) window.open(PUMP_FUN_URL,'_blank');
-  else showToast('Contract not yet deployed — check back soon');
+  else showToast('Contract not yet deployed, check back soon');
 }
 function openChart() {
   if (CONTRACT_ADDR) window.open(DEXSCREENER_URL,'_blank');
-  else showToast('Chart live at launch — contract not yet deployed');
+  else showToast('Chart live at launch, contract not yet deployed');
 }
 function copyCA() {
   if (CONTRACT_ADDR) {
@@ -1767,9 +1767,9 @@ function copyCA() {
 // ═══════════════════════════════
 async function fetchGlobalCounts() {
   if (!db) {
-    document.getElementById('globalToday').textContent = '—';
+    document.getElementById('globalToday').textContent = '-';
     document.getElementById('globalTodaySub').textContent = 'configure Supabase to enable';
-    document.getElementById('globalAllTime').textContent = '—';
+    document.getElementById('globalAllTime').textContent = '-';
     return;
   }
   try {
@@ -1824,11 +1824,11 @@ function anonName(sid) {
 async function fetchLeaderboard() {
   if (!db) {
     document.getElementById('lbContent').innerHTML = `<div class="lb-empty">Configure Supabase to enable the global leaderboard.<br><br>
-      <span style="font-size:13px;color:var(--muted)">Owner: run <code style="color:var(--gold)">supabase/schema.sql</code> — see SUPABASE.md</span></div>`;
+      <span style="font-size:13px;color:var(--muted)">Owner: run <code style="color:var(--gold)">supabase/schema.sql</code>, see SUPABASE.md</span></div>`;
     if (!nickname) document.getElementById('lbJoin').style.display='block';
     return;
   }
-  // Server-side aggregation via leaderboard() RPC — returns top rows pre-sorted
+  // Server-side aggregation via leaderboard() RPC, returns top rows pre-sorted
   const {data, error} = await db.rpc('leaderboard');
 
   const el = document.getElementById('lbContent');
@@ -1966,7 +1966,7 @@ function nut() {
   addLogEntry(t, countToday, method, points);
   addTimelineEntry(t, countToday, method, points);
   renderMethodLedger();
-  if (points > 1) showToast(`2× POINTS — +${points} for ${typeLabel(method)} ✦`);
+  if (points > 1) showToast(`2× POINTS, +${points} for ${typeLabel(method)} ✦`);
   else if (Math.random() < 1) showToast(TOASTS[Math.floor(Math.random()*TOASTS.length)]);
   if (MILESTONES[countToday]) {
     const[em,ti,su]=MILESTONES[countToday];
@@ -1989,8 +1989,8 @@ function nut() {
 // UI UPDATE
 // ═══════════════════════════════
 function updateUI() {
-  const avg = daysTracked>0 ? (countAllTime/daysTracked).toFixed(1) : '—';
-  const pct = bestDay>0 ? Math.round((countToday/bestDay)*100)+'%' : '—';
+  const avg = daysTracked>0 ? (countAllTime/daysTracked).toFixed(1) : '-';
+  const pct = bestDay>0 ? Math.round((countToday/bestDay)*100)+'%' : '-';
   document.getElementById('bigCount').textContent=countToday.toLocaleString();
   document.getElementById('myAllTime').textContent=countAllTime.toLocaleString();
   document.getElementById('mySession').textContent=countSession.toLocaleString();
@@ -2135,7 +2135,7 @@ function updateClock() {
 
 // ── CERT PRE-RENDER CACHE ──
 // Render the cert in the background so the blob is ready the instant
-// share is clicked — no async gap before clipboard / WebShare calls.
+// share is clicked, no async gap before clipboard / WebShare calls.
 let _certCache = null;
 async function prerenderCert() {
   try {
@@ -2160,7 +2160,7 @@ async function openXWithCert(text) {
     blob = await new Promise(r => c.toBlob(r, 'image/png', 0.95));
   }
 
-  // Mobile only: native share sheet (skip on Windows/Mac desktop — they open system dialogs)
+  // Mobile only: native share sheet (skip on Windows/Mac desktop, they open system dialogs)
   const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
   if (isMobile && blob && navigator.canShare) {
     try {
@@ -2180,7 +2180,7 @@ async function openXWithCert(text) {
 
   // Open tweet composer after a brief delay so the download dialog registers first
   setTimeout(() => window.open(tweetUrl, '_blank'), 400);
-  showToast('Receipt PNG saved — attach to your tweet and start drama.');
+  showToast('Receipt PNG saved, attach to your tweet and start drama.');
 }
 
 function pickStirTweet() {
@@ -2311,12 +2311,12 @@ function showMilestone(emoji,title,sub) {
 // MOBILE ENHANCEMENTS
 // ═══════════════════════════════
 
-// Haptic feedback — ignored silently on desktop
+// Haptic feedback, ignored silently on desktop
 function haptic(pattern) {
   try { if (navigator.vibrate) navigator.vibrate(pattern || [70, 20, 110]); } catch(e){}
 }
 
-// Squirt particles — disabled (DOM churn killed mobile scroll perf)
+// Squirt particles, disabled (DOM churn killed mobile scroll perf)
 function spawnSquirt() {
   return;
   if (window.innerWidth > 700) return;
@@ -2379,7 +2379,7 @@ function clearSweatDrops() {
   _sweatDrops = [];
 }
 
-// Build-up state — button glistens + sweats as cooldown expires
+// Build-up state, button glistens + sweats as cooldown expires
 function updateBuildUp() {
   if (PERF_LITE) return;
   const btn = document.querySelector('.nut-btn');
@@ -2395,7 +2395,7 @@ function updateBuildUp() {
   }
 }
 
-// Shake detection — detect phone shake, fire a joke
+// Shake detection, detect phone shake, fire a joke
 let _lastShake = 0, _shakeAccum = 0, _lastAcc = {x:0,y:0,z:0};
 function initShakeDetect() {
   if (!window.DeviceMotionEvent) return;
@@ -2425,11 +2425,11 @@ function initShakeDetect() {
   });
 }
 
-// Mobile nav — switches panel and scrolls to panels section
+// Mobile nav, switches panel and scrolls to panels section
 const MNAV_MAP = {0:null, 1:0, 5:5, 6:6, 9:9}; // navId → panelIdx (null = scroll to top)
 function mnavGo(panelIdx, e) {
   haptic(28);
-  // Update active state — find which nav button was tapped
+  // Update active state, find which nav button was tapped
   document.querySelectorAll('.mnav-btn').forEach(b => {
     const pid = parseInt(b.id.replace('mnav',''));
     b.classList.toggle('active', pid === panelIdx);
@@ -2482,7 +2482,7 @@ function showToast(msg) {
 }
 
 // ═══════════════════════════════
-// RECEIPT (download + X share) — 1080×1350 viral card
+// RECEIPT (download + X share), 1080×1350 viral card
 // ═══════════════════════════════
 function getReceiptPayload() {
   const lastType = todayLog.length ? logType(todayLog[todayLog.length - 1]) : selectedNutType;
@@ -2634,7 +2634,7 @@ async function renderCertificate(canvas) {
 
   ctx.font = '500 22px Inter,system-ui,sans-serif';
   ctx.fillStyle = MUTED;
-  ctx.fillText('solo · partnered · quickie · hotel · chaos — all count', W / 2, 562);
+  ctx.fillText('solo · partnered · quickie · hotel · chaos, all count', W / 2, 562);
 
   const stats = [
     { l: 'ALL-TIME', v: p.allTime },
@@ -2825,7 +2825,7 @@ function renderChronometer() {
   out+=`<text x="${cx}" y="${cy+22}" text-anchor="middle" font-family="Space Mono,monospace" font-size="9" fill="rgba(200,169,110,.3)">${new Date().toTimeString().slice(0,5)}</text>`;
   svg.innerHTML=out;
   const peakH=hourCounts.indexOf(Math.max(...hourCounts));
-  document.getElementById('chronoPeak').textContent=todayLog.length?`${peakH%12||12}:00 ${peakH>=12?'PM':'AM'}`:'—';
+  document.getElementById('chronoPeak').textContent=todayLog.length?`${peakH%12||12}:00 ${peakH>=12?'PM':'AM'}`:'-';
   const arches=[[0,5,'the midnight nutter. while the world sleeps you are out here doing this. wild.'],[5,9,'the dawn nutter. up before the sun to handle business. unhinged. genuinely impressive.'],[9,12,'a morning person in the worst possible way. the codex is taking notes and shaking its head.'],[12,15,'nutting on your lunch break. the absolute audacity. we respect it fully.'],[15,18,'the afternoon degenerate. peak working hours and here you are. incredible.'],[18,21,'the sunset freak. the day winds down and you wind up. naturally.'],[21,24,'a creature of the night. the darkness is your temple. this is your ritual. you need help.']];
   const arch=arches.find(([s,e])=>peakH>=s&&peakH<e);
   document.getElementById('chronoArchetype').textContent=todayLog.length?(arch?arch[2]:'your timing defies classification. the oracle is stumped.'):'go nut first. then we will judge what time of day you do this.';
@@ -3045,7 +3045,7 @@ function initTwitterEmbed() {
   twttr.widgets.load(document.getElementById('xFeedEmbed')).then(() => {
     if (loading) loading.style.display = 'none';
   }).catch(() => {
-    if (loading) loading.textContent = 'Could not load posts — follow on X ↗';
+    if (loading) loading.textContent = 'Could not load posts, follow on X ↗';
   });
 }
 </script>

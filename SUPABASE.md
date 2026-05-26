@@ -82,7 +82,7 @@ db.rpc('leaderboard')
 
 - [ ] Owner confirmed `supabase/schema.sql` ran without errors
 - [ ] `SUPABASE_URL` / `SUPABASE_KEY` in `index.html` match **Settings → API** (anon key)
-- [ ] Live site: global counter not `—` / “configure Supabase”
+- [ ] Live site: global counter not `-` / “configure Supabase”
 - [ ] Live site: leaderboard loads without SQL error message
 - [ ] Supabase **Logs → API**: `log_nut`, `global_counts`, `leaderboard` return 200
 - [ ] Never commit **service_role** key
@@ -90,11 +90,11 @@ db.rpc('leaderboard')
 
 ### If leaderboard shows an error
 
-1. SQL Editor: `select * from leaderboard();` — must return rows or empty set, not error
+1. SQL Editor: `select * from leaderboard();`, must return rows or empty set, not error
 2. If function missing: re-run `supabase/schema.sql`
 3. If `permission denied`: re-run the `grant execute` lines at bottom of schema
 
-### If global counter stays `—`
+### If global counter stays `-`
 
 1. Browser devtools → Network → filter `supabase` → check `global_counts` response
 2. Confirm anon key is not expired / wrong project
@@ -136,7 +136,7 @@ Browser (anon key)
 nut_logs table ◄── only security definer functions touch it (RLS blocks anon)
 ```
 
-**Session ID:** `localStorage` UUID per browser — not authentication; cooldown limits spam per browser.
+**Session ID:** `localStorage` UUID per browser, not authentication; cooldown limits spam per browser.
 
 ---
 
@@ -144,7 +144,7 @@ nut_logs table ◄── only security definer functions touch it (RLS blocks an
 
 | File | Role |
 |------|------|
-| `supabase/schema.sql` | Single source of truth — run in dashboard |
+| `supabase/schema.sql` | Single source of truth, run in dashboard |
 | `SUPABASE.md` | This doc |
 | `index.html` | `SUPABASE_URL`, `SUPABASE_KEY`, RPC calls |
 | `CLAUDE_HANDOFF.md` | Links here for Step 6 |

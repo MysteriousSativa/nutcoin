@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate og.png and favicon.ico for $NUT — no external deps except Pillow."""
+"""Generate og.png and favicon.ico for $NUT, no external deps except Pillow."""
 from pathlib import Path
 
 try:

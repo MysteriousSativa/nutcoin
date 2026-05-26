@@ -1,4 +1,4 @@
-# $NUT — World Nut Tracking Memecoin
+# $NUT, World Nut Tracking Memecoin
 
 Single-page memecoin site + global nut counter.
 

@@ -6,7 +6,7 @@ Canvas: 1080x1350 portrait. Background #050301 with orange-gold top glow. NO par
 
 - Header: OFFICIAL NUT RECEIPT · FORM 69-A
 - Huge: $NUT in gold
-- Giant number: {TODAY} — NUTS TODAY
+- Giant number: {TODAY}, NUTS TODAY
 - LAST LOGGED: {METHOD_EMOJI} {METHOD}
 - Subline: solo · partnered · all methods count
 - Stats row: ALL-TIME {ALLTIME} | PARTNERED {PARTNERED} | STREAK {STREAK} | SESSION {SESSION}

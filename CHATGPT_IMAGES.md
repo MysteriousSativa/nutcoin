@@ -1,4 +1,4 @@
-# ChatGPT image prompts for Claude — $NUT
+# ChatGPT image prompts for Claude, $NUT
 
 **Read this before generating or swapping any images.** Use **ChatGPT** (DALL·E / image gen) for all marketing art. Do **not** use religious filigree, Star of David shapes, checkerboard fake transparency, or cream parchment unless explicitly asked.
 
@@ -10,7 +10,7 @@
 2. Generate images in ChatGPT at exact pixel sizes.
 3. Export **PNG with true transparency** only where needed; receipt background should be **opaque** (dark `#050301`).
 4. Save into `img/` and commit. Update `RECEIPT_BG_IMAGE` in `index.html` if using a custom background.
-5. Test: **Get Receipt** → **Download PNG** → **Post Receipt to X** — image must be readable on mobile at thumbnail size.
+5. Test: **Get Receipt** → **Download PNG** → **Post Receipt to X**, image must be readable on mobile at thumbnail size.
 
 ---
 
@@ -36,9 +36,9 @@ When prompting, replace placeholders:
 
 ---
 
-## 1. Share receipt (primary) — `img/receipt-share.png`
+## 1. Share receipt (primary), `img/receipt-share.png`
 
-**Size:** 1080 × 1350 px (portrait — X/Telegram/IG story)  
+**Size:** 1080 × 1350 px (portrait, X/Telegram/IG story)  
 **Used for:** Download receipt + attach to tweet
 
 ### ChatGPT prompt (copy/paste)
@@ -58,7 +58,7 @@ Layout (bold, readable on phone):
 - Quote in a dark card: "{VERDICT}"
 - Bottom: fake barcode strip, @TheNutTracker, "POST AT YOUR OWN RISK", nutcoin meme energy
 
-Style: 2024 pump.fun / degen Twitter — Inter-like sans serif, gold on black, ember orange accents, slightly unhinged but clean. Meme coin not corporate. No photorealistic people. No explicit nudity — suggestive humor only via text.
+Style: 2024 pump.fun / degen Twitter, Inter-like sans serif, gold on black, ember orange accents, slightly unhinged but clean. Meme coin not corporate. No photorealistic people. No explicit nudity, suggestive humor only via text.
 
 Typography must be sharp and high contrast. Export as flat PNG, opaque background.
 ```
@@ -73,12 +73,12 @@ The site **overlays live stats in canvas** on top of this BG, OR uses pure canva
 
 ---
 
-## 2. Open Graph / link preview — `img/og.png`
+## 2. Open Graph / link preview, `img/og.png`
 
 **Size:** 1200 × 630 px
 
 ```
-Dark #050301 background, gold "$NUT" wordmark, tagline "Every nut counts — solo, sex, chaos — all logged."
+Dark #050301 background, gold "$NUT" wordmark, tagline "Every nut counts, solo, sex, chaos, all logged."
 Subtext: @TheNutTracker · Solana memecoin · World Nut Tracking
 Subtle peanut/ember glow, no faces, no religious icons, no checkerboard. Clean bold sans serif. Opaque PNG 1200x630.
 ```
@@ -105,7 +105,7 @@ Wire in code only if you add `RECEIPT_BG_BY_TYPE` map in CONFIG.
 
 ---
 
-## 4. X post templates (no image — text only)
+## 4. X post templates (no image, text only)
 
 Claude should pair receipt PNG with copy from `pickStirTweet()` / `pickCertStirTweet()` in `index.html`. Always tell user to **attach** the downloaded PNG.
 

@@ -1,4 +1,4 @@
-# $NUT — Manual launch steps for Claude
+# $NUT, Manual launch steps for Claude
 
 **Repo:** MysteriousSativa/nutcoin  
 **Live:** https://nutcoin-alpha.vercel.app/  
@@ -8,7 +8,7 @@
 
 ---
 
-## Step 1 — Launch on pump.fun (OWNER ONLY — you wait)
+## Step 1, Launch on pump.fun (OWNER ONLY, you wait)
 
 Owner creates token on https://pump.fun and sends you the Solana mint address.
 
@@ -18,7 +18,7 @@ Owner creates token on https://pump.fun and sends you the Solana mint address.
 
 ---
 
-## Step 2 — Set contract address (CLAUDE)
+## Step 2, Set contract address (CLAUDE)
 
 In `index.html` CONFIG:
 
@@ -34,7 +34,7 @@ Push to main. Verify live:
 
 ---
 
-## Step 3 — Social (mostly done; confirm with owner)
+## Step 3, Social (mostly done; confirm with owner)
 
 Current values:
 
@@ -50,9 +50,9 @@ Ask owner:
 
 ---
 
-## Step 4 — Production domain (OWNER in Vercel, then CLAUDE in code)
+## Step 4, Production domain (OWNER in Vercel, then CLAUDE in code)
 
-Do not point URLs at `nutcoin.vercel.app` until it's aliased — it 404s today and breaks OG.
+Do not point URLs at `nutcoin.vercel.app` until it's aliased, it 404s today and breaks OG.
 
 **Owner (Vercel dashboard):**
 
@@ -79,7 +79,7 @@ Do not point URLs at `nutcoin.vercel.app` until it's aliased — it 404s today a
 
 ---
 
-## Step 5 — OG / favicons (CLAUDE, only if copy changes)
+## Step 5, OG / favicons (CLAUDE, only if copy changes)
 
 Already live. Regenerate if needed:
 
@@ -94,7 +94,7 @@ Never use old ChatGPT PNGs, religious symbols, or checkerboard fake-alpha images
 
 ---
 
-## Step 6 — Supabase (OWNER runs SQL once; CLAUDE verifies)
+## Step 6, Supabase (OWNER runs SQL once; CLAUDE verifies)
 
 **Full guide:** `SUPABASE.md` · **SQL file:** `supabase/schema.sql`
 
@@ -105,7 +105,7 @@ Never use old ChatGPT PNGs, religious symbols, or checkerboard fake-alpha images
 3. **Settings → API** → confirm URL + **anon** key match `index.html` CONFIG
 4. Tap NUT on live site → row appears in **Table Editor → nut_logs**
 
-**Claude (already done in repo — verify after owner runs SQL):**
+**Claude (already done in repo, verify after owner runs SQL):**
 
 - Client uses RPCs only: `log_nut`, `global_counts`, `leaderboard`
 - Do **not** revert to `db.from('nut_logs').insert()` or open RLS insert/select policies
@@ -117,7 +117,7 @@ Never use old ChatGPT PNGs, religious symbols, or checkerboard fake-alpha images
 
 ---
 
-## Step 7 — Verify before calling it "launched"
+## Step 7, Verify before calling it "launched"
 
 | Check | Pass? |
 |-------|-------|
@@ -137,12 +137,12 @@ Never use old ChatGPT PNGs, religious symbols, or checkerboard fake-alpha images
 - Redirect alpha → prod before prod domain serves this repo
 - Use `mix-blend-mode: screen`, `background-attachment: fixed`, goo filters, heavy `backdrop-filter`
 - Point OG at `nutcoin.vercel.app` before Vercel domain is linked
-- Use `font-size:0` / `color:transparent` button hacks — all buttons are CSS-only now
+- Use `font-size:0` / `color:transparent` button hacks, all buttons are CSS-only now
 - Commit `.env` or Supabase service role keys
 
 ---
 
-## Quick reference — CONFIG block
+## Quick reference, CONFIG block
 
 ```javascript
 const TICKER         = 'NUT';
@@ -160,11 +160,11 @@ const SUPABASE_KEY   = '...';                                 // anon key only
 ## What buyers need to see in the first 3 seconds
 
 - **Display:** `$NUT` large and readable, no religious filigree PNGs
-- **One-line pitch** — honest, funny, not medieval RP
-- **CA box** — copy button, monospace address when live
-- **BUY + CHART + Telegram + X** — all working URLs from CONFIG
-- **Social proof** — global nuts today / all-time (Supabase), with LIVE chip
-- **Fast mobile** — no goo drips, no backdrop-blur stacks, no 30 animated PNG backgrounds
+- **One-line pitch**, honest, funny, not medieval RP
+- **CA box**, copy button, monospace address when live
+- **BUY + CHART + Telegram + X**, all working URLs from CONFIG
+- **Social proof**, global nuts today / all-time (Supabase), with LIVE chip
+- **Fast mobile**, no goo drips, no backdrop-blur stacks, no 30 animated PNG backgrounds
 
 ---
 

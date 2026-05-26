@@ -1,4 +1,4 @@
--- $NUT — Supabase schema (run in SQL Editor — safe to re-run)
+-- $NUT, Supabase schema (run in SQL Editor, safe to re-run)
 -- Dashboard: https://supabase.com/dashboard → SQL → New query → Run
 
 -- ── Table ─────────────────────────────────────────────────────────────
