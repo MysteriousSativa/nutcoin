@@ -910,14 +910,13 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 //     create policy "insert" on nut_logs for insert with check (true);
 //     create policy "select" on nut_logs for select using (true);
 //
-//     create or replace function leaderboard(target_date date default current_date)
+//     create or replace function leaderboard()
 //     returns table(session_id text, nickname text, deeds bigint) language sql security definer as $$
 //       select
 //         session_id,
 //         max(nickname) as nickname,
 //         count(*)::bigint as deeds
 //       from nut_logs
-//       where deed_date = target_date
 //       group by session_id
 //       order by deeds desc;
 //     $$;
@@ -1111,42 +1110,27 @@ async function fetchLeaderboard() {
     return;
   }
   try {
-    // Use the SECURITY DEFINER RPC — bypasses RLS, groups by session_id in SQL.
-    // Run the updated leaderboard() function from the SQL config block above.
-    const {data, error} = await db.rpc('leaderboard', {target_date: dateStr});
+    // SECURITY DEFINER RPC — bypasses RLS, all-time, all sessions (named + anon).
+    // Run the updated leaderboard() SQL from the config block above in Supabase.
+    const {data, error} = await db.rpc('leaderboard');
     if (error) throw error;
 
-    // New RPC returns {session_id, nickname, deeds} per row (pre-aggregated)
-    const hasSession = Array.isArray(data) && data.length > 0 && 'session_id' in data[0];
-
-    if (hasSession) {
-      lbCache = data.map(s => ({
-        nickname: s.nickname || anonName(s.session_id),
-        session_id: s.session_id,
-        deeds: Number(s.deeds),
-        isAnon: !s.nickname,
-        isYou: s.session_id === sessionId,
-      })).sort((a,b) => b.deeds - a.deeds);
-    } else {
-      // Old RPC (not yet updated) — returns {nickname, deeds}, named users only
-      lbCache = (data || []).map(r => ({
-        nickname: r.nickname,
-        session_id: null,
-        deeds: Number(r.deeds),
-        isAnon: false,
-        isYou: r.nickname === nickname,
-      }));
-    }
+    lbCache = (data || []).map(s => ({
+      nickname: s.nickname || anonName(s.session_id),
+      session_id: s.session_id,
+      deeds: Number(s.deeds),
+      isAnon: !s.nickname,
+      isYou: s.session_id === sessionId,
+    })).sort((a,b) => b.deeds - a.deeds);
 
     renderLeaderboard(lbCache);
     updateNickRank(lbCache);
   } catch(e) {
-    // RPC unavailable — fall back to direct table query
+    // RPC unavailable — fall back to direct table query (all-time, no date filter)
     try {
       const {data:rows, error:fe} = await db
         .from('nut_logs')
-        .select('nickname, session_id')
-        .eq('deed_date', dateStr);
+        .select('nickname, session_id');
       if (fe) throw fe;
       const sessions = {};
       (rows || []).forEach(row => {
@@ -1186,7 +1170,7 @@ function renderLeaderboard(rows) {
   ];
   const rowClass = i => i===0?'top1':i===1?'top2':i===2?'top3':'';
   let html = `<div class="lb-header">
-    <span class="lb-count-label">ALL USERS TODAY &nbsp;<span>${rows.length} NUTTERS</span></span>
+    <span class="lb-count-label">ALL TIME &nbsp;<span>${rows.length} NUTTERS</span></span>
   </div>`;
   html += `<div class="lb-list">`;
   rows.forEach((r,i)=>{
