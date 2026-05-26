@@ -448,9 +448,21 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .cert-btn:hover,.share-btn:hover{transform:translateY(-3px);filter:drop-shadow(0 0 20px rgba(200,140,0,0.5));color:#fff;}
 
 /* ── STAT PANELS ── */
-.panel-indicators{display:flex;justify-content:center;gap:10px;margin-bottom:16px;}
-.pind{width:6px;height:6px;border-radius:50%;background:var(--muted);transition:background .3s,transform .3s,box-shadow .3s;cursor:pointer;}
-.pind.active{background:var(--gold);transform:scale(1.5);box-shadow:0 0 9px rgba(200,169,110,0.55);}
+.panel-nav{
+  display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:16px;padding:0 8px;
+}
+.panel-nav-btn{
+  flex-shrink:0;width:44px;height:44px;border-radius:50%;border:1px solid rgba(200,169,110,0.45);
+  background:rgba(12,8,4,0.95);color:var(--gold-bright);font-size:26px;font-weight:700;line-height:1;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  box-shadow:0 4px 16px rgba(0,0,0,0.35);transition:transform .12s,background .15s,border-color .15s;
+  -webkit-tap-highlight-color:transparent;font-family:inherit;padding:0;
+}
+.panel-nav-btn:hover{background:rgba(200,100,10,0.22);border-color:var(--gold);transform:scale(1.05);}
+.panel-nav-btn:active{transform:scale(0.94);}
+.panel-indicators{display:flex;justify-content:center;align-items:center;gap:8px;flex:1;max-width:280px;flex-wrap:wrap;}
+.pind{width:8px;height:8px;border-radius:50%;background:var(--muted);transition:background .3s,transform .3s,box-shadow .3s;cursor:pointer;padding:6px;margin:-6px;box-sizing:content-box;}
+.pind.active{background:var(--gold);transform:scale(1.35);box-shadow:0 0 9px rgba(200,169,110,0.55);}
 .panel{
   display:none;
   background:
@@ -526,7 +538,9 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .tl-nut{width:24px;height:24px;object-fit:contain;flex-shrink:0;
   filter:drop-shadow(0 0 8px rgba(200,140,0,0.55)) drop-shadow(0 0 16px rgba(180,100,0,0.3));
 }
-.tl-text{font-family:'Crimson Text',serif;font-size:15px;color:var(--text);flex:1;}
+.tl-text{font-family:'Crimson Text',serif;font-size:15px;color:var(--text);flex:1;min-width:0;}
+.tl-user{font-weight:700;color:var(--gold-bright);}
+.tl-you{font-size:9px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--ember);margin-left:6px;}
 .tl-time{font-family:'Space Mono',monospace;font-size:11px;color:var(--muted);}
 .tl-empty{font-family:'Crimson Text',serif;font-size:17px;color:var(--muted);font-style:italic;text-align:center;padding:20px 0;}
 
@@ -1007,7 +1021,9 @@ position:relative;overflow:hidden;
 
   /* Panels */
   .panels-wrap{margin-bottom:12px;}
-  .panel-indicators{gap:7px;margin-bottom:12px;}
+  .panel-nav{gap:8px;margin-bottom:12px;}
+  .panel-nav-btn{width:40px;height:40px;font-size:24px;}
+  .panel-indicators{gap:6px;max-width:220px;}
   .pind{width:5px;height:5px;}
   .panel{padding:18px 12px;border-radius:18px;}
   .panel-title{font-size:8.5px;letter-spacing:.2em;margin-bottom:14px;}
@@ -1238,7 +1254,11 @@ position:relative;overflow:hidden;
   <!-- PANEL INDICATORS -->
   <div class="ornament" aria-hidden="true"><span class="ornament-line"></span><span class="ornament-gem">✦</span><span class="ornament-line"></span></div>
 
-  <div class="panel-indicators" id="panelDots"></div>
+  <div class="panel-nav">
+    <button type="button" class="panel-nav-btn" onclick="cyclePanel(-1)" aria-label="Previous category">‹</button>
+    <div class="panel-indicators" id="panelDots"></div>
+    <button type="button" class="panel-nav-btn" onclick="cyclePanel(1)" aria-label="Next category">›</button>
+  </div>
 
   <!-- ROTATING PANELS -->
   <div class="panels-wrap">
@@ -1381,8 +1401,8 @@ position:relative;overflow:hidden;
 
   <!-- ACTIVITY LOG -->
   <div class="log-section">
-    <div class="section-title">Activity Log</div>
-    <div class="log-empty" id="logEmpty">nothing logged yet. go nut and come back.</div>
+    <div class="section-title">Global Activity</div>
+    <div class="log-empty" id="logEmpty">waiting for the first nut worldwide…</div>
     <div id="logList"></div>
   </div>
 
@@ -1517,7 +1537,7 @@ position:relative;overflow:hidden;
 // ═══════════════════════════════════════════════════════
 //
 //  Supabase: see SUPABASE.md, run supabase/schema.sql in SQL Editor, then paste anon key below.
-//  Client uses RPCs only: log_nut, global_counts, leaderboard (not raw table insert/select).
+//  Client uses RPCs only: log_nut, global_counts, leaderboard, recent_activity (not raw table insert/select).
 
 const SUPABASE_URL  = 'https://ynzbwnlltqrprnrlbtna.supabase.co';
 const SUPABASE_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InluemJ3bmxsdHFycHJucmxidG5hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk3MzQyNDQsImV4cCI6MjA5NTMxMDI0NH0.W7R5bD7F7XWpW0HEK9rgcMYsIbhF2caq57d0grZZjqA';
@@ -1891,7 +1911,67 @@ async function logToSupabase() {
     if (error || (data && data.ok === false)) return;
     fetchGlobalCounts();
     fetchLeaderboard();
+    fetchGlobalActivity();
   } catch(e){}
+}
+
+async function fetchGlobalActivity() {
+  const empty = document.getElementById('logEmpty');
+  const list = document.getElementById('logList');
+  if (!list) return;
+  if (!db) {
+    if (empty) {
+      empty.style.display = 'block';
+      empty.textContent = 'Connect Supabase to see live activity from everyone.';
+    }
+    list.innerHTML = '';
+    return;
+  }
+  try {
+    const { data, error } = await db.rpc('recent_activity', { p_limit: 25 });
+    if (error) throw error;
+    if (!data || !data.length) {
+      if (empty) {
+        empty.style.display = 'block';
+        empty.textContent = 'no nuts logged yet. be the first.';
+      }
+      list.innerHTML = '';
+      return;
+    }
+    if (empty) empty.style.display = 'none';
+    list.innerHTML = data.map((row, i) => {
+      const name = row.nickname || anonName(row.session_id);
+      const isYou = row.session_id === sessionId;
+      const ty = NUT_TYPES[row.nut_type] ? row.nut_type : 'solo';
+      const pts = row.points || 1;
+      const when = formatActivityTime(row.created_at);
+      return `<div class="tl-item">
+        <span class="tl-num">${data.length - i}</span>
+        <img class="tl-nut" src="./img/nut-icon.png" alt="">
+        <span class="tl-text"><span class="tl-user">${escHtml(name)}</span>${isYou ? '<span class="tl-you">you</span>' : ''} · ${nutLogText(ty, pts)}</span>
+        <span class="tl-time">${when}</span>
+      </div>`;
+    }).join('');
+  } catch (e) {
+    if (empty) {
+      empty.style.display = 'block';
+      empty.textContent = 'could not load activity. check Supabase setup.';
+    }
+  }
+}
+
+function formatActivityTime(iso) {
+  if (!iso) return '';
+  const d = new Date(iso);
+  const sec = Math.floor((Date.now() - d) / 1000);
+  if (sec < 60) return 'just now';
+  if (sec < 3600) return `${Math.floor(sec / 60)}m ago`;
+  if (sec < 86400) return `${Math.floor(sec / 3600)}h ago`;
+  return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+}
+
+function escHtml(s) {
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
 // ═══════════════════════════════
@@ -2048,7 +2128,6 @@ function nut() {
   spawnSquirt();
   shakeCard();
   haptic([60, 18, 100, 18, 160]);
-  addLogEntry(t, countToday, method, points);
   addTimelineEntry(t, countToday, method, points);
   renderMethodLedger();
   if (points > 1) showToast(`2× POINTS, +${points} for ${typeLabel(method)} ✦`);
@@ -2115,15 +2194,6 @@ function nutLogText(typeId, pts) {
   if (typeId === 'solo') return `${m.em} Solo mission${mult}`;
   return `${m.em} ${m.label}${mult}`;
 }
-function addLogEntry(t, num, typeId, pts) {
-  document.getElementById('logEmpty').style.display='none';
-  const list=document.getElementById('logList');
-  const item=document.createElement('div');
-  item.className='tl-item';
-  item.innerHTML=`<span class="tl-num">#${num}</span><img class="tl-nut" src="./img/nut-icon.png" alt=""><span class="tl-text">${nutLogText(typeId, pts)}</span><span class="tl-time">${t}</span>`;
-  list.insertBefore(item,list.firstChild);
-  if(list.children.length>10) list.removeChild(list.lastChild);
-}
 function addTimelineEntry(t, num, typeId, pts) {
   document.getElementById('tlEmpty').style.display='none';
   const list=document.getElementById('timelineList');
@@ -2135,15 +2205,12 @@ function addTimelineEntry(t, num, typeId, pts) {
 }
 function seedLogs() {
   if(!todayLog.length) return;
-  document.getElementById('logEmpty').style.display='none';
   document.getElementById('tlEmpty').style.display='none';
-  const logList=document.getElementById('logList');
   const tlList=document.getElementById('timelineList');
   todayLog.slice(-5).reverse().forEach((e,i)=>{
     const n=todayLog.length-i;
     const t=logTime(e), ty=logType(e), pts=logPts(e);
     const mk=(text)=>{const d=document.createElement('div');d.className='tl-item';d.innerHTML=`<span class="tl-num">#${n}</span><img class="tl-nut" src="./img/nut-icon.png" alt=""><span class="tl-text">${text}</span><span class="tl-time">${t}</span>`;return d;};
-    logList.appendChild(mk(nutLogText(ty, pts)));
     tlList.appendChild(mk(nutLogText(ty, pts)));
   });
 }
@@ -2169,6 +2236,12 @@ function showPanel(idx) {
   if(idx===3) renderFact('factCat2','factText2','factSrc2',factIdx2);
   if(idx===5) fetchLeaderboard();
   if(idx===11) renderMethodLedger();
+}
+function cyclePanel(dir) {
+  const next = (currentPanel + dir + PANEL_COUNT) % PANEL_COUNT;
+  if (next === 1) factIdx = (factIdx + 1) % FACTS.length;
+  if (next === 3) factIdx2 = (factIdx2 + 1) % FACTS.length;
+  showPanel(next);
 }
 function renderFact(cid,tid,sid,idx) {
   const f=FACTS[idx%FACTS.length];
@@ -2824,10 +2897,12 @@ setInterval(updateCooldown,10000);
 initMobile();
 fetchGlobalCounts();
 fetchLeaderboard();
+fetchGlobalActivity();
 setInterval(()=>{ if(!document.hidden) fetchGlobalCounts(); },60000);
 setInterval(()=>{ if(!document.hidden) fetchLeaderboard(); },120000);
+setInterval(()=>{ if(!document.hidden) fetchGlobalActivity(); },30000);
 document.addEventListener('visibilitychange',()=>{
-  if(!document.hidden){ fetchGlobalCounts(); if(currentPanel===5) fetchLeaderboard(); }
+  if(!document.hidden){ fetchGlobalCounts(); fetchGlobalActivity(); if(currentPanel===5) fetchLeaderboard(); }
 });
 
 // Seed initial facts

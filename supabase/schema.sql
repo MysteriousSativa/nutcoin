@@ -124,6 +124,31 @@ as $$
   order by cnt desc;
 $$;
 
+-- ── Recent activity feed (global) ───────────────────────────────────────
+create or replace function public.recent_activity(p_limit int default 25)
+returns table(
+  nickname   text,
+  session_id text,
+  nut_type   text,
+  points     int,
+  created_at timestamptz
+)
+language sql
+security definer
+set search_path = public
+stable
+as $$
+  select
+    nickname,
+    session_id,
+    nut_type,
+    points,
+    created_at
+  from public.nut_logs
+  order by created_at desc
+  limit greatest(1, least(coalesce(p_limit, 25), 50));
+$$;
+
 -- ── Grants ──────────────────────────────────────────────────────────────
 grant usage on schema public to anon, authenticated;
 grant select, insert on public.nut_logs to service_role;
@@ -132,6 +157,7 @@ revoke all on public.nut_logs from anon, authenticated;
 grant execute on function public.log_nut(text, text, date, text, int) to anon, authenticated;
 grant execute on function public.global_counts(date) to anon, authenticated;
 grant execute on function public.leaderboard() to anon, authenticated;
+grant execute on function public.recent_activity(int) to anon, authenticated;
 grant execute on function public.nut_type_stats(date) to anon, authenticated;
 
 -- Drop old overloads if upgrading
