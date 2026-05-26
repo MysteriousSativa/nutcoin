@@ -1109,57 +1109,52 @@ async function fetchLeaderboard() {
     if (!nickname) document.getElementById('lbJoin').style.display='block';
     return;
   }
-  try {
-    // SECURITY DEFINER RPC — bypasses RLS, all-time, all sessions (named + anon).
-    // Run the updated leaderboard() SQL from the config block above in Supabase.
-    const {data, error} = await db.rpc('leaderboard');
-    if (error) throw error;
+  // Direct table query — no RPC, no date filter, all-time, all sessions
+  const {data, error} = await db
+    .from('nut_logs')
+    .select('nickname, session_id')
+    .limit(5000);
 
-    lbCache = (data || []).map(s => ({
+  const el = document.getElementById('lbContent');
+
+  if (error) {
+    el.innerHTML = `<div class="lb-empty">Leaderboard error: ${error.message}</div>`;
+    return;
+  }
+
+  if (!data || data.length === 0) {
+    el.innerHTML = `<div class="lb-empty">No nuts logged yet. Be the first.</div>`;
+    document.getElementById('lbJoin').style.display = !nickname ? 'block' : 'none';
+    return;
+  }
+
+  // Aggregate by session_id — one row per device, all time
+  const sessions = {};
+  data.forEach(row => {
+    const sid = row.session_id || 'unknown';
+    if (!sessions[sid]) sessions[sid] = {nickname: null, session_id: sid, count: 0};
+    if (row.nickname && !sessions[sid].nickname) sessions[sid].nickname = row.nickname;
+    sessions[sid].count++;
+  });
+
+  lbCache = Object.values(sessions)
+    .map(s => ({
       nickname: s.nickname || anonName(s.session_id),
       session_id: s.session_id,
-      deeds: Number(s.deeds),
+      deeds: s.count,
       isAnon: !s.nickname,
       isYou: s.session_id === sessionId,
-    })).sort((a,b) => b.deeds - a.deeds);
+    }))
+    .sort((a,b) => b.deeds - a.deeds);
 
-    renderLeaderboard(lbCache);
-    updateNickRank(lbCache);
-  } catch(e) {
-    // RPC unavailable — fall back to direct table query (all-time, no date filter)
-    try {
-      const {data:rows, error:fe} = await db
-        .from('nut_logs')
-        .select('nickname, session_id');
-      if (fe) throw fe;
-      const sessions = {};
-      (rows || []).forEach(row => {
-        const sid = row.session_id || 'unknown';
-        if (!sessions[sid]) sessions[sid] = {nickname: row.nickname || null, session_id: sid, count: 0};
-        if (row.nickname && !sessions[sid].nickname) sessions[sid].nickname = row.nickname;
-        sessions[sid].count++;
-      });
-      lbCache = Object.values(sessions)
-        .map(s => ({
-          nickname: s.nickname || anonName(s.session_id),
-          session_id: s.session_id,
-          deeds: s.count,
-          isAnon: !s.nickname,
-          isYou: s.session_id === sessionId,
-        }))
-        .sort((a,b) => b.deeds - a.deeds);
-      renderLeaderboard(lbCache);
-      updateNickRank(lbCache);
-    } catch(fe2) {
-      document.getElementById('lbContent').innerHTML=`<div class="lb-empty">Could not load leaderboard.</div>`;
-    }
-  }
+  renderLeaderboard(lbCache);
+  updateNickRank(lbCache);
 }
 
 function renderLeaderboard(rows) {
   const el = document.getElementById('lbContent');
   if (!rows.length) {
-    el.innerHTML=`<div class="lb-empty">No entries yet today. Be the first.</div>`;
+    el.innerHTML=`<div class="lb-empty">No nuts logged yet. Be the first.</div>`;
     if (!nickname) document.getElementById('lbJoin').style.display='block';
     return;
   }
