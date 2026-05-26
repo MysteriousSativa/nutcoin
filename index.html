@@ -1460,49 +1460,18 @@ async function openXWithCert(text) {
     } catch(e) {}
   }
 
-  // Desktop: open a dedicated share page with the image embedded
-  const dataUrl = await new Promise(resolve => {
-    const reader = new FileReader();
-    reader.onload = e => resolve(e.target.result);
-    reader.readAsDataURL(blob);
-  });
-
+  // Desktop: download the image then open the tweet composer
   const fname = `NUT-Certificate-${dateStr}${nickname ? '-' + nickname : ''}.png`;
-  const win = window.open('', '_blank');
-  if (!win) { showToast('Allow popups to open the share page'); return; }
+  const objUrl = URL.createObjectURL(blob);
+  const dl = document.createElement('a');
+  dl.download = fname;
+  dl.href = objUrl;
+  dl.click();
+  setTimeout(() => URL.revokeObjectURL(objUrl), 5000);
 
-  win.document.write(`<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta property="og:image" content="${dataUrl}">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="${dataUrl}">
-<title>$NUT Certificate ${dateStr}</title>
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{background:#050301;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 20px;gap:24px;font-family:'Segoe UI',system-ui,sans-serif}
-img{max-width:min(700px,100%);border-radius:10px;box-shadow:0 0 80px rgba(200,169,110,0.35),0 0 0 1px rgba(200,169,110,0.15);display:block}
-.btns{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
-a,button{display:inline-block;padding:12px 28px;border-radius:7px;text-decoration:none;font-size:14px;font-weight:700;letter-spacing:.06em;cursor:pointer;border:none;transition:opacity .15s}
-.tweet{background:#000;color:#fff;border:1px solid #333}
-.tweet:hover{opacity:.8}
-.save{background:#C8A96E;color:#050301}
-.save:hover{opacity:.8}
-p{color:#5a4f44;font-size:12px;text-align:center;letter-spacing:.04em}
-</style>
-</head>
-<body>
-<img src="${dataUrl}" alt="NUT Certificate">
-<div class="btns">
-  <a class="tweet" href="${tweetUrl}" target="_blank">Post to X / Twitter</a>
-  <a class="save" download="${fname}" href="${dataUrl}">Save Image</a>
-</div>
-<p>Right-click the image and choose Save image as &nbsp;&bull;&nbsp; ${SITE_URL}</p>
-</body>
-</html>`);
-  win.document.close();
+  // Open tweet composer after a brief delay so the download dialog registers first
+  setTimeout(() => window.open(tweetUrl, '_blank'), 400);
+  showToast('Certificate saved. Attach it to your tweet.');
 }
 
 async function shareTwitter() {
@@ -1665,12 +1634,13 @@ async function renderCertificate(canvas) {
   canvas.width=W;canvas.height=H;
   const ctx=canvas.getContext('2d');
 
-  // Draw parchment background
+  // Draw parchment background — minimal dark overlay so parchment stays light
   await new Promise(resolve => {
     const img = new Image();
     img.onload = () => {
       ctx.drawImage(img, 0, 0, W, H);
-      ctx.fillStyle = 'rgba(20,8,0,0.22)';
+      // Very light tint only — keep parchment bright for contrast
+      ctx.fillStyle = 'rgba(255,245,220,0.18)';
       ctx.fillRect(0, 0, W, H);
       resolve();
     };
@@ -1682,12 +1652,16 @@ async function renderCertificate(canvas) {
     };
     img.src='./parchment.jpg';
   });
-  ctx.fillStyle='rgba(200,169,110,0.03)';
-  for(let x=0;x<W;x+=18)for(let y=0;y<H;y+=18)ctx.fillRect(x,y,1,1);
 
-  ctx.strokeStyle='#5C3D0A';ctx.lineWidth=7;rrect(ctx,16,16,W-32,H-32,3);ctx.stroke();
-  ctx.strokeStyle='#C8A96E';ctx.lineWidth=2.5;rrect(ctx,30,30,W-60,H-60,2);ctx.stroke();
-  ctx.strokeStyle='#8B6914';ctx.lineWidth=1;rrect(ctx,44,44,W-88,H-88,1);ctx.stroke();
+  // Subtle cream reading-area wash across the content zone for extra legibility
+  const readWash = ctx.createRadialGradient(W/2,H/2,80,W/2,H/2,680);
+  readWash.addColorStop(0,'rgba(255,250,235,0.38)');
+  readWash.addColorStop(1,'rgba(255,245,215,0)');
+  ctx.fillStyle=readWash;ctx.fillRect(0,0,W,H);
+
+  ctx.strokeStyle='#3A1E00';ctx.lineWidth=8;rrect(ctx,16,16,W-32,H-32,3);ctx.stroke();
+  ctx.strokeStyle='#8B5C00';ctx.lineWidth=2.5;rrect(ctx,30,30,W-60,H-60,2);ctx.stroke();
+  ctx.strokeStyle='#6B4800';ctx.lineWidth=1;rrect(ctx,44,44,W-88,H-88,1);ctx.stroke();
 
   [[65,65],[W-65,65],[65,H-65],[W-65,H-65]].forEach(([cx,cy])=>{
     const sx=cx<W/2?1:-1,sy=cy<H/2?1:-1;
@@ -1721,49 +1695,56 @@ async function renderCertificate(canvas) {
     };
     coinImg.src='./nut-coin.jpg';
   });
-  ctx.font='900 98px "Cinzel Decorative",serif';ctx.fillStyle='#1A0E04';
-  ctx.shadowColor='rgba(200,169,110,0.35)';ctx.shadowBlur=18;
+  // PALETTE — all near-black or dark brown for maximum parchment contrast
+  const INK     = '#0A0400';   // near-black for primary text
+  const INK2    = '#1C0A00';   // dark brown for secondary text
+  const GOLDINC = '#5C3000';   // dark gold for decorative labels
+  const GOLDMED = '#7A4500';   // medium-dark gold for smaller labels
+
+  ctx.font='900 98px "Cinzel Decorative",serif';ctx.fillStyle=INK;
+  ctx.shadowColor='rgba(180,120,20,0.5)';ctx.shadowBlur=22;
   ctx.fillText('$NUT',W/2,128);ctx.shadowBlur=0;
-  ctx.font='600 20px "Cinzel",serif';ctx.fillStyle='#8B6914';
+  ctx.font='700 20px "Cinzel",serif';ctx.fillStyle=GOLDINC;
+  ctx.letterSpacing='0.15em';
   ctx.fillText('C E R T I F I C A T E   O F   S A C R E D   A C H I E V E M E N T',W/2,196);
 
   ornLine(ctx,W/2,228,560);
 
-  ctx.font='italic 26px "Crimson Text",Georgia,serif';ctx.fillStyle='#4A3520';
+  ctx.font='italic 28px "Crimson Text",Georgia,serif';ctx.fillStyle=INK2;
   ctx.fillText('This is to certify that the bearer hath committed',W/2,284);
 
-  ctx.font='900 152px "Cinzel Decorative",serif';ctx.fillStyle='#1A0E04';
-  ctx.shadowColor='rgba(200,169,110,0.4)';ctx.shadowBlur=24;
-  ctx.fillText(countToday.toLocaleString(),W/2,400);ctx.shadowBlur=0;
+  ctx.font='900 160px "Cinzel Decorative",serif';ctx.fillStyle=INK;
+  ctx.shadowColor='rgba(150,80,0,0.45)';ctx.shadowBlur=28;
+  ctx.fillText(countToday.toLocaleString(),W/2,408);ctx.shadowBlur=0;
 
-  ctx.font='600 28px "Cinzel",serif';ctx.fillStyle='#8B6914';
-  ctx.fillText('S A C R E D   N U T S',W/2,506);
+  ctx.font='700 30px "Cinzel",serif';ctx.fillStyle=GOLDINC;
+  ctx.fillText('S A C R E D   N U T S',W/2,512);
 
-  ctx.font='italic 23px "Crimson Text",Georgia,serif';ctx.fillStyle='#6B5535';
+  ctx.font='italic 25px "Crimson Text",Georgia,serif';ctx.fillStyle=INK2;
   const df=new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
-  ctx.fillText(`on this day of ${df}`,W/2,548);
-  if(nickname){ctx.font='italic 19px "Crimson Text",Georgia,serif';ctx.fillStyle='#8B6914';ctx.fillText(`Recorded under the name: ${nickname}`,W/2,578);}
+  ctx.fillText(`on this day of ${df}`,W/2,556);
+  if(nickname){ctx.font='italic 20px "Crimson Text",Georgia,serif';ctx.fillStyle=GOLDMED;ctx.fillText(`Recorded under the name: ${nickname}`,W/2,586);}
 
-  ornLine(ctx,W/2,608,540);
+  ornLine(ctx,W/2,615,540);
 
   const stats=[{l:'ALL-TIME TOTAL',v:countAllTime.toLocaleString()},{l:'PERSONAL RECORD',v:bestDay.toLocaleString()},{l:'DAYS TRACKED',v:daysTracked.toLocaleString()},{l:'SESSION',v:countSession.toLocaleString()}];
   const cw=(W-180)/4;
   stats.forEach(({l,v},i)=>{
     const x=90+cw/2+i*cw;
-    ctx.fillStyle='rgba(200,169,110,0.1)';rrect(ctx,x-cw/2+10,634,cw-20,90,5);ctx.fill();
-    ctx.strokeStyle='rgba(200,169,110,0.35)';ctx.lineWidth=1;ctx.stroke();
-    ctx.font='700 36px "Space Mono",monospace';ctx.fillStyle='#1A0E04';ctx.fillText(v,x,684);
-    ctx.font='600 11px "Cinzel",serif';ctx.fillStyle='#8B6914';ctx.fillText(l,x,712);
+    ctx.fillStyle='rgba(100,55,0,0.08)';rrect(ctx,x-cw/2+10,640,cw-20,92,5);ctx.fill();
+    ctx.strokeStyle='rgba(100,55,0,0.45)';ctx.lineWidth=1.5;ctx.stroke();
+    ctx.font='700 40px "Space Mono",monospace';ctx.fillStyle=INK;ctx.fillText(v,x,690);
+    ctx.font='700 13px "Cinzel",serif';ctx.fillStyle=GOLDINC;ctx.fillText(l,x,720);
   });
 
-  ctx.font='italic 23px "Crimson Text",Georgia,serif';ctx.fillStyle='#4A3520';
-  wrapText(ctx,`"${getAchievementText(countToday)}"`,W/2,800,W-200,32);
+  ctx.font='italic 25px "Crimson Text",Georgia,serif';ctx.fillStyle=INK2;
+  wrapText(ctx,`"${getAchievementText(countToday)}"`,W/2,808,W-200,34);
 
-  ornLine(ctx,W/2,840,500);
+  ornLine(ctx,W/2,850,500);
 
-  const sx=158,sy=900,sr=66;
-  ctx.beginPath();ctx.arc(sx,sy,sr,0,Math.PI*2);ctx.strokeStyle='#C8A96E';ctx.lineWidth=3;ctx.stroke();
-  ctx.beginPath();ctx.arc(sx,sy,sr-14,0,Math.PI*2);ctx.strokeStyle='rgba(200,169,110,0.4)';ctx.lineWidth=1;ctx.stroke();
+  const sx=158,sy=908,sr=66;
+  ctx.beginPath();ctx.arc(sx,sy,sr,0,Math.PI*2);ctx.strokeStyle='#6B4000';ctx.lineWidth=3;ctx.stroke();
+  ctx.beginPath();ctx.arc(sx,sy,sr-14,0,Math.PI*2);ctx.strokeStyle='rgba(100,60,0,0.5)';ctx.lineWidth=1;ctx.stroke();
   await new Promise(resolve => {
     const si = new Image();
     si.onload = () => {
@@ -1774,16 +1755,16 @@ async function renderCertificate(canvas) {
     si.onerror = () => { ctx.font='42px serif';ctx.fillText('🥜',sx,sy+2);resolve(); };
     si.src='./nut-coin.jpg';
   });
-  ctx.font='700 9.5px "Cinzel",serif';ctx.fillStyle='#8B6914';ctx.fillText('THE SACRED NUT COUNCIL',sx,sy+sr+15);
+  ctx.font='700 11px "Cinzel",serif';ctx.fillStyle='#4A2800';ctx.fillText('THE SACRED NUT COUNCIL',sx,sy+sr+16);
 
   ctx.textAlign='right';
-  ctx.strokeStyle='rgba(26,14,4,0.45)';ctx.lineWidth=1;
-  ctx.beginPath();ctx.moveTo(W-360,918);ctx.lineTo(W-78,918);ctx.stroke();
-  ctx.font='italic 30px "Crimson Text",Georgia,serif';ctx.fillStyle='#1A0E04';ctx.fillText('The Sacred Nut Council',W-80,905);
-  ctx.font='600 11px "Cinzel",serif';ctx.fillStyle='#8B6914';ctx.fillText('AUTHENTICATED · SACRED NUT CODEX',W-80,928);
+  ctx.strokeStyle='rgba(50,25,0,0.55)';ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(W-380,920);ctx.lineTo(W-78,920);ctx.stroke();
+  ctx.font='italic 32px "Crimson Text",Georgia,serif';ctx.fillStyle='#0A0400';ctx.fillText('The Sacred Nut Council',W-80,908);
+  ctx.font='700 12px "Cinzel",serif';ctx.fillStyle='#5C3000';ctx.fillText('AUTHENTICATED · SACRED NUT CODEX',W-80,932);
 
-  ctx.textAlign='center';ctx.font='10px "Cinzel",serif';ctx.fillStyle='rgba(139,105,20,0.25)';
-  ctx.fillText(`$NUT  ·  pump.fun  ·  Issued ${dateStr}  ·  ${SITE_URL}`,W/2,H-20);
+  ctx.textAlign='center';ctx.font='11px "Cinzel",serif';ctx.fillStyle='rgba(80,40,0,0.45)';
+  ctx.fillText(`$NUT  ·  pump.fun  ·  Issued ${dateStr}  ·  ${SITE_URL}`,W/2,H-18);
 
   document.getElementById('certLoading').style.display='none';
 }
