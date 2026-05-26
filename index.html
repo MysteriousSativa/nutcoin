@@ -911,11 +911,15 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 //     create policy "select" on nut_logs for select using (true);
 //
 //     create or replace function leaderboard(target_date date default current_date)
-//     returns table(nickname text, deeds bigint) language sql security definer as $$
-//       select nickname, count(*)::bigint
+//     returns table(session_id text, nickname text, deeds bigint) language sql security definer as $$
+//       select
+//         session_id,
+//         max(nickname) as nickname,
+//         count(*)::bigint as deeds
 //       from nut_logs
-//       where deed_date = target_date and nickname is not null
-//       group by nickname order by count(*) desc limit 10;
+//       where deed_date = target_date
+//       group by session_id
+//       order by deeds desc;
 //     $$;
 //
 //  3. Paste your URL + anon key from Settings → API below
@@ -1107,34 +1111,64 @@ async function fetchLeaderboard() {
     return;
   }
   try {
-    // Fetch session_id + nickname — no filter, includes anon users
-    const {data,error} = await db
-      .from('nut_logs')
-      .select('nickname, session_id')
-      .eq('deed_date', dateStr);
+    // Use the SECURITY DEFINER RPC — bypasses RLS, groups by session_id in SQL.
+    // Run the updated leaderboard() function from the SQL config block above.
+    const {data, error} = await db.rpc('leaderboard', {target_date: dateStr});
     if (error) throw error;
-    // Aggregate by session_id so each device = one row
-    const sessions = {};
-    (data || []).forEach(row => {
-      const sid = row.session_id || 'unknown';
-      if (!sessions[sid]) sessions[sid] = {nickname: row.nickname || null, session_id: sid, count: 0};
-      // If this row has a nickname and we don't have one yet, capture it
-      if (row.nickname && !sessions[sid].nickname) sessions[sid].nickname = row.nickname;
-      sessions[sid].count++;
-    });
-    lbCache = Object.values(sessions)
-      .map(s => ({
+
+    // New RPC returns {session_id, nickname, deeds} per row (pre-aggregated)
+    const hasSession = Array.isArray(data) && data.length > 0 && 'session_id' in data[0];
+
+    if (hasSession) {
+      lbCache = data.map(s => ({
         nickname: s.nickname || anonName(s.session_id),
         session_id: s.session_id,
-        deeds: s.count,
+        deeds: Number(s.deeds),
         isAnon: !s.nickname,
         isYou: s.session_id === sessionId,
-      }))
-      .sort((a,b) => b.deeds - a.deeds);
+      })).sort((a,b) => b.deeds - a.deeds);
+    } else {
+      // Old RPC (not yet updated) — returns {nickname, deeds}, named users only
+      lbCache = (data || []).map(r => ({
+        nickname: r.nickname,
+        session_id: null,
+        deeds: Number(r.deeds),
+        isAnon: false,
+        isYou: r.nickname === nickname,
+      }));
+    }
+
     renderLeaderboard(lbCache);
     updateNickRank(lbCache);
   } catch(e) {
-    document.getElementById('lbContent').innerHTML=`<div class="lb-empty">Could not load leaderboard.</div>`;
+    // RPC unavailable — fall back to direct table query
+    try {
+      const {data:rows, error:fe} = await db
+        .from('nut_logs')
+        .select('nickname, session_id')
+        .eq('deed_date', dateStr);
+      if (fe) throw fe;
+      const sessions = {};
+      (rows || []).forEach(row => {
+        const sid = row.session_id || 'unknown';
+        if (!sessions[sid]) sessions[sid] = {nickname: row.nickname || null, session_id: sid, count: 0};
+        if (row.nickname && !sessions[sid].nickname) sessions[sid].nickname = row.nickname;
+        sessions[sid].count++;
+      });
+      lbCache = Object.values(sessions)
+        .map(s => ({
+          nickname: s.nickname || anonName(s.session_id),
+          session_id: s.session_id,
+          deeds: s.count,
+          isAnon: !s.nickname,
+          isYou: s.session_id === sessionId,
+        }))
+        .sort((a,b) => b.deeds - a.deeds);
+      renderLeaderboard(lbCache);
+      updateNickRank(lbCache);
+    } catch(fe2) {
+      document.getElementById('lbContent').innerHTML=`<div class="lb-empty">Could not load leaderboard.</div>`;
+    }
   }
 }
 
