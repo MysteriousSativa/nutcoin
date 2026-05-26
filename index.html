@@ -1126,8 +1126,8 @@ position:relative;overflow:hidden;
       All-time nuts: <span id="myAllTime">0</span> &nbsp;·&nbsp; Session: <span id="mySession">0</span>
     </div>
     <div class="card-actions">
-      <button class="cert-btn" onclick="openCertificate()">Certificate</button>
-      <button class="share-btn" onclick="shareTwitter()">Share on X</button>
+      <button class="cert-btn" onclick="openCertificate()">Get Receipt</button>
+      <button class="share-btn" onclick="shareTwitter()">Post Receipt to X</button>
     </div>
   </div>
 
@@ -1303,7 +1303,7 @@ position:relative;overflow:hidden;
     All personal data stored locally &nbsp;·&nbsp; Global data powered by Supabase<br>
     <a href="https://pump.fun" target="_blank" rel="noopener" id="footerPump">pump.fun</a> &nbsp;·&nbsp;
     <a href="https://x.com/TheNutTracker" target="_blank" rel="noopener" id="footerTwitter">@TheNutTracker</a> &nbsp;·&nbsp;
-    <a href="#" onclick="shareTwitter();return false;">Share Your Stats</a>
+    <a href="#" onclick="shareTwitter();return false;">Post Your Nut Receipt</a>
   </div>
 </div>
 
@@ -1364,8 +1364,8 @@ position:relative;overflow:hidden;
 <div class="modal-overlay" id="certModal">
   <div class="cert-inner">
     <div class="cert-modal-hdr">
-      <div class="cert-modal-title">Your NUT Certificate</div>
-      <div class="cert-modal-sub">proof you nutted today. downloadable. shareable. not advisable.</div>
+      <div class="cert-modal-title">Your Official Nut Receipt</div>
+      <div class="cert-modal-sub">legally dubious proof you nutted. download it. post it. let them cope.</div>
     </div>
     <div class="cert-canvas-wrap">
       <canvas id="certCanvas"></canvas>
@@ -1373,7 +1373,7 @@ position:relative;overflow:hidden;
     </div>
     <div class="cert-btns">
       <button class="cert-dl-btn" onclick="downloadCert()">⬇ &nbsp; Download PNG</button>
-      <button class="cert-tweet-btn" onclick="shareCertTweet()">𝕏 &nbsp; Share on X</button>
+      <button class="cert-tweet-btn" onclick="shareCertTweet()">𝕏 &nbsp; Post Receipt &amp; Start Drama</button>
       <button class="modal-close" onclick="closeCert()">Dismiss</button>
     </div>
   </div>
@@ -1951,7 +1951,7 @@ async function openXWithCert(text) {
   }
 
   // Desktop: download the image then open the tweet composer
-  const fname = `NUT-Certificate-${dateStr}${nickname ? '-' + nickname : ''}.png`;
+  const fname = `NUT-Receipt-${dateStr}${nickname ? '-' + nickname : ''}.png`;
   const objUrl = URL.createObjectURL(blob);
   const dl = document.createElement('a');
   dl.download = fname;
@@ -1961,86 +1961,110 @@ async function openXWithCert(text) {
 
   // Open tweet composer after a brief delay so the download dialog registers first
   setTimeout(() => window.open(tweetUrl, '_blank'), 400);
-  showToast('Certificate saved. Attach it to your tweet.');
+  showToast('Receipt saved — attach it and let the timeline cook.');
 }
 
-async function shareTwitter() {
+function pickStirTweet() {
   const s = currentStreak || 0;
+  const name = nickname ? nickname : 'anonymous menace';
   const pool = [];
 
   if (countToday === 0) {
     pool.push(
-      `zero nuts on $NUT today\n\neither i have self control or i am about to go absolutely feral\n\nthe oracle is watching\n\n${SITE_URL} #NUT #Solana`,
-      `logged zero nuts on $NUT today\n\ntaking a rest day\n\neven degenerates need recovery\n\n${SITE_URL} #NUT`
+      `i have logged ZERO nuts on $NUT today\n\nwhich means i am either disciplined or about to absolutely destroy my wrist\n\nthe receipt printer is warming up\n\n${SITE_URL} #NUT #Solana`,
+      `0 nuts today on $NUT\n\nrest day? edging arc? cowardice?\n\nthe oracle knows and it is taking notes\n\n${SITE_URL} #NUT`
     );
   }
 
   if (countToday === 1) {
     pool.push(
-      `first nut of the day logged on $NUT\n\n• wrist status: fresh\n• regrets: none\n• shame level: zero\n\nif you know what this coin tracks you are my people\n\n${SITE_URL} #NUT`,
-      `one nut. clean. deliberate. logged on the blockchain forever.\n\n$NUT tracks the thing everybody does and nobody admits\n\nyou are welcome\n\n${SITE_URL} #NUT #Solana`
+      `just logged my first nut of the day on $NUT and received an official receipt\n\nyes there is a solana memecoin for this\nyes i am posting about it\nno i will not be taking questions\n\n${SITE_URL} #NUT #memecoin`,
+      `one (1) nut. documented. timestamped. receipt attached.\n\n$NUT is what happens when crypto finally gets honest\n\n${SITE_URL} #NUT #Solana`
     );
   }
 
   if (countToday >= 2 && countToday <= 4) {
     pool.push(
-      `$NUT market update\n\n• nuts today: ${countToday}\n• all time: ${countAllTime}\n• wrist status: operational\n• shame: none detected\n\nmost honest chart in all of crypto\n\n${SITE_URL} #NUT`,
-      `${countToday} nuts on $NUT today\n\nsome call it a problem\nthe oracle calls it dedication\n\nyou know exactly what this coin tracks\n\n${SITE_URL} #NUT #Solana`
+      `${countToday} nuts logged today on $NUT\n\nmy wrist: operational\nmy dignity: deprecated\nmy receipt: attached\n\nmost transparent asset in all of crypto and i mean ALL of it\n\n${SITE_URL} #NUT`,
+      `market update:\n\n• $NUT nuts today: ${countToday}\n• shame: not found\n• receipt: printed\n\nif you know what this coin tracks you are already laughing\n\n${SITE_URL} #NUT #Solana`
     );
   }
 
   if (countToday >= 5 && countToday <= 9) {
     pool.push(
-      `$NUT status check\n\n${countToday} nuts today\n${countAllTime} all time\n${s>1?`${s} day streak 🔥\n`:''}\nmy therapist has concerns\ni have conviction\n\n${SITE_URL} #NUT #Solana`,
-      `${countToday} nuts logged today on $NUT\n\nthe codex does not judge\nit just counts\n\nmost transparent project in web3 and i will not apologize\n\n${SITE_URL} #NUT`
+      `${countToday} nuts today on $NUT\n\nat this point it is not a hobby it is a lifestyle brand\n\nposting the receipt before someone asks\n\n${SITE_URL} #NUT #memecoin`,
+      `HR if you're reading this: yes\n\n$NUT count today: ${countToday}\nall time: ${countAllTime}\nreceipt attached\n\n${SITE_URL} #NUT #Solana`
     );
   }
 
   if (countToday >= 10) {
     pool.push(
-      `$NUT STATUS REPORT\n\n🥜 today: ${countToday} nuts\n📊 all time: ${countAllTime}\n${s>1?`🔥 streak: ${s} days\n`:''}\ni have a therapist. she is concerned.\n\nstill extremely bullish on $NUT\n\n${SITE_URL} #NUT`,
-      `posting my $NUT stats unironically and without a single ounce of shame\n\ntoday: ${countToday}\nall time: ${countAllTime}\n\nyou do not have to understand it. just respect it.\n\n${SITE_URL} #NUT #Solana`
+      `PUBLIC SERVICE ANNOUNCEMENT\n\n🥜 $NUT nuts today: ${countToday}\n📊 lifetime: ${countAllTime}\n${s > 1 ? `🔥 streak: ${s} days\n` : ''}📄 official receipt attached\n\ni was asked to log off. i logged another nut instead\n\n${SITE_URL} #NUT`,
+      `posting my nut stats on the timeline because transparency is a virtue\n\n${countToday} today · ${countAllTime} all time · receipt included\n\n$NUT does not miss\n\n${SITE_URL} #NUT #Solana #memecoin`
     );
   }
 
   if (s >= 7) {
     pool.push(
-      `day ${s} of the $NUT streak\n\nsome people DCA into bitcoin every day\ni have a different kind of daily habit\n\nconsistency is a virtue apparently\n\n${SITE_URL} #NUT #Solana`
+      `day ${s} of logging nuts on $NUT every single day\n\nsome people streak Duolingo\ni streak something else entirely\n\nreceipt attached. cope.\n\n${SITE_URL} #NUT`
     );
   }
 
-  if (s >= 3 && s < 7) {
+  if (countAllTime === 69) {
     pool.push(
-      `${s} day $NUT streak 🔥\n\n${countToday} today and ${countAllTime} all time\n\nmost consistent chart in the entire space and you know why\n\n${SITE_URL} #NUT`
+      `my $NUT all-time count just hit 69\n\nnice.\n\nreceipt attached for the timeline historians\n\n${SITE_URL} #NUT #Solana`
     );
   }
-
-  if (countAllTime === 1)  pool.push(`just joined $NUT\n\nfirst nut in the eternal ledger\n\nthe most self aware coin ever made\n\n${SITE_URL} #NUT #Solana`);
-  if (countAllTime === 69) pool.push(`my $NUT all time count just hit 69\n\nnice\n\n${SITE_URL} #NUT #Solana`);
-  if (countAllTime === 100) pool.push(`100 total nuts on $NUT\n\nthree digits. the codex is getting heavy.\n\n${SITE_URL} #NUT #Solana`);
-  if (countAllTime === 420) pool.push(`420 nuts on $NUT\n\ncoincidence? the oracle says absolutely not.\n\n${SITE_URL} #NUT #Solana`);
+  if (countAllTime === 420) {
+    pool.push(
+      `420 nuts logged on $NUT all time\n\nthe receipt is attached\n\nthe prophecy is fulfilled\n\n${SITE_URL} #NUT`
+    );
+  }
 
   pool.push(
-    `${countToday} today and ${countAllTime} all time on $NUT\n\na coin for people who are built different\n\nif you know what it tracks welcome home\n\n${SITE_URL} #NUT #Solana`,
-    `$NUT update\n\n${countToday} nuts today\n${countAllTime} recorded forever\n\nnobody asked for this coin\neverybody needed it\n\n${SITE_URL} #NUT #Solana #memecoin`
+    `they made a memecoin that tracks how many times you nut and i am fully committed\n\n${countToday} today · ${countAllTime} lifetime · receipt attached\n\n$NUT @TheNutTracker\n\n${SITE_URL} #NUT #Solana #memecoin`,
+    `showed someone $NUT and they said "this can't be real"\n\nit is real\nhere is my receipt\n${countToday} nuts today\n\n${SITE_URL} #NUT`,
+    `degen twitter asked for transparency\n\nso here: ${countToday} nuts today on $NUT\nrecorded forever\nreceipt attached\n\n${SITE_URL} #NUT #Solana`,
+    `name on receipt: ${name}\nnuts today: ${countToday}\nall time: ${countAllTime}\n\nyes this is a solana coin\nyes i am posting it\n\n${SITE_URL} #NUT`
   );
 
-  const pick = pool[Math.floor(Math.random()*pool.length)];
-  openXWithCert(pick);
+  return pool[Math.floor(Math.random() * pool.length)];
+}
+
+function pickCertStirTweet() {
+  const s = currentStreak || 0;
+  const name = nickname ? `"${nickname}"` : 'anonymous';
+  const pool = [
+    `ATTACHED: my official $NUT receipt\n\n📄 nuts today: ${countToday}\n📊 lifetime: ${countAllTime}\n${s > 0 ? `🔥 streak: ${s} days\n` : ''}signed by the nut council\n\nthis is the most honest coin in crypto and i will die on this hill\n\n${SITE_URL} #NUT #Solana`,
+    `some projects drop whitepapers\n\n$NUT drops RECEIPTS\n\nmine says ${countToday} nuts today\nyours could be next\n\n${SITE_URL} #NUT #memecoin`,
+    `just got my $NUT nut receipt and i am posting it on main\n\n${countToday} today · ${countAllTime} all time\n\nif this doesn't cause a stir then crypto is truly dead\n\n${SITE_URL} #NUT @TheNutTracker`,
+    `POV: you explain $NUT to a normie\n\n"it's a coin that counts nuts"\n"here's my receipt"\n"${countToday} today"\n\nthey stop making eye contact\n\n${SITE_URL} #NUT #Solana`,
+    `certified nut activity disclosure 🥜\n\nrecorded as ${name}\n${countToday} nuts today\n${countAllTime} on the eternal ledger\n\nreceipt attached. deny nothing.\n\n${SITE_URL} #NUT`,
+    `the $NUT receipt goes hard\n\n${countToday} nuts · ${countAllTime} lifetime · blockchain-adjacent documentation of busting\n\nquote tweet this if you've ever lied about your body count\n\n${SITE_URL} #NUT #memecoin`,
+    `my therapist: "what did you do this week"\n\nme: *slides $NUT receipt across the table*\n\n"${countToday} nuts. documented. timestamped."\n\n${SITE_URL} #NUT #Solana`,
+    `WEB3 INNOVATION:\n\n❌ fake utility\n❌ vaporware roadmaps\n✅ official nut receipts\n\n${countToday} today on $NUT\nreceipt attached\n\n${SITE_URL} #NUT`
+  ];
+
+  if (countToday >= 10) {
+    pool.push(
+      `EMERGENCY DISCLOSURE 🚨\n\n$NUT receipt confirms ${countToday} nuts TODAY\n\nthis is not financial advice\nthis IS nut advice\n\n${SITE_URL} #NUT`
+    );
+  }
+  if (countToday === 1) {
+    pool.push(
+      `first nut of the day just hit the $NUT ledger\n\nreceipt minted\nshame waived\n\n${SITE_URL} #NUT #Solana`
+    );
+  }
+
+  return pool[Math.floor(Math.random() * pool.length)];
+}
+
+async function shareTwitter() {
+  openXWithCert(pickStirTweet());
 }
 
 async function shareCertTweet() {
-  const s = currentStreak || 0;
-  const badges = typeof earnedBadges !== 'undefined' ? earnedBadges.size : 0;
-  const pool = [
-    `just minted my $NUT Certificate of Sacred Achievement\n\n📊 today: ${countToday} nuts\n📈 all time: ${countAllTime}\n🔥 streak: ${s} days\n🏅 ${badges} badge${badges!==1?'s':''} earned\n\nthe ledger does not lie\n\n${SITE_URL} #NUT #Solana`,
-    `my $NUT Certificate just dropped\n\n${countToday} today\n${countAllTime} all time\n${s>0?`${s} day streak 🔥\n`:''}\nhonestly frame worthy\n\n${SITE_URL} #NUT`,
-    `${countAllTime} sacred nuts. recorded forever. certified.\n\n$NUT is the most self aware coin ever made and i stand by that\n\n${SITE_URL} #NUT #Solana #memecoin`,
-    `$NUT certificate secured 🥜\n\n${countToday} today · ${countAllTime} all time\n\nif you know what this tracks you are my people\n\n${SITE_URL} #NUT`,
-    `just got my official $NUT Certificate\n\nsome people collect NFTs\ni collect proof of something else\n\n${SITE_URL} #NUT #Solana`,
-  ];
-  const pick = pool[Math.floor(Math.random()*pool.length)];
-  openXWithCert(pick);
+  openXWithCert(pickCertStirTweet());
 }
 
 // ═══════════════════════════════
@@ -2242,14 +2266,14 @@ function showToast(msg) {
 // CERTIFICATE
 // ═══════════════════════════════
 function getAchievementText(n) {
-  if(n===0) return "you haven't nutted yet. what are you doing here. go nut. come back.";
-  if(n===1) return 'one nut. the journey begins. your ancestors are watching. they are confused.';
-  if(n<5)   return 'respectable. not impressive. respectable. there is a difference and you are on the wrong side of it.';
-  if(n<10)  return 'getting there. the codex takes note. so does your wrist. it is filing a complaint.';
-  if(n<25)  return 'ok now we are talking. the oracle is writing shit down. concerning shit.';
-  if(n<50)  return 'what in the actual hell. the elders have been notified. they said damn.';
-  if(n<100) return 'beyond normal human behavior. certified freak. we mean that as a compliment. please hydrate.';
-  return 'one hundred nuts. holy shit. frame this. hang it somewhere private. then drink water. then maybe get help.';
+  if(n===0) return "has not nutted yet. suspicious. report to the nut council immediately.";
+  if(n===1) return "one nut. the receipt has been printed. your group chat will hear about this.";
+  if(n<5)   return "a modest session. not embarrassing. not impressive. deeply logged anyway.";
+  if(n<10)  return "getting unhinged. the wrist filed a grievance. the receipt did not care.";
+  if(n<25)  return "certified menace behavior. quote tweet bait. absolutely no remorse detected.";
+  if(n<50)  return "this is what they meant by on-chain transparency. seek hydration. post anyway.";
+  if(n<100) return "beyond human norms. the timeline will not survive this receipt. good.";
+  return "one hundred nuts. hall of fame. hall of shame. same building. receipt attached.";
 }
 
 function rrect(ctx,x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.quadraticCurveTo(x+w,y,x+w,y+r);ctx.lineTo(x+w,y+h-r);ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);ctx.lineTo(x+r,y+h);ctx.quadraticCurveTo(x,y+h,x,y+h-r);ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath();}
@@ -2346,26 +2370,26 @@ async function renderCertificate(canvas) {
   ctx.font='900 98px "Cinzel Decorative",serif';ctx.fillStyle=INK;
   ctx.shadowColor='rgba(180,120,20,0.5)';ctx.shadowBlur=22;
   ctx.fillText('$NUT',W/2,128);ctx.shadowBlur=0;
-  ctx.font='700 20px "Cinzel",serif';ctx.fillStyle=GOLDINC;
-  ctx.letterSpacing='0.15em';
-  ctx.fillText('C E R T I F I C A T E   O F   S A C R E D   A C H I E V E M E N T',W/2,196);
+  ctx.font='700 18px "Cinzel",serif';ctx.fillStyle=GOLDINC;
+  ctx.letterSpacing='0.12em';
+  ctx.fillText('O F F I C I A L   N U T   R E C E I P T   ·   F O R M   6 9 - A',W/2,196);
 
   ornLine(ctx,W/2,228,560);
 
   ctx.font='italic 28px "Crimson Text",Georgia,serif';ctx.fillStyle=INK2;
-  ctx.fillText('This is to certify that the bearer hath committed',W/2,284);
+  ctx.fillText('Be it known that the undersigned has busted',W/2,284);
 
   ctx.font='900 160px "Cinzel Decorative",serif';ctx.fillStyle=INK;
   ctx.shadowColor='rgba(150,80,0,0.45)';ctx.shadowBlur=28;
   ctx.fillText(countToday.toLocaleString(),W/2,408);ctx.shadowBlur=0;
 
   ctx.font='700 30px "Cinzel",serif';ctx.fillStyle=GOLDINC;
-  ctx.fillText('S A C R E D   N U T S',W/2,512);
+  ctx.fillText('D O C U M E N T E D   N U T S',W/2,512);
 
   ctx.font='italic 25px "Crimson Text",Georgia,serif';ctx.fillStyle=INK2;
   const df=new Date().toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
-  ctx.fillText(`on this day of ${df}`,W/2,556);
-  if(nickname){ctx.font='italic 20px "Crimson Text",Georgia,serif';ctx.fillStyle=GOLDMED;ctx.fillText(`Recorded under the name: ${nickname}`,W/2,586);}
+  ctx.fillText(`on ${df} — timestamped for maximum timeline damage`,W/2,556);
+  if(nickname){ctx.font='italic 20px "Crimson Text",Georgia,serif';ctx.fillStyle=GOLDMED;ctx.fillText(`Issued to: ${nickname} (do not show HR)`,W/2,586);}
 
   ornLine(ctx,W/2,615,540);
 
@@ -2397,16 +2421,16 @@ async function renderCertificate(canvas) {
     si.onerror = () => { ctx.font='42px serif';ctx.fillText('🥜',sx,sy+2);resolve(); };
     si.src='./nut-coin.jpg';
   });
-  ctx.font='700 11px "Cinzel",serif';ctx.fillStyle='#4A2800';ctx.fillText('THE NUT COUNCIL',sx,sy+sr+16);
+  ctx.font='700 11px "Cinzel",serif';ctx.fillStyle='#4A2800';ctx.fillText('NUT DISCLOSURE BOARD',sx,sy+sr+16);
 
   ctx.textAlign='right';
   ctx.strokeStyle='rgba(50,25,0,0.55)';ctx.lineWidth=1.5;
   ctx.beginPath();ctx.moveTo(W-380,920);ctx.lineTo(W-78,920);ctx.stroke();
-  ctx.font='italic 32px "Crimson Text",Georgia,serif';ctx.fillStyle='#0A0400';ctx.fillText('The Nut Council',W-80,908);
-  ctx.font='700 12px "Cinzel",serif';ctx.fillStyle='#5C3000';ctx.fillText('AUTHENTICATED · NUT CODEX',W-80,932);
+  ctx.font='italic 32px "Crimson Text",Georgia,serif';ctx.fillStyle='#0A0400';ctx.fillText('Chief Nut Officer',W-80,908);
+  ctx.font='700 12px "Cinzel",serif';ctx.fillStyle='#5C3000';ctx.fillText('AUTHENTICATED · POST AT YOUR OWN RISK',W-80,932);
 
   ctx.textAlign='center';ctx.font='11px "Cinzel",serif';ctx.fillStyle='rgba(80,40,0,0.45)';
-  ctx.fillText(`$NUT  ·  pump.fun  ·  Issued ${dateStr}  ·  ${SITE_URL}`,W/2,H-18);
+  ctx.fillText(`$NUT · OFFICIAL RECEIPT · ${dateStr} · ${SITE_URL} · NOT FINANCIAL ADVICE`,W/2,H-18);
 
   document.getElementById('certLoading').style.display='none';
 }
@@ -2423,7 +2447,7 @@ function closeCert(){ document.getElementById('certModal').classList.remove('sho
 function downloadCert() {
   const canvas=document.getElementById('certCanvas');
   const link=document.createElement('a');
-  link.download=`NUT-Certificate-${dateStr}${nickname?'-'+nickname:''}.png`;
+  link.download=`NUT-Receipt-${dateStr}${nickname?'-'+nickname:''}.png`;
   link.href=canvas.toDataURL('image/png',.95);
   link.click();
 }
