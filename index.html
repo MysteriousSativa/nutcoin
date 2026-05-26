@@ -62,12 +62,18 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
   min-height:440px;display:flex;flex-direction:column;align-items:center;justify-content:center;
   text-align:center;padding:170px 20px 60px;position:relative;
   background:
-    linear-gradient(to bottom,rgba(5,3,1,0.45) 0%,rgba(5,3,1,0.88) 72%,#050301 100%),
-    url('./hero-bg.jpg') center/cover no-repeat;
+    linear-gradient(to bottom,rgba(5,3,1,0) 0%,rgba(5,3,1,0.82) 62%,#050301 100%),
+    radial-gradient(ellipse 110% 80% at 50% -8%,rgba(200,150,55,0.24) 0%,rgba(90,45,8,0.14) 42%,transparent 68%),
+    radial-gradient(ellipse 55% 55% at 15% 110%,rgba(50,25,5,0.6) 0%,transparent 60%),
+    radial-gradient(ellipse 55% 55% at 85% 110%,rgba(50,25,5,0.6) 0%,transparent 60%),
+    radial-gradient(ellipse 100% 100% at 50% 110%,rgba(20,10,2,0.9) 0%,transparent 55%),
+    #050301;
 }
 .hero::before{
   content:'';position:absolute;inset:0;pointer-events:none;
-  background:radial-gradient(ellipse 70% 55% at 50% 42%,rgba(200,169,110,0.1) 0%,transparent 70%);
+  background:
+    radial-gradient(ellipse 60% 45% at 50% 38%,rgba(200,169,110,0.13) 0%,transparent 65%),
+    radial-gradient(ellipse 30% 25% at 50% 30%,rgba(220,180,100,0.09) 0%,transparent 50%);
   animation:hero-pulse 7s ease-in-out infinite;
 }
 @keyframes hero-pulse{0%,100%{opacity:0.6;}50%{opacity:1.3;}}
@@ -1086,6 +1092,13 @@ async function logToSupabase() {
 // ═══════════════════════════════
 let lbCache = [];
 
+// Generates a stable "Anon #XXXX" name from a session UUID
+function anonName(sid) {
+  const hex = String(sid).replace(/-/g,'').slice(-6);
+  const num = (parseInt(hex, 16) % 9000) + 1000;
+  return `Anon #${num}`;
+}
+
 async function fetchLeaderboard() {
   if (!db) {
     document.getElementById('lbContent').innerHTML = `<div class="lb-empty">Configure Supabase to enable the global leaderboard.<br><br>
@@ -1094,19 +1107,30 @@ async function fetchLeaderboard() {
     return;
   }
   try {
-    // Query all rows for today directly — bypasses the RPC's hardcoded LIMIT 10
+    // Fetch session_id + nickname — no filter, includes anon users
     const {data,error} = await db
       .from('nut_logs')
-      .select('nickname')
-      .eq('deed_date', dateStr)
-      .not('nickname', 'is', null);
+      .select('nickname, session_id')
+      .eq('deed_date', dateStr);
     if (error) throw error;
-    // Aggregate counts in JS
-    const counts = {};
-    (data || []).forEach(row => { counts[row.nickname] = (counts[row.nickname] || 0) + 1; });
-    lbCache = Object.entries(counts)
-      .map(([nickname, deeds]) => ({nickname, deeds}))
-      .sort((a, b) => b.deeds - a.deeds);
+    // Aggregate by session_id so each device = one row
+    const sessions = {};
+    (data || []).forEach(row => {
+      const sid = row.session_id || 'unknown';
+      if (!sessions[sid]) sessions[sid] = {nickname: row.nickname || null, session_id: sid, count: 0};
+      // If this row has a nickname and we don't have one yet, capture it
+      if (row.nickname && !sessions[sid].nickname) sessions[sid].nickname = row.nickname;
+      sessions[sid].count++;
+    });
+    lbCache = Object.values(sessions)
+      .map(s => ({
+        nickname: s.nickname || anonName(s.session_id),
+        session_id: s.session_id,
+        deeds: s.count,
+        isAnon: !s.nickname,
+        isYou: s.session_id === sessionId,
+      }))
+      .sort((a,b) => b.deeds - a.deeds);
     renderLeaderboard(lbCache);
     updateNickRank(lbCache);
   } catch(e) {
@@ -1132,14 +1156,15 @@ function renderLeaderboard(rows) {
   </div>`;
   html += `<div class="lb-list">`;
   rows.forEach((r,i)=>{
-    const isYou = r.nickname===nickname;
+    const isYou = r.isYou || (r.session_id === sessionId) || (!r.isAnon && r.nickname === nickname);
     const ri = i < 3 ? rankIcons[i] : null;
     const rankEl = ri
       ? `<span class="lb-row-rank ${ri.cls}">${ri.txt}</span>`
       : `<span class="lb-row-rank plain">${i+1}</span>`;
+    const nameStyle = r.isAnon ? 'color:var(--muted);font-style:italic;' : '';
     html += `<div class="lb-row ${rowClass(i)} ${isYou?'you':''}">
       ${rankEl}
-      <span class="lb-row-name">${escHtml(r.nickname)}</span>
+      <span class="lb-row-name" style="${nameStyle}">${escHtml(r.nickname)}</span>
       ${isYou ? '<span class="lb-you-badge">YOU</span>' : ''}
       <span class="lb-row-count">${Number(r.deeds).toLocaleString()}</span>
       <span class="lb-row-nuts">NUTS</span>
@@ -1151,9 +1176,13 @@ function renderLeaderboard(rows) {
 }
 
 function updateNickRank(rows) {
-  if (!nickname) { document.getElementById('nickRankDisplay').textContent=''; return; }
-  const idx=rows.findIndex(r=>r.nickname===nickname);
-  document.getElementById('nickRankDisplay').textContent = idx>=0 ? `· #${idx+1} today` : '· Not on board yet';
+  // Find the current user's row by session_id (works for both named and anon)
+  const idx = rows.findIndex(r => r.isYou || r.session_id === sessionId);
+  if (idx < 0) {
+    document.getElementById('nickRankDisplay').textContent = '';
+    return;
+  }
+  document.getElementById('nickRankDisplay').textContent = `· #${idx+1} today`;
 }
 
 function escHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
@@ -1395,25 +1424,26 @@ async function openXWithCert(text) {
     } catch(e) {}
   }
 
-  // ── DESKTOP: open Twitter compose, copy cert to clipboard ──
-  // window.open must fire before any await to avoid popup blockers
-  window.open(twitterUrl, '_blank');
-
-  if (window.ClipboardItem && navigator.clipboard) {
+  // ── DESKTOP: write clipboard FIRST (needs user gesture), then open Twitter ──
+  // Initiating clipboard.write before any window.open preserves the activation token.
+  if (blob && window.ClipboardItem && navigator.clipboard) {
     try {
-      // If blob already in cache: Promise.resolve() is instant, gesture survives fine.
-      // If not cached: Chrome 92+ holds the user gesture open while a Promise<Blob> resolves.
-      const blobPromise = blob
-        ? Promise.resolve(blob)
-        : (async () => {
-            const c = document.createElement('canvas');
-            await renderCertificate(c);
-            return new Promise(r => c.toBlob(r, 'image/png', 0.95));
-          })();
-      await navigator.clipboard.write([new ClipboardItem({'image/png': blobPromise})]);
+      // Kick off the clipboard write without awaiting — this starts the write
+      // within the user gesture window before window.open consumes it.
+      const clipPromise = navigator.clipboard.write([new ClipboardItem({'image/png': blob})]);
+      // Open Twitter immediately after (still within gesture window)
+      window.open(twitterUrl, '_blank');
+      // Now await the result
+      await clipPromise;
       showToast('📋 certificate copied — paste into X with Ctrl+V');
       return;
-    } catch(e) {}
+    } catch(e) {
+      // clipboard failed — still open Twitter, fall through to download
+      window.open(twitterUrl, '_blank');
+    }
+  } else {
+    // No blob or no clipboard API — open Twitter, then try to render + download
+    window.open(twitterUrl, '_blank');
   }
 
   // ── FALLBACK: auto-download so user can attach manually ──
