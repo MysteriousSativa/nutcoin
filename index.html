@@ -1309,33 +1309,8 @@ position:relative;overflow:hidden;
 //  ⚙️  CONFIG — FILL THESE IN TO ACTIVATE GLOBAL FEATURES
 // ═══════════════════════════════════════════════════════
 //
-//  1. Create free Supabase project at supabase.com
-//  2. Run this SQL in the SQL editor:
-//
-//     create table nut_logs (
-//       id bigserial primary key,
-//       session_id text not null,
-//       nickname text,
-//       deed_date date default current_date,
-//       created_at timestamptz default now()
-//     );
-//     alter table nut_logs enable row level security;
-//     create policy "insert" on nut_logs for insert with check (true);
-//     create policy "select" on nut_logs for select using (true);
-//
-//     create or replace function leaderboard()
-//     returns table(session_id text, nickname text, deeds bigint) language sql security definer as $$
-//       select
-//         session_id,
-//         max(nickname) as nickname,
-//         count(*)::bigint as deeds
-//       from nut_logs
-//       group by session_id
-//       order by deeds desc;
-//     $$;
-//
-//  3. Paste your URL + anon key from Settings → API below
-//  4. Paste your pump.fun contract address once deployed
+//  Supabase: see SUPABASE.md — run supabase/schema.sql in SQL Editor, then paste anon key below.
+//  Client uses RPCs only: log_nut, global_counts, leaderboard (not raw table insert/select).
 
 const SUPABASE_URL  = 'https://ynzbwnlltqrprnrlbtna.supabase.co';
 const SUPABASE_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InluemJ3bmxsdHFycHJucmxidG5hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk3MzQyNDQsImV4cCI6MjA5NTMxMDI0NH0.W7R5bD7F7XWpW0HEK9rgcMYsIbhF2caq57d0grZZjqA';
@@ -1509,12 +1484,11 @@ async function fetchGlobalCounts() {
     return;
   }
   try {
-    const [todayRes, allTimeRes] = await Promise.all([
-      db.from('nut_logs').select('*',{count:'exact',head:true}).eq('deed_date',dateStr),
-      db.from('nut_logs').select('*',{count:'exact',head:true}),
-    ]);
-    const t = todayRes.count ?? 0;
-    const a = allTimeRes.count ?? 0;
+    const { data, error } = await db.rpc('global_counts', { p_deed_date: dateStr });
+    if (error) throw error;
+    const row = data?.[0] || {};
+    const t = Number(row.today_count ?? 0);
+    const a = Number(row.all_time_count ?? 0);
     document.getElementById('globalToday').textContent = t.toLocaleString();
     document.getElementById('globalToday').classList.remove('loading');
     const ht = document.getElementById('heroToday');
@@ -1532,11 +1506,12 @@ async function fetchGlobalCounts() {
 async function logToSupabase() {
   if (!db) return;
   try {
-    await db.from('nut_logs').insert({
-      session_id: sessionId,
-      nickname: nickname || null,
-      deed_date: dateStr,
+    const { data, error } = await db.rpc('log_nut', {
+      p_session_id: sessionId,
+      p_nickname: nickname || null,
+      p_deed_date: dateStr,
     });
+    if (error || (data && data.ok === false)) return;
     fetchGlobalCounts();
     fetchLeaderboard();
   } catch(e){}
@@ -1557,12 +1532,12 @@ function anonName(sid) {
 async function fetchLeaderboard() {
   if (!db) {
     document.getElementById('lbContent').innerHTML = `<div class="lb-empty">Configure Supabase to enable the global leaderboard.<br><br>
-      <span style="font-size:13px;font-family:'Cinzel',serif;letter-spacing:.1em;color:var(--muted)">Run the SQL schema from the config block to get started.</span></div>`;
+      <span style="font-size:13px;color:var(--muted)">Owner: run <code style="color:var(--gold)">supabase/schema.sql</code> — see SUPABASE.md</span></div>`;
     if (!nickname) document.getElementById('lbJoin').style.display='block';
     return;
   }
   // Server-side aggregation via leaderboard() RPC — returns top rows pre-sorted
-  const {data, error} = await db.rpc('leaderboard').limit(20);
+  const {data, error} = await db.rpc('leaderboard');
 
   const el = document.getElementById('lbContent');
 

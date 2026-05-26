@@ -37,4 +37,8 @@ Outputs: `img/og.png`, `img/favicon.ico`, `img/apple-touch-icon.png`
 
 Until step 2 is done, the live URL stays **https://nutcoin-alpha.vercel.app**.
 
+## Supabase (global counter + leaderboard)
+
+See **`SUPABASE.md`**. Run **`supabase/schema.sql`** once in the Supabase SQL Editor.
+
 Deploy: `git push origin main`
