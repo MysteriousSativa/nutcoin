@@ -55,6 +55,7 @@
   </div>
 
   <script src="./profiles.js"></script>
+  <script src="./npcs.js"></script>
   <script>
     const SUPABASE_URL = 'https://ynzbwnlltqrprnrlbtna.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InluemJ3bmxsdHFycHJucmxidG5hIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk3MzQyNDQsImV4cCI6MjA5NTMxMDI0NH0.W7R5bD7F7XWpW0HEK9rgcMYsIbhF2caq57d0grZZjqA';
@@ -134,38 +135,75 @@
       let nickname = null;
       let deeds = 0;
       let rank = null;
+      let resolvedBio = '';
 
-      if (window.supabase && SUPABASE_URL && SUPABASE_KEY) {
-        try {
-          const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-          const { data, error } = await db.rpc('leaderboard');
-          if (!error && data) {
-            const idx = data.findIndex(r => r.session_id === targetSid);
-            if (idx >= 0) {
-              rank = idx + 1;
-              nickname = data[idx].nickname;
-              deeds = Number(data[idx].deeds || 0);
+      // ── NPC fast-path: resolve from local NPCS data ─────────────
+      const npcObj = window.NutNPCs && window.NutNPCs.isNPCSid(targetSid)
+        ? window.NutNPCs.getNPCBySid(targetSid)
+        : null;
+
+      if (npcObj) {
+        nickname     = npcObj.name;
+        deeds        = window.NutNPCs.allTime(npcObj);
+        resolvedBio  = npcObj.bio;
+        // Attempt to improve deeds count from leaderboard if available
+        if (window.supabase && SUPABASE_URL && SUPABASE_KEY) {
+          try {
+            const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+            const { data, error } = await db.rpc('leaderboard');
+            if (!error && data) {
+              const idx = data.findIndex(r => r.session_id === targetSid);
+              if (idx >= 0) {
+                rank  = idx + 1;
+                deeds = Math.max(deeds, Number(data[idx].deeds || 0));
+              }
             }
-          }
-        } catch (_) {}
-      }
+          } catch (_) {}
+        }
+      } else {
+        // ── Real user path ──────────────────────────────────────────
+        if (window.supabase && SUPABASE_URL && SUPABASE_KEY) {
+          try {
+            const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+            const { data, error } = await db.rpc('leaderboard');
+            if (!error && data) {
+              const idx = data.findIndex(r => r.session_id === targetSid);
+              if (idx >= 0) {
+                rank     = idx + 1;
+                nickname = data[idx].nickname;
+                deeds    = Number(data[idx].deeds || 0);
+              }
+            }
+          } catch (_) {}
+        }
 
-      if (isYou) {
-        const localNick = localStorage.getItem('nut_nickname_v1');
-        if (localNick) nickname = localNick;
-        const localAll = parseInt(localStorage.getItem('nut_alltime_v1') || '0', 10);
-        if (localAll > deeds) deeds = localAll;
+        if (isYou) {
+          const localNick = localStorage.getItem('nut_nickname_v1');
+          if (localNick) nickname = localNick;
+          const localAll = parseInt(localStorage.getItem('nut_alltime_v1') || '0', 10);
+          if (localAll > deeds) deeds = localAll;
+        }
+
+        resolvedBio = isYou ? (localStorage.getItem('nut_bio_v1') || '') : '';
       }
 
       const displayName = nickname || NutProfiles.anonName(targetSid);
       const nutId = NutProfiles.nutDisplayId(targetSid);
-      const bio = isYou ? (localStorage.getItem('nut_bio_v1') || '') : '';
-      const today = isYou ? (() => {
+      const bio = resolvedBio;
+      const _todayStr = (() => {
         const t = new Date();
-        const k = `${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,'0')}-${String(t.getDate()).padStart(2,'0')}`;
-        return parseInt(localStorage.getItem('nut_today_' + k) || '0', 10);
-      })() : '—';
-      const streak = isYou ? parseInt(localStorage.getItem('nut_streak_v1') || '0', 10) : '—';
+        return `${t.getFullYear()}-${String(t.getMonth()+1).padStart(2,'0')}-${String(t.getDate()).padStart(2,'0')}`;
+      })();
+      const today = npcObj
+        ? window.NutNPCs.todayCount(npcObj, _todayStr)
+        : isYou
+          ? parseInt(localStorage.getItem('nut_today_' + _todayStr) || '0', 10)
+          : '—';
+      const streak = npcObj
+        ? Math.min(npcObj.joinDays, 7 + (npcObj.seed % 60))
+        : isYou
+          ? parseInt(localStorage.getItem('nut_streak_v1') || '0', 10)
+          : '—';
       const crew = isYou ? (localStorage.getItem('nut_crew_v1') || '—') : '—';
 
       document.title = `${displayName} · $NUT`;

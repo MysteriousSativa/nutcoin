@@ -4577,7 +4577,7 @@ if (window.NutDream) NutDream.init();
 if (window.NutOracle) NutOracle.init();
 if (window.NutChart) NutChart.init();
 if (window.NutDrop) NutDrop.init();
-if (window.NutNPCs) NutNPCs.init();
+if (window.NutNPCs) NutNPCs.init(db);
 if (window.NutCasino) NutCasino.init();
 setInterval(()=>{ if(!document.hidden) fetchGlobalCounts(); },60000);
 setInterval(()=>{ if(!document.hidden) fetchLeaderboard(); },120000);

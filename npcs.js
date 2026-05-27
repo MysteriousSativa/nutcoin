@@ -1,6 +1,10 @@
 /**
- * $NUT Community Engine — 300 NPC Profiles, Live Activity, Duels
- * Fully client-side, deterministic. No server needed.
+ * $NUT Community Engine — 300 NPC Profiles
+ *
+ * NPCs are real users as far as Supabase is concerned.
+ * Each NPC has a stable session_id, logs actual nuts via log_nut RPC,
+ * appears in the global activity feed, leaderboard, and has a searchable profile.
+ * No quips. No messages. Twitter brainrot bios only. Indistinguishable from real users.
  */
 (function () {
 
@@ -21,7 +25,7 @@
   const NOUN = ['Nut','Chad','Degen','Lurker','Brain','Lord','King','Sigma',
     'Wizard','Warrior','Hunter','Counter','Logger','Tracker','Enjoyer','Bro',
     'Operator','Participant','Contributor','Researcher','Analyst','Poster',
-    'Commenter','Lurker','Observer','Verifier'];
+    'Commenter','Observer','Verifier'];
   const THROW = ['throwaway','temp','burner','anon','notme','rando','lurker',
     'nobody','passerby','justhere','account','realaccount','actuallyreal',
     'notarobot','definitelynotme','totallynotburner'];
@@ -49,6 +53,74 @@
     return THROW[s1 % THROW.length] + '_' + NOUN[s2 % NOUN.length].toLowerCase();
   }
 
+  // ── TWITTER BRAINROT BIOS ────────────────────────────────────────
+  const BIOS = [
+    'not financial advice | this app was my first blockchain interaction',
+    'on the ledger forever | logged every day since launch | cannot be stopped',
+    'i am the data. the data is me. the coin is me.',
+    'wife knows about the app. husband does not.',
+    'bear witness or say nothing | on-chain documentation enjoyer',
+    'if the oracle said peak hour i am not arguing with it',
+    'certified degen | logging since wave 1 | receipt game immaculate',
+    'NNN survivor 2023 | barely made it | never again | i will not elaborate',
+    'tracking for science | the dataset needs every single data point',
+    'my daily streak is more consistent than my rent payment',
+    'solana was built for this specific use case and i know it',
+    'adding to the permanent record | future historians will understand',
+    'logged 300+ and counting | supply is fixed but my count is not',
+    'born to nut forced to work | schedule has been optimized accordingly',
+    'doing this for the tokenomics and that is my final answer',
+    'i have never missed a day | i take this more seriously than my job',
+    'my emergency contact also has this app installed',
+    'the receipt goes incredibly hard and i am telling everyone',
+    'nnn is a coordinated psyop | have receipts | logged anyway',
+    'just vibes and data points | mostly data points | some vibes',
+    'consistency is a virtue | i am virtuous | oracle confirms daily',
+    'peaked during lockdowns like the rest of the dataset',
+    'not a financial advisor but the supply logic is genuinely immaculate',
+    'WAGMI when you log on-chain | this is the way',
+    'airdrop bag secured | still logging | the grind does not stop',
+    'the spreadsheet does not lie | neither do i | both publicly verifiable',
+    'sunday night logged at 11:42pm | oracle called it | i obliged',
+    'coffee then log or log then coffee | i have not decided | both happen',
+    'paperhands never log | diamond hands log daily | i log daily',
+    'certified data point | part of the 4.998 trillion | permanently documented',
+    'told my doctor about this app | she was confused | i am still logging',
+    'oracle was bullish | i matched energy | timestamp immortalized',
+    'imagine not logging | could not be me | it literally cannot be me',
+    'building in public | building consistently | building every single morning',
+    'gm | logged | back to work | no further questions',
+    'the oracle predicted 9pm | the oracle was correct | praise the oracle',
+    'streak is going | not stopping | do not ask me to stop',
+    'pump.fun launch is going to be historic and i have the receipts to prove it',
+    'first nut logged before 8am | schedule secured | gm to the blockchain',
+    'i log therefore i am | descartes didnt have wifi but he would have',
+    'found this through a cursed tweet and have been logging ever since',
+    'sent the receipt to my group chat | two of them downloaded the app',
+    'my nutcoin bag and my logging streak are the only things im consistent with',
+    'this is what financial freedom looks like | at least something is documented',
+    'if you arent logging youre just guessing | i am not guessing',
+  ];
+
+  function genBio(i) {
+    return BIOS[h32('bio_' + i) % BIOS.length];
+  }
+
+  // ── NUT TYPES FOR NPCS ───────────────────────────────────────────
+  // Weighted: mostly solo, some partner/quickie for realism
+  const NPC_NUT_TYPES = ['solo','solo','solo','solo','solo','partner','quickie','solo','partner','solo'];
+
+  function genNutType(npcId, dateStr) {
+    return NPC_NUT_TYPES[h32('ntype_' + npcId + '_' + dateStr) % NPC_NUT_TYPES.length];
+  }
+
+  // ── STABLE SESSION ID PER NPC ────────────────────────────────────
+  // Each NPC has a fixed session ID so their profile is linkable and their
+  // Supabase rows deduplicate correctly across page loads and devices.
+  function npcSessionId(npc) {
+    return 'npcbot' + String(npc.id).padStart(4, '0');
+  }
+
   // ── BUILD 300 PROFILES ──────────────────────────────────────────
   function buildNPCs() {
     const list = [];
@@ -58,12 +130,14 @@
       list.push({
         id:       i,
         name:     genName(i),
-        // 1-4 nuts/day, weighted toward 1-2
-        freq:     fRol < 40 ? 1 : fRol < 72 ? 2 : fRol < 90 ? 3 : 4,
-        // peak activity hour 8am-10pm
-        peakH:    (h32('peak_' + i) % 14) + 8,
-        // days since joined: 5-150
-        joinDays: (h32('join_' + i) % 146) + 5,
+        bio:      genBio(i),
+        sessionId: 'npcbot' + String(i).padStart(4, '0'),
+        // 1-3 nuts/day, weighted toward 1-2 (realistic)
+        freq:     fRol < 45 ? 1 : fRol < 78 ? 2 : 3,
+        // peak activity hour 8am-11pm
+        peakH:    (h32('peak_' + i) % 15) + 8,
+        // days since joined: 10-180
+        joinDays: (h32('join_' + i) % 171) + 10,
         seed:     s,
       });
     }
@@ -71,6 +145,19 @@
   }
 
   const NPCS = buildNPCs();
+
+  // ── NPC LOOKUP BY NAME ──────────────────────────────────────────
+  const _byName = Object.create(null);
+  const _bySid  = Object.create(null);
+  NPCS.forEach(n => {
+    _byName[n.name.toLowerCase()] = n;
+    _bySid[n.sessionId]           = n;
+  });
+
+  function getNPC(name)   { return _byName[(name || '').toLowerCase()] || null; }
+  function getNPCBySid(sid){ return _bySid[sid || ''] || null; }
+  function getBio(name)   { const n = getNPC(name); return n ? n.bio : null; }
+  function isNPCSid(sid)  { return typeof sid === 'string' && sid.startsWith('npcbot') && sid.length === 10; }
 
   // ── ALL-TIME COUNT (LAZY) ───────────────────────────────────────
   const _ct = {};
@@ -86,43 +173,33 @@
     return total;
   }
 
-  // ── ACTIVITY SIMULATION ─────────────────────────────────────────
-  const QUIPS = [
-    'not financial advice', 'wagmi', 'LFG', 'doing my part for the dataset',
-    'the oracle called it', 'supply is fixed, demand is not',
-    'wen token', 'sunday 12am LETS GOOO', 'set my alarm already',
-    'nutmaxxing responsibly', 'this is the way', 'fundamentals looking bullish',
-    'based and nutpilled', 'every log is a vote', 'hodling my logs',
-    "can't stop won't stop", 'paperhands stay mad', 'degen hours activated',
-    'logged the morning one already', 'research confirms gm',
-    'airdrop qualification secured', 'wave 2 secured lets ride',
-    'the spreadsheet does not lie', 'consistent. daily. documented.',
-    'touched grass then came back', 'science demands sacrifice',
-    'my portfolio is mostly $NUT rn ngl', 'diamond hands on my logs',
-    'first of the day early bird', 'NNN is a psyop btw',
-    'statistically significant behavior', 'Oracle said peak hour, obliged',
-  ];
+  // ── TODAY'S COUNT (for a given date string) ─────────────────────
+  function todayCount(npc, dateStr) {
+    const ds = h32('today_' + npc.id + '_' + dateStr) % 100;
+    const df = ds < 20 ? 0 : ds < 55 ? Math.max(0, npc.freq - 1) : ds < 88 ? npc.freq : npc.freq + 1;
+    return Math.max(0, df);
+  }
 
-  // Events in last `windowMs` ms for up to `count` NPCs
+  // ── ACTIVITY SIMULATION: 6-HOUR ROLLING WINDOW ─────────────────
+  // Each NPC contributes at most one event (their most recent within the window).
+  // At avg 2 nuts/day × 300 NPCs, ~75 events exist per 6-hour window.
   function getRecentEvents(count, now) {
-    const windowMs = 6 * 60000; // 6-min rolling window
+    const windowMs = 6 * 3600000;
     const events   = [];
 
     NPCS.forEach(npc => {
       const intervalMs = 86400000 / npc.freq;
-      // deterministic offset so each NPC has consistent log times
-      const tick    = Math.floor(now / intervalMs);
-      const baseTs  = tick * intervalMs;
-      const offset  = frac('ev_off_' + npc.id) * intervalMs;
-      const logTs   = baseTs + offset;
-
-      if (logTs >= now - windowMs && logTs <= now) {
-        const qs = h32('quip_' + npc.id + '_' + tick) % 100;
-        events.push({
-          npc,
-          ts:   logTs,
-          quip: qs < 35 ? QUIPS[h32('q2_' + npc.id + '_' + tick) % QUIPS.length] : null,
-        });
+      // Check up to 3 past ticks to find an event in the window
+      const tick0 = Math.floor(now / intervalMs);
+      for (let t = 0; t <= 3; t++) {
+        const tick  = tick0 - t;
+        const baseTs = tick * intervalMs;
+        const offset = frac('ev_off_' + npc.id) * intervalMs;
+        const logTs  = baseTs + offset;
+        if (logTs > now) continue;
+        if (logTs < now - windowMs) break; // Too old
+        events.push({ npc, ts: logTs });
+        break; // Only most-recent event per NPC
       }
     });
 
@@ -132,44 +209,37 @@
 
   // ── DUEL SYSTEM ─────────────────────────────────────────────────
   const TAUNT_A = [
-    'you\'re already done, son',
+    "you're already done, son",
     'not even warming up yet',
     'I trained for this',
     'your frequency is embarrassing',
     'get rekt bestie',
   ];
   const TAUNT_B = [
-    'I\'m just getting started',
+    "I'm just getting started",
     'lmao watch this comeback',
     'you peaked too early, classic',
     'I have more tabs open',
-    'this isn\'t over',
+    "this isn't over",
   ];
 
   function getActiveDuels(now) {
-    const slot  = Math.floor(now / 900000); // new bracket every 15 min
+    const slot  = Math.floor(now / 900000);
     const duels = [];
-
     for (let d = 0; d < 4; d++) {
       const i1 = h32('da_' + d + '_' + slot) % 300;
       let   i2 = h32('db_' + d + '_' + slot) % 300;
       if (i1 === i2) i2 = (i2 + 7) % 300;
-
-      const npc1   = NPCS[i1];
-      const npc2   = NPCS[i2];
-      const dur    = 1200000; // 20-min duel
+      const npc1    = NPCS[i1], npc2 = NPCS[i2];
+      const dur     = 1200000;
       const startTs = slot * 900000 + d * 280000;
       const endTs   = startTs + dur;
       const elapsed = Math.max(0, now - startTs);
       const pct     = Math.min(1, elapsed / dur);
-
-      // Deterministic score accumulation
-      const v1 = 1 + frac('dv1_' + d + '_' + slot) * 0.35;
-      const v2 = 1 + frac('dv2_' + d + '_' + slot) * 0.35;
-      const c1  = Math.round(npc1.freq * pct * v1 * 1.3);
-      const c2  = Math.round(npc2.freq * pct * v2 * 1.3);
-
-      // Trash talk (changes every quarter of duel)
+      const v1      = 1 + frac('dv1_' + d + '_' + slot) * 0.35;
+      const v2      = 1 + frac('dv2_' + d + '_' + slot) * 0.35;
+      const c1      = Math.round(npc1.freq * pct * v1 * 1.3);
+      const c2      = Math.round(npc2.freq * pct * v2 * 1.3);
       const tSlot   = Math.floor(pct * 4);
       const tSeed   = h32('taunt_' + d + '_' + slot + '_' + tSlot);
       const taunt   = pct > 0.05 && pct < 0.9
@@ -177,12 +247,10 @@
             ? `u/${npc1.name}: "${TAUNT_A[tSeed % TAUNT_A.length]}"`
             : `u/${npc2.name}: "${TAUNT_B[tSeed % TAUNT_B.length]}"`)
         : null;
-
       const lead1 = c1 >= c2;
       const total = c1 + c2;
       const pct1  = total > 0 ? Math.round(c1 / total * 100) : 50;
       const done  = pct >= 1;
-
       duels.push({ id: `${d}_${slot}`, npc1, npc2, c1, c2, startTs, endTs, pct, pct1, lead1, done, taunt, dur });
     }
     return duels;
@@ -199,31 +267,28 @@
 
   const COLORS = ['#4EC97A','#4E9AC9','#C8A96E','#9A4EC9','#C94E78','#C9904E','#4EC9B5','#C9C24E'];
   function npcColor(id) { return COLORS[id % COLORS.length]; }
-
   function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
 
-  // ── RENDER: NPC FEED ────────────────────────────────────────────
+  // ── RENDER: COMMUNITY FEED ──────────────────────────────────────
+  // Shows NPCs who logged in the last 6 hours. No messages, no quips.
   function renderFeed() {
     const el = document.getElementById('npcFeed');
     if (!el) return;
     const now    = Date.now();
-    const events = getRecentEvents(18, now);
-
+    const events = getRecentEvents(20, now);
     if (!events.length) {
-      el.innerHTML = '<div class="npc-quiet">Activity loading…</div>';
+      el.innerHTML = '<div class="npc-quiet">Loading community activity…</div>';
       return;
     }
-
     el.innerHTML = events.map(ev => {
-      const ago    = timeAgo(ev.ts, now);
-      const color  = npcColor(ev.npc.id);
-      const init2  = ev.npc.name.slice(0, 2).toUpperCase();
+      const ago   = timeAgo(ev.ts, now);
+      const color = npcColor(ev.npc.id);
+      const init2 = ev.npc.name.slice(0, 2).toUpperCase();
       return `<div class="npc-ev">
         <div class="npc-av" style="background:${color}">${esc(init2)}</div>
         <div class="npc-ev-body">
           <span class="npc-ev-name">u/${esc(ev.npc.name)}</span>
           <span class="npc-ev-act"> logged a nut</span>
-          ${ev.quip ? `<div class="npc-ev-quip">"${esc(ev.quip)}"</div>` : ''}
         </div>
         <div class="npc-ev-ago">${ago}</div>
       </div>`;
@@ -236,7 +301,6 @@
     if (!el) return;
     const now   = Date.now();
     const duels = getActiveDuels(now);
-
     el.innerHTML = duels.map(d => {
       if (d.done) {
         const w = d.c1 >= d.c2 ? d.npc1 : d.npc2;
@@ -245,11 +309,9 @@
           <span class="duel-winner">🏆 u/${esc(w.name)} wins</span>
         </div>`;
       }
-
       const timeLeft = Math.max(0, d.endTs - now);
       const mins = Math.floor(timeLeft / 60000);
       const secs = String(Math.floor((timeLeft % 60000) / 1000)).padStart(2, '0');
-
       return `<div class="duel-card">
         <div class="duel-top">
           <span class="duel-badge live">⚔ LIVE DUEL</span>
@@ -278,52 +340,122 @@
     }).join('');
   }
 
-  // ── INJECT INTO GLOBAL ACTIVITY LOG ────────────────────────────
-  let _lastInjectedTs = 0;
+  // ── SUPABASE INJECTION ──────────────────────────────────────────
+  // Writes real NPC nut logs to Supabase. Each NPC has a stable session_id
+  // so their rows deduplicate correctly across page loads and devices:
+  // - Same (session_id, deed_date) → log_nut returns ok:false → no duplicate
+  // - History injection covers the last 14 days on first load
+  // Rate-limited to 20 minutes per device to avoid hammering the DB.
 
-  function injectToLog() {
-    const logList  = document.getElementById('logList');
-    const logEmpty = document.getElementById('logEmpty');
-    if (!logList) return;
+  const _INJECT_COOLDOWN = 20 * 60 * 1000; // 20 min
+  const _DAY_KEY_PREFIX  = 'npc_sbinj_';    // localStorage key prefix per day
 
-    const now    = Date.now();
-    const events = getRecentEvents(3, now);
-    if (!events.length) return;
+  async function _logNPC(db, npc, dateStr) {
+    const sesId   = npc.sessionId;
+    const nutType = genNutType(npc.id, dateStr);
+    try {
+      const { data, error } = await db.rpc('log_nut', {
+        p_session_id: sesId,
+        p_nickname:   npc.name,
+        p_deed_date:  dateStr,
+        p_nut_type:   nutType,
+        p_points:     1,
+      });
+      // Fallback: older RPC that doesn't take p_nut_type / p_points
+      if (error) {
+        await db.rpc('log_nut', {
+          p_session_id: sesId,
+          p_nickname:   npc.name,
+          p_deed_date:  dateStr,
+        });
+      }
+    } catch (_) { /* silent */ }
+  }
 
-    const ev = events[0];
-    if (ev.ts === _lastInjectedTs) return;
-    _lastInjectedTs = ev.ts;
+  async function injectToSupabase(db) {
+    if (!db) return;
+    const now = Date.now();
+    const lastTs = parseInt(localStorage.getItem('npc_inject_ts') || '0');
+    if (now - lastTs < _INJECT_COOLDOWN) return;
+    localStorage.setItem('npc_inject_ts', String(now));
 
-    if (logEmpty) logEmpty.style.display = 'none';
+    // Inject for today + yesterday (to build up history quickly)
+    const DAYS_BACK = [0, 1, 2, 3, 4, 5, 6, 7, 14];
+    let totalInjected = 0;
 
-    const color = npcColor(ev.npc.id);
-    const div   = document.createElement('div');
-    div.className = 'log-item npc-log';
-    div.innerHTML = `
-      <span class="log-user" style="color:${color}">u/${esc(ev.npc.name)}</span>
-      <span class="log-verb"> logged a nut</span>
-      ${ev.quip ? `<span class="log-msg"> · "${esc(ev.quip)}"</span>` : ''}
-      <span class="log-time">&nbsp;${timeAgo(ev.ts, now)}</span>
-    `;
+    for (const dBack of DAYS_BACK) {
+      if (totalInjected >= 8) break; // Max 8 DB writes per batch
 
-    logList.insertBefore(div, logList.firstChild);
-    // Keep last 35 entries
-    while (logList.children.length > 35) logList.removeChild(logList.lastChild);
+      const date    = new Date(now - dBack * 86400000);
+      const dateStr = date.toISOString().split('T')[0];
+      const key     = _DAY_KEY_PREFIX + dateStr;
+      const done    = new Set(JSON.parse(localStorage.getItem(key) || '[]'));
+
+      // Deterministic NPC selection for this day: 12-20 NPCs log per day
+      const dayH = h32('daynpcs_' + dateStr);
+      const count = 12 + (dayH % 9);
+      const candidates = [];
+
+      for (let i = 0; i < count; i++) {
+        const npcId = h32('dsel_' + dateStr + '_' + i) % 300;
+        const npc   = NPCS[npcId];
+        // NPC must have joined before this date
+        const joinedMsAgo = npc.joinDays * 86400000;
+        if (now - joinedMsAgo > date.getTime()) continue; // Not joined yet
+        if (done.has(npcId)) continue; // Already injected from this device
+        candidates.push(npc);
+      }
+
+      // Inject up to 3 per day per batch
+      const batch = candidates.slice(0, Math.min(3, 8 - totalInjected));
+      for (const npc of batch) {
+        await _logNPC(db, npc, dateStr);
+        done.add(npc.id);
+        totalInjected++;
+      }
+
+      // Persist injected set (trim if huge)
+      const arr = [...done];
+      localStorage.setItem(key, JSON.stringify(arr.slice(-500)));
+    }
+
+    // Prune old day keys (keep 30 days)
+    for (let i = 31; i <= 60; i++) {
+      const old = new Date(now - i * 86400000).toISOString().split('T')[0];
+      localStorage.removeItem(_DAY_KEY_PREFIX + old);
+    }
   }
 
   // ── INIT ────────────────────────────────────────────────────────
-  function init() {
+  function init(db) {
     renderFeed();
     renderDuels();
-    injectToLog();
 
-    setInterval(() => { renderFeed(); renderDuels(); }, 12000);
-    // Stagger inject to feel organic (7-15 sec interval)
-    function scheduleInject() {
-      setTimeout(() => { injectToLog(); scheduleInject(); }, 7000 + Math.random() * 8000);
+    // Non-blocking Supabase injection
+    if (db) {
+      injectToSupabase(db).catch(() => {});
+      // Re-run periodically to catch new time windows
+      setInterval(() => injectToSupabase(db).catch(() => {}), _INJECT_COOLDOWN + 2 * 60 * 1000);
     }
-    scheduleInject();
+
+    // Refresh display every 15 seconds
+    setInterval(() => { renderFeed(); renderDuels(); }, 15000);
   }
 
-  window.NutNPCs = { init, getActiveDuels, allTime, NPCS, getRecentEvents };
+  // ── PUBLIC API ──────────────────────────────────────────────────
+  window.NutNPCs = {
+    init,
+    getActiveDuels,
+    allTime,
+    todayCount,
+    NPCS,
+    getRecentEvents,
+    getNPC,
+    getNPCBySid,
+    getBio,
+    isNPCSid,
+    npcSessionId,
+    npcColor,
+  };
+
 })();
