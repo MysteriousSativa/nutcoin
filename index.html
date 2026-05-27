@@ -1301,8 +1301,56 @@ position:relative;overflow:hidden;
     justify-content:center;padding:15px;font-size:13px;
   }
 
-  /* Toast, above nav */
-  .toast{bottom:78px;font-size:10.5px;padding:10px 20px;max-width:88vw;white-space:normal;text-align:center;line-height:1.4;}
+  /* Toast — above sticky trade + float box */
+  .toast{bottom:calc(166px + env(safe-area-inset-bottom,0px));font-size:10.5px;padding:10px 20px;max-width:88vw;white-space:normal;text-align:center;line-height:1.4;}
+
+  /* Token float box — above sticky trade */
+  #tokenFloat{
+    bottom:calc(114px + env(safe-area-inset-bottom,0px));
+    left:10px;padding:7px 10px;gap:6px;border-radius:11px;
+  }
+  .tf-amount{font-size:13px;}
+  .tf-usd{font-size:9px;}
+  .tf-buy{font-size:10px;padding:6px 10px;}
+  .tf-spin{font-size:14px;padding:5px 8px;}
+
+  /* Hub tabs — compact so all 6 fit one row */
+  .hub-card{padding:12px;}
+  .hub-tab{padding:6px 7px;font-size:8px;letter-spacing:.08em;}
+  .hub-tabs{gap:4px;margin-bottom:10px;}
+
+  /* Passport v2 */
+  .pv2-hdr{padding:8px 10px;}
+  .pv2-doc{font-size:12px;letter-spacing:.06em;}
+  .pv2-mid{padding:10px;gap:10px;}
+  .pv2-photo-col{gap:4px;}
+  .pv2-avatar{width:58px;height:58px;font-size:28px;}
+  .pv2-tier{font-size:6px;}
+  .pv2-av-btn{font-size:8px;padding:3px 7px;}
+  .pv2-lbl{font-size:7px;width:36px;}
+  .pv2-val{font-size:11px;}
+  .pv2-bio-wrap{padding:8px 10px;}
+  .pv2-bio-text{font-size:12px;}
+  .pv2-stat-n{font-size:18px;}
+  .pv2-stat{padding:10px 6px;}
+  .pv2-mrz{font-size:6px;padding:6px 10px;}
+
+  /* Passport methods/stamps/actions inside pv2 */
+  .pv2 .passport-methods{padding:8px 10px 0 !important;}
+  .pv2 .passport-stamps{padding:6px 10px !important;}
+  .pv2 .hub-actions{padding:8px 10px !important;}
+
+  /* Avatar picker — 5 cols on narrow screens */
+  .avatar-emoji-grid{grid-template-columns:repeat(5,1fr);}
+  .av-em{font-size:16px;padding:5px 0;}
+
+  /* Roulette modal */
+  .roulette-box{padding:16px 12px 14px;width:96%;}
+  #wheelCanvas{width:260px;height:260px;}
+  .roulette-title{font-size:17px;}
+
+  /* Leaderboard — avatar already 26px, tighten gap */
+  .lb-row{gap:6px;}
 }
 
 /* ── PERF MODE ── */
