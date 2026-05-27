@@ -366,7 +366,10 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
   display:flex;align-items:center;justify-content:space-between;gap:4px;padding:3px 5px;border-radius:6px;
   font-family:'Space Mono',monospace;font-size:9px;letter-spacing:0;text-align:left;
   background:rgba(12,8,4,0.4);border:1px solid transparent;
+  cursor:pointer;transition:border-color .12s,background .12s;
 }
+.clock-tz:hover{border-color:rgba(200,169,110,0.35);}
+.clock-tz.is-selected{border-color:var(--gold-bright);background:rgba(200,100,10,0.12);}
 .clock-tz.is-you{border-color:rgba(78,201,122,0.45);background:rgba(78,201,122,0.08);}
 .clock-tz .tz-label{
   font-family:'Cinzel',serif;font-size:7px;font-weight:700;letter-spacing:.06em;color:var(--gold-bright);
@@ -374,6 +377,15 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 }
 .clock-tz .tz-time{color:var(--cream);flex-shrink:0;font-variant-numeric:tabular-nums;font-size:8px;}
 .clock-tz-count{font-size:8px;color:var(--muted);margin-top:4px;letter-spacing:.08em;text-transform:uppercase;}
+.clock-pinned{
+  display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:8px;padding:7px 10px;
+  border-radius:10px;border:1px solid rgba(200,169,110,0.3);background:rgba(12,8,4,0.75);
+  font-family:'Space Mono',monospace;font-size:10px;
+}
+.clock-pinned-label{font-family:'Cinzel',serif;font-size:8px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);}
+.clock-pinned-name{font-family:'Cinzel',serif;font-size:9px;font-weight:700;color:var(--gold-bright);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:left;}
+.clock-pinned-time{color:var(--cream);font-variant-numeric:tabular-nums;flex-shrink:0;}
+.clock-pinned-period{font-size:8px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;}
 
 /* ── WRAP ── */
 .wrap{max-width:920px;margin:0 auto;padding:0 16px 160px;position:relative;z-index:1;}
@@ -441,6 +453,8 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 }
 .nut-method-chip .em{font-size:13px;line-height:1;}
 .nut-method-chip.is-2x{border-color:rgba(120,220,120,0.55);box-shadow:0 0 14px rgba(78,201,122,0.2);}
+.nut-method-chip.is-locked{opacity:.42;cursor:not-allowed;filter:grayscale(0.35);}
+.nut-method-chip.is-locked:hover{border-color:var(--border);color:var(--muted);}
 .nut-method-chip.is-2x::after{
   content:'2×';margin-left:4px;font-size:9px;font-weight:800;color:#8EE4A8;
   background:rgba(78,201,122,0.2);padding:1px 5px;border-radius:4px;
@@ -1052,8 +1066,8 @@ position:relative;overflow:hidden;
   .clock-bar{max-width:100%;padding:4px 0 10px;font-size:10px;}
   .clock-head{padding:7px 10px;gap:6px;}
   .clock-zones{max-height:64px;}
-  .clock-tz{font-size:8px;}
   .clock-tz .tz-time{font-size:7px;}
+  .clock-pinned{padding:6px 8px;font-size:9px;}
 
   /* Counter card (continued) */
   .counter-label{font-size:8.5px;letter-spacing:.18em;margin-bottom:12px;}
@@ -1287,6 +1301,12 @@ position:relative;overflow:hidden;
       </div>
       <div class="clock-zones" id="clockZones"></div>
       <div class="clock-tz-count" id="clockTzCount"></div>
+    </div>
+    <div class="clock-pinned" id="clockPinned">
+      <span class="clock-pinned-label">Selected</span>
+      <span class="clock-pinned-name" id="clockPinnedName">—</span>
+      <span class="clock-pinned-time" id="clockPinnedTime">--:--:--</span>
+      <span class="clock-pinned-period" id="clockPinnedPeriod"></span>
     </div>
   </div>
   <p class="section-kicker">solo · partnered · unhinged, all nuts count</p>
@@ -1644,6 +1664,7 @@ const KEY_BEST    = 'nut_best_day_v1';
 const KEY_DAYS    = 'nut_days_tracked_v1';
 const KEY_LOG     = `nut_log_${dateStr}`;
 const KEY_NICK    = 'nut_nickname_v1';
+const KEY_SELECTED_TZ = 'nut_selected_tz_v1';
 const KEY_SID     = 'nut_session_id_v1';
 const TEN_MIN     = 10 * 60 * 1000;
 
@@ -1751,14 +1772,25 @@ function uniqueMethodsToday() {
 function buildNutMethodChips() {
   const grid = document.getElementById('nutMethodGrid');
   if (!grid) return;
-  grid.innerHTML = Object.entries(NUT_TYPES).map(([id, m]) =>
-    `<button type="button" class="nut-method-chip${id === selectedNutType ? ' active' : ''}${is2xNutType(id) ? ' is-2x' : ''}" data-type="${id}" onclick="selectNutType('${id}')"><span class="em">${m.em}</span>${m.label}</button>`
-  ).join('');
+  if (selectedNutType === 'morning' && !isMorningMethodAllowed()) {
+    selectedNutType = 'solo';
+    localStorage.setItem('nut_method_selected_v1', selectedNutType);
+  }
+  grid.innerHTML = Object.entries(NUT_TYPES).map(([id, m]) => {
+    const locked = id === 'morning' && !isMorningMethodAllowed();
+    return `<button type="button" class="nut-method-chip${id === selectedNutType ? ' active' : ''}${is2xNutType(id) ? ' is-2x' : ''}${locked ? ' is-locked' : ''}" data-type="${id}" onclick="selectNutType('${id}')"${locked ? ' disabled' : ''}><span class="em">${m.em}</span>${m.label}</button>`;
+  }).join('');
   renderBonusHour();
   updateMethodAttachPreview(selectedNutType);
 }
 function selectNutType(id) {
   if (!NUT_TYPES[id]) return;
+  if (id === 'morning' && !isMorningMethodAllowed()) {
+    if (typeof showToast === 'function') {
+      showToast(`Morning locked until before 12pm in ${tzDisplayName(selectedTimezone)} ✦`);
+    }
+    return;
+  }
   selectedNutType = id;
   localStorage.setItem('nut_method_selected_v1', id);
   buildNutMethodChips();
@@ -1769,6 +1801,10 @@ function updateMethodAttachPreview(id) {
   const m = NUT_TYPES[id] || NUT_TYPES.solo;
   const pts = getNutPoints(id);
   const bonus = is2xNutType(id) ? ' · <strong>2× this hour</strong>' : '';
+  if (id === 'morning' && !isMorningMethodAllowed()) {
+    if (el) el.innerHTML = `${m.em} Morning locked · before 12pm in ${tzDisplayName(selectedTimezone)} only`;
+    return;
+  }
   if (el) el.innerHTML = `${m.em} ${m.label} · ${pts} pt${pts > 1 ? 's' : ''}${bonus}`;
 }
 function scrollMethods(dir) {
@@ -2177,6 +2213,13 @@ function nut() {
     return;
   }
   const method = selectedNutType;
+  if (method === 'morning' && !isMorningMethodAllowed()) {
+    if (typeof showToast === 'function') {
+      showToast(`Morning nuts only before 12pm in ${tzDisplayName(selectedTimezone)} ✦`);
+    }
+    buildNutMethodChips();
+    return;
+  }
   const points = getNutPoints(method);
   countToday += points;
   countAllTime += points;
@@ -2349,9 +2392,11 @@ function buildTicker() {
 let allTimezones = [];
 let tzFilterMode = 'all';
 let userTimezone = null;
+let selectedTimezone = localStorage.getItem(KEY_SELECTED_TZ) || Intl.DateTimeFormat().resolvedOptions().timeZone;
 let tzSearchQuery = '';
 let tzElements = new Map();
 let clockPanelOpen = false;
+let lastMorningAllowed = null;
 
 function getAllTimezones() {
   if (typeof Intl.supportedValuesOf === 'function') {
@@ -2383,6 +2428,50 @@ function tzOffsetMinutes(date, timeZone) {
   const utc = new Date(date.toLocaleString('en-US', { timeZone: 'UTC' }));
   const local = new Date(date.toLocaleString('en-US', { timeZone }));
   return Math.round((local - utc) / 60000);
+}
+
+function getLocalHourInTimezone(date, timeZone) {
+  const parts = new Intl.DateTimeFormat('en-GB', {
+    timeZone,
+    hour: '2-digit',
+    hour12: false,
+  }).formatToParts(date);
+  return parseInt(parts.find(p => p.type === 'hour')?.value || '0', 10);
+}
+
+function isMorningInTimezone(date, timeZone) {
+  if (!timeZone) return false;
+  return getLocalHourInTimezone(date, timeZone) < 12;
+}
+
+function isMorningMethodAllowed(date = new Date()) {
+  return isMorningInTimezone(date, selectedTimezone);
+}
+
+function selectTimezone(tz, opts = {}) {
+  if (!tz || !allTimezones.includes(tz)) return;
+  selectedTimezone = tz;
+  localStorage.setItem(KEY_SELECTED_TZ, tz);
+  renderTimezoneList();
+  updateClockPinned();
+  buildNutMethodChips();
+  if (!opts.silent && typeof showToast === 'function') showToast(`Timezone set to ${tzDisplayName(tz)} ✦`);
+}
+
+function updateClockPinned() {
+  const nameEl = document.getElementById('clockPinnedName');
+  const timeEl = document.getElementById('clockPinnedTime');
+  const periodEl = document.getElementById('clockPinnedPeriod');
+  if (!selectedTimezone) return;
+  const now = new Date();
+  if (nameEl) {
+    nameEl.textContent = tzDisplayName(selectedTimezone);
+    nameEl.title = selectedTimezone;
+  }
+  if (timeEl) timeEl.textContent = formatClockTime(now, selectedTimezone);
+  if (periodEl) {
+    periodEl.textContent = isMorningInTimezone(now, selectedTimezone) ? 'morning' : 'after noon';
+  }
 }
 
 function formatClockTime(date, timeZone) {
@@ -2451,12 +2540,12 @@ function setTzFilter(mode) {
 function requestLocationFilter() {
   const applyNear = () => {
     userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    selectTimezone(userTimezone, { silent: true });
     tzFilterMode = 'near';
     document.getElementById('tzAllBtn')?.classList.remove('active');
     document.getElementById('tzNearBtn')?.classList.add('active');
     toggleClockPanel(true);
-    renderTimezoneList();
-    if (typeof showToast === 'function') showToast(`Showing zones near ${tzDisplayName(userTimezone)} ✦`);
+    if (typeof showToast === 'function') showToast(`Near ${tzDisplayName(userTimezone)} ✦`);
   };
   if (!navigator.geolocation) {
     applyNear();
@@ -2482,9 +2571,13 @@ function renderTimezoneList() {
   tzElements.clear();
   list.forEach(tz => {
     const el = document.createElement('div');
-    el.className = 'clock-tz' + (tz === userTimezone ? ' is-you' : '');
+    const classes = ['clock-tz'];
+    if (tz === selectedTimezone) classes.push('is-selected');
+    if (tz === userTimezone) classes.push('is-you');
+    el.className = classes.join(' ');
     el.dataset.tz = tz;
     el.innerHTML = `<span class="tz-label" title="${tz}">${tzDisplayName(tz)}</span><span class="tz-time">${formatClockTime(now, tz)}</span>`;
+    el.onclick = () => selectTimezone(tz);
     wrap.appendChild(el);
     tzElements.set(tz, el);
   });
@@ -2508,6 +2601,10 @@ function updateClockTimes() {
 
 function initClock() {
   allTimezones = getAllTimezones();
+  if (!allTimezones.includes(selectedTimezone)) {
+    selectedTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    localStorage.setItem(KEY_SELECTED_TZ, selectedTimezone);
+  }
   const search = document.getElementById('tzSearch');
   if (search) {
     search.addEventListener('input', () => {
@@ -2517,6 +2614,8 @@ function initClock() {
     });
   }
   updateClockHeadMeta(allTimezones.length);
+  updateClockPinned();
+  buildNutMethodChips();
   updateClock();
 }
 
@@ -2533,6 +2632,10 @@ function updateClock() {
   if (dateEl) {
     dateEl.innerHTML = `<span>${days[now.getDay()]}, ${months[now.getMonth()]} ${now.getDate()}</span> &nbsp;✦&nbsp; <span>Resets in ${hL}h ${mL}m</span>`;
   }
+  updateClockPinned();
+  const morningNow = isMorningMethodAllowed(now);
+  if (lastMorningAllowed !== null && lastMorningAllowed !== morningNow) buildNutMethodChips();
+  lastMorningAllowed = morningNow;
   updateClockTimes();
   updateCooldown();
 }
