@@ -2,9 +2,9 @@
  * $NUT Dream Machine — mcap calculator, bag flex, milestone unlocks
  */
 (function () {
-  // Research-derived supply: 2,869,000,000,000 documented global instances 2014-2026
-  // Sources: NSSHB, NATSAL-4, Kinsey Institute — see /whitepaper.html
-  const NUT_TOTAL_SUPPLY = 2_869_000_000_000;
+  // Research-derived supply: 4,998,000,000,000 documented global orgasms 2014-2026
+  // Scope: all activities (solo + partnered). Sources: NSSHB, Durex, Frederick et al. 2018 — see /whitepaper.html
+  const NUT_TOTAL_SUPPLY = 4_998_000_000_000;
   const PROJECTED_SUPPLY = NUT_TOTAL_SUPPLY;
   const MCAP_RUNGS = [
     { label: '$500K launch', cap: 500_000 },

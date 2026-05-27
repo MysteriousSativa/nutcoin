@@ -1,15 +1,19 @@
 /**
  * $NUT Algorithmic Oracle
- * Behavioral prediction engine based on global masturbation research 2014-2024
+ * Behavioral prediction engine based on global orgasm research 2014-2026
+ * Scope: ALL orgasm-generating sexual activities (solo + partnered)
  *
  * Primary sources:
- *   Herbenick et al. (2010, 2017) — National Survey of Sexual Health & Behavior (NSSHB)
- *   Sonnenberg et al. (2013) — National Survey of Sexual Attitudes & Lifestyles (NATSAL-4)
+ *   Herbenick, D., et al. (2010, 2017, 2020) — National Survey of Sexual Health & Behavior (NSSHB), Indiana University
+ *   Sonnenberg et al. (2013) — National Survey of Sexual Attitudes & Lifestyles (NATSAL-4), The Lancet
+ *   Frederick, D.A., et al. (2018) — "Differences in Orgasm Frequency" (n=52,588), Archives of Sexual Behavior
  *   Kinsey Institute longitudinal behavioral studies (2014-2022)
- *   Durex Global Sex Survey annual reports (2014-2023)
+ *   Durex Global Sex Survey annual reports (2014-2023) · IPSOS Pleasure Revolution Survey (2021)
  *   Journal of Sexual Medicine, volumes 7-21
  *
- * Documented global instances 2014-2026: 2,869,000,000,000
+ * Documented global orgasms 2014-2026: 4,998,000,000,000
+ *   Solo masturbation component:   2,869,000,000,000 (NSSHB, NATSAL-4, Kinsey)
+ *   Partnered activity component:  2,129,000,000,000 (Durex + Frederick et al. orgasm rates)
  * Snapshot date: May 27, 2026 (Genesis Snapshot — supply fixed at this date)
  * Full methodology: /whitepaper.html
  */
@@ -19,12 +23,12 @@
   // RESEARCH CONSTANTS
   // ═══════════════════════════════════════════════════════
 
-  const RESEARCH_SUPPLY     = 2_869_000_000_000;
+  const RESEARCH_SUPPLY     = 4_998_000_000_000;
   const RESEARCH_YEARS      = 12.40;
   const RESEARCH_HOURS      = RESEARCH_YEARS * 365.25 * 24;
 
-  // Global baseline: average documented instances per hour
-  // 2,869,000,000,000 / (12.40 × 365.25 × 24) = ~26,395,000 per hour
+  // Global baseline: average documented orgasms per hour (all activities)
+  // 4,998,000,000,000 / (12.40 × 365.25 × 24) = ~45,989,000 per hour
   const GLOBAL_HOURLY_BASELINE = Math.round(RESEARCH_SUPPLY / RESEARCH_HOURS);
 
   // ═══════════════════════════════════════════════════════
@@ -76,7 +80,7 @@
     '12-25': { label: 'Christmas Day',      mult: 0.68, dir: -1 },
     '12-31': { label: 'New Year Eve',       mult: 0.74, dir: -1 },
     '01-01': { label: 'New Year Day',       mult: 0.89, dir: -1 },
-    '02-14': { label: "Valentine's Day",    mult: 0.72, dir: -1 },
+    '02-14': { label: "Valentine's Day ❤️",  mult: 1.18, dir:  1 },
     '03-14': { label: 'Pi Day Anomaly',     mult: 1.06, dir:  1 },
   };
 
@@ -293,7 +297,7 @@
         </div>` : ''}
 
         <div class="oracle-basis">
-          Research basis: <strong>2,869,000,000,000</strong> documented instances · NSSHB · NATSAL-4 · Kinsey Institute · 2014-2026
+          Research basis: <strong>4,998,000,000,000</strong> documented orgasms · all activities · NSSHB · Durex · Frederick et al. 2018 · 2014-2026
           <a href="/whitepaper.html" class="oracle-cite">Full methodology →</a>
         </div>
       </div>`;

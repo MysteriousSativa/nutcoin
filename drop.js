@@ -1,11 +1,11 @@
 /**
- * $NUT Drop Countdown — AIRDROP WAVE 2 · SUNDAY MAY 31 12:00 AM
+ * $NUT Launch Countdown — $NUT GOES LIVE ON PUMP.FUN · SUNDAY MAY 31 12:00 AM
  */
 (function () {
   // Sunday May 31, 2026 at 00:00:00 local time
   const DROP_TS  = new Date(2026, 4, 31, 0, 0, 0).getTime();
-  const KEY_NOTE = 'nut_drop_notify_v1';
-  const KEY_SEEN = 'nut_drop_seen_v1';
+  const KEY_NOTE = 'nut_launch_notify_v1';
+  const KEY_SEEN = 'nut_launch_seen_v1';
 
   function getLeft() {
     const d = DROP_TS - Date.now();
@@ -26,7 +26,7 @@
     if (!el) return;
     const t = getLeft();
     if (!t) {
-      el.innerHTML = '<span class="drop-live-badge">🟢 WAVE 2 SNAPSHOT CLOSED</span>';
+      el.innerHTML = '<span class="drop-live-badge">🚀 $NUT IS LIVE ON PUMP.FUN</span>';
       document.getElementById('dropBanner')?.classList.add('drop-past');
       return;
     }
@@ -58,7 +58,7 @@
       if (typeof showToast === 'function') showToast('Reminder removed');
     } else {
       localStorage.setItem(KEY_NOTE, Date.now());
-      if (typeof showToast === 'function') showToast('Reminder set — check back Sunday 🔔');
+      if (typeof showToast === 'function') showToast('Reminder set — $NUT launches Sunday on pump.fun 🚀');
     }
     updateNotifyBtn();
   }
