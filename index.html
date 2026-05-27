@@ -591,6 +591,25 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
   transition:transform .12s,filter .15s;}
 .nick-btn:hover{transform:translateY(-2px);filter:drop-shadow(0 0 16px rgba(200,140,0,0.45));}
 
+/* ── INLINE LEADERBOARD ── */
+.lb-inline-wrap{margin-bottom:18px;}
+.lb-inline-wrap .nick-bar{
+  border-bottom-left-radius:0;border-bottom-right-radius:0;
+  margin-bottom:0;border-bottom:none;
+}
+.lb-inline-wrap #lbContent{
+  background:rgba(18,13,6,0.78);
+  border:1px solid var(--border-hi);border-top:none;
+  border-bottom-left-radius:12px;border-bottom-right-radius:12px;
+  padding:8px 14px 14px;
+}
+.lb-inline-wrap .lb-list{max-height:none;overflow-y:visible;padding-right:0;}
+.lb-panel-note{
+  text-align:center;font-size:12px;color:var(--muted);
+  font-family:'Cinzel',serif;letter-spacing:.08em;
+  padding:14px 0 6px;
+}
+
 /* ── CLOCK ── */
 .clock-bar{text-align:center;font-family:'Cinzel',serif;font-size:12px;color:var(--muted);padding:6px 0 14px;letter-spacing:.07em;line-height:1.4;max-width:380px;margin:0 auto;}
 .clock-bar span{color:var(--gold);text-shadow:0 0 10px rgba(200,169,110,0.28);}
@@ -1962,14 +1981,22 @@ body.genesis-mode .hero-title{text-shadow:0 0 40px rgba(255,217,125,0.35);}
     <div class="quirks-live" id="quirksLive"></div>
   </div>
 
-  <!-- NICKNAME BAR -->
-  <div class="nick-bar" id="nickBar">
-    <div class="nick-left">
-      <span style="color:var(--muted)">Leaderboard:</span>
-      <span class="nick-name" id="nickDisplay">Anonymous</span>
-      <span class="nick-rank" id="nickRankDisplay"></span>
+  <!-- INLINE LEADERBOARD -->
+  <div class="lb-inline-wrap">
+    <div class="nick-bar" id="nickBar">
+      <div class="nick-left">
+        <span style="color:var(--muted)">Leaderboard</span>
+        <span class="nick-name" id="nickDisplay">Anonymous</span>
+        <span class="nick-rank" id="nickRankDisplay"></span>
+      </div>
+      <button class="nick-btn" onclick="openNickModal()">Set Name</button>
     </div>
-    <button class="nick-btn" onclick="openNickModal()">Set Name</button>
+    <div id="lbContent">
+      <div class="lb-empty">Connecting to the ledger...</div>
+    </div>
+    <div class="lb-join" id="lbJoin" style="display:none">
+      <button class="lb-join-btn" onclick="openNickModal()">Join Leaderboard</button>
+    </div>
   </div>
   <div class="lb-ghost" id="lbGhost"></div>
 
@@ -2122,21 +2149,16 @@ body.genesis-mode .hero-title{text-shadow:0 0 40px rgba(255,217,125,0.35);}
       </div>
     </div>
 
-    <!-- 5: Global Leaderboard -->
+    <!-- 5: Global Leaderboard (duels + events — full table is in main feed) -->
     <div class="panel" id="panel-5">
       <div id="lbAllocation"></div>
-      <div class="panel-title">Global Leaderboard, All Time Top 20</div>
-      <div id="lbContent">
-        <div class="lb-empty">Connecting to the ledger...</div>
-      </div>
+      <div class="panel-title">Global Leaderboard</div>
+      <p class="lb-panel-note">↑ Full leaderboard is in the main feed above</p>
       <div id="lbEventHistory"></div>
       <div id="nutOracle"></div>
       <div class="duel-section">
         <div class="duel-section-title"><span class="live-dot"></span> LIVE DUELS</div>
         <div id="npcDuels"></div>
-      </div>
-      <div class="lb-join" id="lbJoin" style="display:none">
-        <button class="lb-join-btn" onclick="openNickModal()">Join Leaderboard</button>
       </div>
     </div>
 

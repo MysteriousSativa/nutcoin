@@ -341,89 +341,95 @@
   }
 
   // ── SUPABASE INJECTION ──────────────────────────────────────────
-  // Writes real NPC nut logs to Supabase. Each NPC has a stable session_id
-  // so their rows deduplicate correctly across page loads and devices:
-  // - Same (session_id, deed_date) → log_nut returns ok:false → no duplicate
-  // - History injection covers the last 14 days on first load
-  // Rate-limited to 20 minutes per device to avoid hammering the DB.
+  // Strategy: full history bootstrap so NPCs rank competitively on the
+  // leaderboard. Each visit bootstraps 3 NPCs (all their historical days).
+  // Supabase deduplicates via (session_id, deed_date) — re-injecting is
+  // always safe, just returns ok:false for existing rows.
+  //
+  // Progress tracked in localStorage so each device picks up where it left
+  // off across visits. Typically done in 100 page visits (300 NPCs / 3).
 
-  const _INJECT_COOLDOWN = 20 * 60 * 1000; // 20 min
-  const _DAY_KEY_PREFIX  = 'npc_sbinj_';    // localStorage key prefix per day
+  const _BOOT_KEY    = 'npc_boot_n_v2';  // index of next NPC to bootstrap
+  const _DAILY_KEY   = 'npc_daily_ts_v2'; // timestamp of last daily run
+  const _DAILY_CD    = 20 * 60 * 1000;    // 20-min cooldown for daily pass
+  const _MAX_HIST    = 120;               // inject at most 120 days of history
+  const _BOOT_BATCH  = 3;                 // NPCs bootstrapped per page visit
+  const _WRITE_BATCH = 15;               // concurrent writes per Promise.allSettled
 
   async function _logNPC(db, npc, dateStr) {
-    const sesId   = npc.sessionId;
     const nutType = genNutType(npc.id, dateStr);
     try {
-      const { data, error } = await db.rpc('log_nut', {
-        p_session_id: sesId,
+      const { error } = await db.rpc('log_nut', {
+        p_session_id: npc.sessionId,
         p_nickname:   npc.name,
         p_deed_date:  dateStr,
         p_nut_type:   nutType,
         p_points:     1,
       });
-      // Fallback: older RPC that doesn't take p_nut_type / p_points
       if (error) {
         await db.rpc('log_nut', {
-          p_session_id: sesId,
+          p_session_id: npc.sessionId,
           p_nickname:   npc.name,
           p_deed_date:  dateStr,
         });
       }
-    } catch (_) { /* silent */ }
+    } catch (_) { /* silent — dedup ok:false also lands here sometimes */ }
+  }
+
+  // Is NPC active on day index d (0 = oldest, joinDays-1 = most recent)?
+  // Must match the allTime() loop exactly so Supabase count ≈ UI count.
+  function _dayActive(npc, d) {
+    return (h32('day_' + npc.id + '_' + d) % 100) >= 20;
+  }
+
+  // Inject full history for one NPC (up to _MAX_HIST days back).
+  async function _bootstrapNPC(db, npc) {
+    const today   = new Date();
+    const dStart  = Math.max(0, npc.joinDays - _MAX_HIST);
+    const dates   = [];
+
+    for (let d = dStart; d < npc.joinDays; d++) {
+      if (!_dayActive(npc, d)) continue;
+      const daysAgo = npc.joinDays - 1 - d;
+      const dt      = new Date(today.getTime() - daysAgo * 86400000);
+      dates.push(dt.toISOString().split('T')[0]);
+    }
+
+    for (let i = 0; i < dates.length; i += _WRITE_BATCH) {
+      await Promise.allSettled(
+        dates.slice(i, i + _WRITE_BATCH).map(ds => _logNPC(db, npc, ds))
+      );
+      if (i + _WRITE_BATCH < dates.length) {
+        await new Promise(r => setTimeout(r, 120)); // breathe between batches
+      }
+    }
   }
 
   async function injectToSupabase(db) {
     if (!db) return;
-    const now = Date.now();
-    const lastTs = parseInt(localStorage.getItem('npc_inject_ts') || '0');
-    if (now - lastTs < _INJECT_COOLDOWN) return;
-    localStorage.setItem('npc_inject_ts', String(now));
 
-    // Inject for today + yesterday (to build up history quickly)
-    const DAYS_BACK = [0, 1, 2, 3, 4, 5, 6, 7, 14];
-    let totalInjected = 0;
-
-    for (const dBack of DAYS_BACK) {
-      if (totalInjected >= 8) break; // Max 8 DB writes per batch
-
-      const date    = new Date(now - dBack * 86400000);
-      const dateStr = date.toISOString().split('T')[0];
-      const key     = _DAY_KEY_PREFIX + dateStr;
-      const done    = new Set(JSON.parse(localStorage.getItem(key) || '[]'));
-
-      // Deterministic NPC selection for this day: 12-20 NPCs log per day
-      const dayH = h32('daynpcs_' + dateStr);
-      const count = 12 + (dayH % 9);
-      const candidates = [];
-
-      for (let i = 0; i < count; i++) {
-        const npcId = h32('dsel_' + dateStr + '_' + i) % 300;
-        const npc   = NPCS[npcId];
-        // NPC must have joined before this date
-        const joinedMsAgo = npc.joinDays * 86400000;
-        if (now - joinedMsAgo > date.getTime()) continue; // Not joined yet
-        if (done.has(npcId)) continue; // Already injected from this device
-        candidates.push(npc);
+    // ── PHASE 1: bootstrap full history, 3 NPCs per page visit ──────
+    const bootN = parseInt(localStorage.getItem(_BOOT_KEY) || '0');
+    if (bootN < NPCS.length) {
+      const endN = Math.min(bootN + _BOOT_BATCH, NPCS.length);
+      for (let i = bootN; i < endN; i++) {
+        await _bootstrapNPC(db, NPCS[i]);
       }
-
-      // Inject up to 3 per day per batch
-      const batch = candidates.slice(0, Math.min(3, 8 - totalInjected));
-      for (const npc of batch) {
-        await _logNPC(db, npc, dateStr);
-        done.add(npc.id);
-        totalInjected++;
-      }
-
-      // Persist injected set (trim if huge)
-      const arr = [...done];
-      localStorage.setItem(key, JSON.stringify(arr.slice(-500)));
+      localStorage.setItem(_BOOT_KEY, String(endN));
     }
 
-    // Prune old day keys (keep 30 days)
-    for (let i = 31; i <= 60; i++) {
-      const old = new Date(now - i * 86400000).toISOString().split('T')[0];
-      localStorage.removeItem(_DAY_KEY_PREFIX + old);
+    // ── PHASE 2: daily pass — log today for a fresh set of NPCs ─────
+    const now       = Date.now();
+    const lastDaily = parseInt(localStorage.getItem(_DAILY_KEY) || '0');
+    if (now - lastDaily < _DAILY_CD) return;
+    localStorage.setItem(_DAILY_KEY, String(now));
+
+    const todayStr = new Date().toISOString().split('T')[0];
+    const picks    = [];
+    for (let i = 0; i < 25; i++) {
+      picks.push(NPCS[h32('dt_' + todayStr + '_' + i) % NPCS.length]);
     }
+    await Promise.allSettled(picks.map(npc => _logNPC(db, npc, todayStr)));
   }
 
   // ── INIT ────────────────────────────────────────────────────────
@@ -434,8 +440,8 @@
     // Non-blocking Supabase injection
     if (db) {
       injectToSupabase(db).catch(() => {});
-      // Re-run periodically to catch new time windows
-      setInterval(() => injectToSupabase(db).catch(() => {}), _INJECT_COOLDOWN + 2 * 60 * 1000);
+      // Re-run periodically — picks up bootstrap progress and logs today's nuts
+      setInterval(() => injectToSupabase(db).catch(() => {}), _DAILY_CD + 2 * 60 * 1000);
     }
 
     // Refresh display every 15 seconds
