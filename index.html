@@ -141,6 +141,34 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .tam-tagline a{color:rgba(200,169,110,0.7);text-decoration:none;}
 .tam-tagline a:hover{color:var(--gold);}
 @media(max-width:480px){.tam-inner{gap:12px;}.tam-n{font-size:clamp(22px,8vw,32px);}}
+
+/* ── NUT INDEX CHART ── */
+.nidx-section{background:rgba(5,3,1,0.85);border-top:1px solid rgba(200,169,110,0.12);border-bottom:1px solid rgba(200,169,110,0.12);}
+.nidx-hdr{display:flex;align-items:flex-start;gap:14px;padding:14px 18px 8px;flex-wrap:wrap;}
+.nidx-left{flex:1;min-width:0;}
+.nidx-ticker{display:inline-block;font-family:'Space Mono',ui-monospace,monospace;font-size:12px;font-weight:700;color:var(--gold-bright);letter-spacing:.1em;background:rgba(200,169,110,0.10);border:1px solid rgba(200,169,110,0.28);border-radius:5px;padding:3px 8px;margin-bottom:3px;}
+.nidx-pair{font-size:10px;color:var(--muted);letter-spacing:.09em;text-transform:uppercase;}
+.nidx-stats{display:flex;flex-direction:column;align-items:flex-end;gap:2px;flex-shrink:0;}
+.nidx-val{font-family:'Space Mono',ui-monospace,monospace;font-size:clamp(18px,4vw,26px);font-weight:700;color:var(--gold-bright);line-height:1;}
+.nidx-chg{font-size:11px;font-weight:700;letter-spacing:.07em;color:#ff8080;}
+.nidx-chg.up{color:#4EC97A;}
+.nidx-ath{font-family:ui-monospace,monospace;font-size:9px;color:var(--muted);letter-spacing:.05em;}
+.nidx-badge{align-self:flex-start;font-size:8.5px;letter-spacing:.14em;text-transform:uppercase;color:rgba(200,169,110,0.5);border:1px solid rgba(200,169,110,0.18);border-radius:999px;padding:4px 9px;white-space:nowrap;flex-shrink:0;}
+.nidx-period-row{display:flex;gap:4px;padding:0 18px 6px;align-items:center;}
+.nidx-period-btn{background:transparent;border:1px solid rgba(200,169,110,0.18);border-radius:6px;padding:4px 11px;font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--muted);cursor:pointer;font-family:inherit;transition:color .12s,border-color .12s,background .12s;}
+.nidx-period-btn:hover{color:var(--gold-bright);border-color:rgba(200,169,110,0.40);}
+.nidx-period-btn.active{color:var(--gold-bright);border-color:rgba(200,169,110,0.55);background:rgba(200,169,110,0.10);}
+.nidx-chart-wrap{width:100%;overflow:hidden;background:#050301;line-height:0;}
+.nidx-legend{display:flex;align-items:center;gap:14px;padding:7px 18px 12px;flex-wrap:wrap;}
+.nidx-leg{font-size:8.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;}
+.nidx-leg.bear{color:rgba(201,78,78,0.7);}
+.nidx-leg.bull{color:rgba(78,201,122,0.7);}
+.nidx-leg.base{color:rgba(200,169,110,0.5);}
+.nidx-leg.meta{color:var(--muted);font-weight:500;letter-spacing:.06em;}
+.nidx-leg.meta a{color:var(--gold);text-decoration:none;}
+.nidx-leg.meta a:hover{color:var(--gold-bright);}
+.nidx-sep{color:rgba(200,169,110,0.2);font-size:10px;}
+
 .ca-box{
   display:flex;align-items:center;gap:8px;max-width:480px;margin:0 auto 16px;
   background:rgba(0,0,0,0.45);border:1px solid var(--border-hi);border-radius:12px;
@@ -1730,6 +1758,38 @@ body.genesis-mode .hero-title{text-shadow:0 0 40px rgba(255,217,125,0.35);}
     </div>
   </div>
   <div class="tam-tagline">The market is enormous. You are early. &nbsp;<a href="/whitepaper.html">Methodology →</a></div>
+</div>
+
+<!-- NUT INDEX CHART — 12-Year Behavioral Activity Index -->
+<div class="nidx-section" id="nutIdxSection">
+  <div class="nidx-hdr">
+    <div class="nidx-left">
+      <div class="nidx-ticker">NUTIDX</div>
+      <div class="nidx-pair">Behavioral Activity Index · 2014–2026</div>
+    </div>
+    <div class="nidx-stats">
+      <span class="nidx-val" id="nidxVal">1,027.2</span>
+      <span class="nidx-chg" id="nidxChg">−34.1% FROM ATH</span>
+      <span class="nidx-ath" id="nidxATH">ATH 1,558.9 · DEC 2020</span>
+    </div>
+    <div class="nidx-badge">RESEARCH GRADE</div>
+  </div>
+  <div class="nidx-period-row">
+    <button type="button" class="nidx-period-btn active" data-period="ALL">ALL</button>
+    <button type="button" class="nidx-period-btn" data-period="5Y">5Y</button>
+    <button type="button" class="nidx-period-btn" data-period="3Y">3Y</button>
+    <button type="button" class="nidx-period-btn" data-period="1Y">1Y</button>
+    <span class="nidx-sep" style="margin-left:6px">·</span>
+    <span class="nidx-leg meta" style="margin-left:2px"><span id="nidxPts">150</span> monthly data points</span>
+  </div>
+  <div id="nutChartWrap" class="nidx-chart-wrap"></div>
+  <div class="nidx-legend">
+    <span class="nidx-leg bear">■ NNN Suppression</span>
+    <span class="nidx-leg bull">■ Dec Rebound</span>
+    <span class="nidx-leg base">— Baseline 1,000</span>
+    <span class="nidx-sep">·</span>
+    <span class="nidx-leg meta"><a href="/whitepaper.html">Full methodology →</a></span>
+  </div>
 </div>
 
 <div class="wrap">
@@ -3887,6 +3947,7 @@ function downloadCert() {
 <script src="./chaos.js"></script>
 <script src="./dream.js"></script>
 <script src="./predictor.js"></script>
+<script src="./chart.js"></script>
 <script>
 // ═══════════════════════════════
 // INIT
@@ -4351,6 +4412,7 @@ if (window.NutAllocation) NutAllocation.init();
 if (window.NutChaos) NutChaos.init();
 if (window.NutDream) NutDream.init();
 if (window.NutOracle) NutOracle.init();
+if (window.NutChart) NutChart.init();
 setInterval(()=>{ if(!document.hidden) fetchGlobalCounts(); },60000);
 setInterval(()=>{ if(!document.hidden) fetchLeaderboard(); },120000);
 setInterval(()=>{ if(!document.hidden) fetchGlobalActivity(); },30000);
