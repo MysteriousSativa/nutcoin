@@ -93,7 +93,10 @@
     const all = countAllTime || 0;
     const streak = typeof currentStreak !== 'undefined' ? currentStreak : 0;
     const methods = typeof uniqueMethodsToday === 'function' ? uniqueMethodsToday() : 0;
-    const uniqueAll = Object.keys(typeof typeStatsAll !== 'undefined' ? typeStatsAll : {}).length;
+    const uniqueAll = (() => {
+      try { return Object.keys(JSON.parse(localStorage.getItem('nut_types_alltime_v1') || '{}')).length; }
+      catch { return 0; }
+    })();
     const genesis = hasGenesisBonus() ? 200 : 0;
     const refs = getReferralCount() * 25;
     const crew = crewRankBonus();
