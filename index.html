@@ -1617,7 +1617,14 @@ position:relative;overflow:hidden;
     <div class="pm-mini" style="margin-bottom:10px;">
       For fun only, no real money, no payouts, no cashout. Tokens are earned by logging nuts.
     </div>
-    <div class="pm-list" id="pmList"></div>
+    <div class="pm-mini" style="margin-bottom:10px;">
+      Open the full market board in a dedicated page.
+    </div>
+    <div class="pm-row">
+      <button class="pm-btn yes active" onclick="window.open('/predictions.html','_blank')">Open market ↗</button>
+      <button class="pm-btn" onclick="pmReset()">Reset (local)</button>
+    </div>
+    <div class="pm-pill" id="pmMiniStatus"></div>
   </div>
 </div>
 
@@ -3456,63 +3463,19 @@ function pmResolveIfNewDay() {
 }
 
 function pmRender() {
-  const list = document.getElementById('pmList');
+  const mini = document.getElementById('pmMiniStatus');
   const sub = document.getElementById('pmSub');
   const day = document.getElementById('pmDay');
-  if (!list) return;
+  if (!mini) return;
 
   const markets = pmDefaultMarkets();
   if (sub) sub.textContent = `${markets.length} markets`;
   if (day) day.textContent = pmNowDayKey();
-
-  const st = pmLoadState();
-  const slips = st.slips || {};
-
-  list.innerHTML = markets.map(m => {
-    const slip = slips[m.id] || {};
-    const pick = slip.pick || '';
-    const stake = slip.stake || 0;
-    return `
-      <div class="pm-market" data-mid="${m.id}">
-        <div class="pm-q">${m.q}</div>
-        <div class="pm-row">
-          <button class="pm-btn yes ${pick==='YES'?'active':''}" onclick="pmPick('${m.id}','YES')">Yes</button>
-          <button class="pm-btn no ${pick==='NO'?'active':''}" onclick="pmPick('${m.id}','NO')">No</button>
-        </div>
-        <div class="pm-stake">
-          <input inputmode="numeric" pattern="[0-9]*" id="pmStake_${m.id}" value="${stake || 5}" aria-label="Stake tokens"/>
-          <button onclick="pmBet('${m.id}')">Bet</button>
-          <div class="pm-pill">payout: <strong>2×</strong> · balance: <strong>${pmGetBalance()}</strong></div>
-        </div>
-      </div>
-    `;
-  }).join('');
-
+  mini.innerHTML = `open <strong>${markets.length}</strong> markets · balance <strong>${pmGetBalance().toLocaleString()}</strong> · <a href=\"/predictions.html\" target=\"_blank\" rel=\"noopener noreferrer\">launch ↗</a>`;
   pmSetBalance(pmGetBalance());
 }
 
-function pmPick(mid, pick) {
-  const st = pmLoadState();
-  st.slips = st.slips || {};
-  st.slips[mid] = { ...(st.slips[mid] || {}), pick };
-  pmSaveState(st);
-  pmRender();
-}
-
-function pmBet(mid) {
-  const st = pmLoadState();
-  st.slips = st.slips || {};
-  const slip = st.slips[mid] || {};
-  if (!slip.pick) { showToast('Pick YES or NO first'); return; }
-  const inp = document.getElementById(`pmStake_${mid}`);
-  const stake = Math.max(1, Math.min(500, parseInt(inp?.value || '0', 10) || 0));
-  if (stake > pmGetBalance()) { showToast('Not enough tokens'); return; }
-  pmSetBalance(pmGetBalance() - stake);
-  st.slips[mid] = { pick: slip.pick, stake };
-  pmSaveState(st);
-  showToast(`Bet placed: ${stake} on ${slip.pick}`);
-  pmRender();
-}
+// Old inline bet UI removed. Full market is on /predictions.html
 
 function pmResolveNow() {
   // Resolve current markets against current app state (play tokens, daily refresh).
@@ -3521,6 +3484,15 @@ function pmResolveNow() {
   st.results = st.results || {};
   markets.forEach(m => { st.results[m.id] = m.resolve(); });
   pmSaveState(st);
+}
+
+function pmReset() {
+  localStorage.removeItem(KEY_PM_STATE);
+  localStorage.removeItem(KEY_PM_DAY);
+  pmSetBalance(0);
+  const el = document.getElementById('pmMiniStatus');
+  if (el) el.textContent = 'reset done';
+  showToast('Predictions reset (local)');
 }
 
 setupBuyButtons();

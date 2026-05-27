@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>$NUT Predictions</title>
+  <link rel="icon" href="/img/favicon.svg" type="image/svg+xml"/>
+  <link rel="icon" href="/img/favicon.ico" sizes="any"/>
+  <style>
+    :root{
+      --bg:#050301; --cream:#FFF8EE; --gold:#C8A96E; --gold-bright:#FFD97D; --muted:#7A6855;
+      --border:rgba(200,169,110,0.22); --border-hi:rgba(200,169,110,0.45);
+    }
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{background:var(--bg);color:var(--cream);font-family:system-ui,-apple-system,Segoe UI,Inter,sans-serif;min-height:100vh;}
+    .wrap{max-width:980px;margin:0 auto;padding:22px 16px 60px;}
+    .top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px;}
+    .title{font-weight:900;letter-spacing:-.02em;font-size:24px;}
+    .sub{color:var(--muted);font-size:12px;line-height:1.35;}
+    .pill{display:inline-flex;gap:8px;align-items:center;padding:10px 12px;border-radius:14px;border:1px solid var(--border-hi);background:rgba(12,8,4,0.75);}
+    .pill strong{color:var(--gold-bright);}
+    .grid{display:grid;grid-template-columns:1.2fr .8fr;gap:12px;}
+    @media(max-width:900px){.grid{grid-template-columns:1fr;}}
+    .card{border:1px solid var(--border);background:rgba(12,8,4,0.82);border-radius:18px;padding:14px;box-shadow:0 18px 60px rgba(0,0,0,0.35);}
+    .hdr{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:10px;}
+    .hdr h2{font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);font-weight:800;}
+    .hdr span{font-size:12px;color:var(--muted);}
+    .toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;}
+    .search{flex:1;min-width:200px;padding:10px 12px;border-radius:14px;background:rgba(8,5,2,0.8);border:1px solid var(--border);color:var(--cream);}
+    .btn{padding:10px 12px;border-radius:14px;border:1px solid var(--border-hi);background:rgba(200,100,10,0.16);color:var(--gold-bright);font-weight:800;cursor:pointer;}
+    .btn.ghost{background:rgba(8,5,2,0.7);color:var(--muted);border-color:var(--border);}
+    .markets{display:flex;flex-direction:column;gap:10px;max-height:68vh;overflow:auto;padding-right:4px;}
+    .m{border:1px solid rgba(200,169,110,0.14);background:rgba(8,5,2,0.55);border-radius:16px;padding:12px;}
+    .q{font-weight:900;font-size:14px;line-height:1.35;margin-bottom:8px;}
+    .meta{display:flex;gap:10px;flex-wrap:wrap;color:var(--muted);font-size:11px;margin-bottom:8px;}
+    .bar{height:10px;border-radius:999px;background:rgba(255,255,255,0.05);border:1px solid rgba(200,169,110,0.12);overflow:hidden;}
+    .yesFill{height:100%;background:linear-gradient(90deg,rgba(78,201,122,0.35),rgba(78,201,122,0.85));width:50%;}
+    .row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;align-items:center;}
+    .side{flex:1;min-width:180px;display:flex;gap:8px;}
+    .side button{flex:1;padding:10px 10px;border-radius:14px;border:1px solid rgba(200,169,110,0.22);background:rgba(12,8,4,0.75);color:var(--muted);font-weight:900;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;}
+    .side button.activeYes{border-color:rgba(78,201,122,0.55);background:rgba(78,201,122,0.12);color:#8EE4A8;}
+    .side button.activeNo{border-color:rgba(201,78,78,0.55);background:rgba(201,78,78,0.12);color:#ffb0b0;}
+    .qty{width:92px;padding:10px 10px;border-radius:14px;background:rgba(8,5,2,0.85);border:1px solid rgba(200,169,110,0.22);color:var(--cream);}
+    .small{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, \"Liberation Mono\", \"Courier New\", monospace;font-size:11px;color:var(--muted);line-height:1.35;}
+    .pos{display:flex;flex-direction:column;gap:10px;max-height:68vh;overflow:auto;padding-right:4px;}
+    .posItem{border:1px solid rgba(200,169,110,0.14);background:rgba(8,5,2,0.55);border-radius:16px;padding:12px;}
+    .posItem .q{font-size:13px;margin-bottom:6px;}
+    .posRow{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;color:var(--muted);font-size:11px;}
+    .posRow strong{color:var(--gold-bright);}
+    .warn{margin-top:10px;color:var(--muted);font-size:12px;line-height:1.4;}
+    a{color:var(--gold-bright);text-decoration:none;}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="top">
+      <div>
+        <div class="title">$NUT Predictions</div>
+        <div class="sub">Play tokens only, no real money, no cashout. Markets are local to your device for now.</div>
+      </div>
+      <div class="pill">
+        Balance <strong id="bal">0</strong> NUTTOKENS
+        <button class="btn ghost" onclick="window.location.href='/'">Back ↩</button>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <div class="hdr"><h2>Markets</h2><span id="mCount">0 open</span></div>
+        <div class="toolbar">
+          <input class="search" id="q" placeholder="Search markets..." />
+          <button class="btn" onclick="resolveAll()">Resolve now</button>
+          <button class="btn ghost" onclick="resetLocal()">Reset local</button>
+        </div>
+        <div class="markets" id="markets"></div>
+        <div class="warn">Prices are an internal AMM estimate. This is for fun only.</div>
+      </div>
+      <div class="card">
+        <div class="hdr"><h2>Your positions</h2><span id="pCount">0</span></div>
+        <div class="pos" id="pos"></div>
+        <div class="warn">Tip: win tokens by logging nuts on the main page, then bet here.</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const KEY_PM_BAL = 'nut_pm_bal_v1';
+    const KEY_PM_V2 = 'nut_pm_v2_state_v1';
+
+    function getBal(){ return Math.max(0, parseInt(localStorage.getItem(KEY_PM_BAL)||'0',10)||0); }
+    function setBal(v){ localStorage.setItem(KEY_PM_BAL, String(Math.max(0, Math.floor(v)))); }
+    function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+    function defaultMarkets(){
+      const now = Date.now();
+      const endToday = new Date(); endToday.setHours(24,0,0,0);
+      return [
+        { id:'m_you10', cat:'PERSONAL', q:'Will you reach 10+ points today?', closes:endToday.toISOString(), resolves:'daily' },
+        { id:'m_variety3', cat:'PERSONAL', q:'Will you use 3+ different methods today?', closes:endToday.toISOString(), resolves:'daily' },
+        { id:'m_streaksafe', cat:'PERSONAL', q:'Will you log at least once before midnight?', closes:endToday.toISOString(), resolves:'daily' },
+        { id:'m_global_surge', cat:'GLOBAL', q:'Will there be a global surge in the next hour?', closes:new Date(now+60*60*1000).toISOString(), resolves:'manual' },
+        { id:'m_double_hour', cat:'GAME', q:'Will you log a 2× method this hour?', closes:new Date(now+60*60*1000).toISOString(), resolves:'daily' },
+        { id:'m_partner_today', cat:'GAME', q:'Will you log at least one Partnered today?', closes:endToday.toISOString(), resolves:'daily' },
+      ];
+    }
+
+    function load(){
+      try{ return JSON.parse(localStorage.getItem(KEY_PM_V2)||'{}')||{}; }catch{ return {}; }
+    }
+    function save(st){ localStorage.setItem(KEY_PM_V2, JSON.stringify(st)); }
+
+    function ensure(){
+      const st = load();
+      st.markets = st.markets || {};
+      st.positions = st.positions || {};
+      defaultMarkets().forEach(m=>{
+        if (!st.markets[m.id]) {
+          st.markets[m.id] = {
+            ...m,
+            y: 0, n: 0,  // AMM share inventory
+            L: 40,       // liquidity
+            resolved: null, // 'YES' | 'NO'
+          };
+        }
+      });
+      save(st);
+      return st;
+    }
+
+    function prob(m){
+      const x = (m.y - m.n) / Math.max(1, m.L);
+      const p = 1/(1+Math.exp(-x));
+      return Math.min(0.97, Math.max(0.03, p));
+    }
+
+    // Buy integer shares by stepping (keeps math simple)
+    function buy(mid, side, qty){
+      qty = Math.max(1, Math.min(500, Math.floor(qty||0)));
+      const st = ensure();
+      const m = st.markets[mid];
+      if (!m || m.resolved) return;
+      const closesAt = new Date(m.closes).getTime();
+      if (Date.now() > closesAt) return;
+      let cost = 0;
+      for (let i=0;i<qty;i++){
+        const p = prob(m);
+        const px = side==='YES' ? p : (1-p);
+        cost += px * 100; // price in tokens per share, scaled
+        if (side==='YES') m.y += 1; else m.n += 1;
+      }
+      cost = Math.ceil(cost);
+      const bal = getBal();
+      if (cost > bal){
+        // revert step buy
+        if (side==='YES') m.y -= qty; else m.n -= qty;
+        toast('Not enough tokens');
+        return;
+      }
+      setBal(bal - cost);
+      st.positions[mid] = st.positions[mid] || { yes:0, no:0, cost:0 };
+      if (side==='YES') st.positions[mid].yes += qty; else st.positions[mid].no += qty;
+      st.positions[mid].cost += cost;
+      save(st);
+      toast(`Bought ${qty} ${side} shares for ${cost}`);
+      render();
+    }
+
+    function sell(mid, side, qty){
+      qty = Math.max(1, Math.min(500, Math.floor(qty||0)));
+      const st = ensure();
+      const m = st.markets[mid];
+      const pos = st.positions[mid];
+      if (!m || !pos) return;
+      const have = side==='YES' ? pos.yes : pos.no;
+      if (have < qty){ toast('Not enough shares'); return; }
+      let credit = 0;
+      for (let i=0;i<qty;i++){
+        const p = prob(m);
+        const px = side==='YES' ? p : (1-p);
+        credit += px * 100;
+        if (side==='YES') m.y -= 1; else m.n -= 1;
+      }
+      credit = Math.floor(credit);
+      setBal(getBal() + credit);
+      if (side==='YES') pos.yes -= qty; else pos.no -= qty;
+      save(st);
+      toast(`Sold ${qty} ${side} shares for ${credit}`);
+      render();
+    }
+
+    function resolveAll(){
+      // Manual resolver: closes expired markets to whatever current price implies.
+      // Keeps this self-contained without needing backend.
+      const st = ensure();
+      Object.values(st.markets).forEach(m=>{
+        if (m.resolved) return;
+        if (Date.now() < new Date(m.closes).getTime()) return;
+        const p = prob(m);
+        m.resolved = p >= 0.5 ? 'YES' : 'NO';
+      });
+      save(st);
+      settle();
+      render();
+      toast('Resolved expired markets');
+    }
+
+    function settle(){
+      const st = ensure();
+      let bal = getBal();
+      Object.entries(st.positions).forEach(([mid, pos])=>{
+        const m = st.markets[mid];
+        if (!m?.resolved) return;
+        const winShares = m.resolved==='YES' ? pos.yes : pos.no;
+        const payout = winShares * 100; // 100 tokens per share at settlement
+        if (payout > 0){
+          bal += payout;
+          pos.yes = 0; pos.no = 0; pos.cost = 0;
+        } else {
+          pos.yes = 0; pos.no = 0; pos.cost = 0;
+        }
+      });
+      setBal(bal);
+      save(st);
+    }
+
+    function resetLocal(){
+      localStorage.removeItem(KEY_PM_V2);
+      toast('Local markets reset');
+      render();
+    }
+
+    function toast(msg){
+      console.log(msg);
+    }
+
+    function render(){
+      const st = ensure();
+      const bal = getBal();
+      document.getElementById('bal').textContent = bal.toLocaleString();
+
+      const q = (document.getElementById('q').value||'').trim().toLowerCase();
+      const ms = Object.values(st.markets)
+        .filter(m => !q || (m.q.toLowerCase().includes(q) || (m.cat||'').toLowerCase().includes(q)));
+
+      document.getElementById('mCount').textContent = `${ms.length} open`;
+
+      const marketsEl = document.getElementById('markets');
+      marketsEl.innerHTML = ms.map(m=>{
+        const p = prob(m);
+        const closesIn = Math.max(0, new Date(m.closes).getTime() - Date.now());
+        const mins = Math.floor(closesIn/60000);
+        const meta = m.resolved
+          ? `RESOLVED: ${m.resolved}`
+          : `cat ${m.cat} · closes in ${mins}m · price YES ${(p*100).toFixed(0)}¢`;
+        return `
+          <div class="m">
+            <div class="q">${esc(m.q)}</div>
+            <div class="meta"><span>${esc(meta)}</span></div>
+            <div class="bar"><div class="yesFill" style="width:${(p*100).toFixed(1)}%"></div></div>
+            <div class="row">
+              <div class="side">
+                <button class="${''}" onclick="buy('${m.id}','YES',document.getElementById('qty_${m.id}').value)">Buy YES</button>
+                <button class="${''}" onclick="buy('${m.id}','NO',document.getElementById('qty_${m.id}').value)">Buy NO</button>
+              </div>
+              <input class="qty" id="qty_${m.id}" value="3" />
+              <button class="btn ghost" onclick="sell('${m.id}','YES',document.getElementById('qty_${m.id}').value)">Sell YES</button>
+              <button class="btn ghost" onclick="sell('${m.id}','NO',document.getElementById('qty_${m.id}').value)">Sell NO</button>
+            </div>
+            <div class="small">Settlement pays 100 per winning share. Prices are internal, for fun.</div>
+          </div>
+        `;
+      }).join('');
+
+      const posEl = document.getElementById('pos');
+      const positions = Object.entries(st.positions).filter(([,p]) => (p.yes||0) + (p.no||0) > 0);
+      document.getElementById('pCount').textContent = String(positions.length);
+      posEl.innerHTML = positions.length ? positions.map(([mid,p])=>{
+        const m = st.markets[mid];
+        const pr = prob(m);
+        const yesVal = Math.floor((p.yes||0) * pr * 100);
+        const noVal = Math.floor((p.no||0) * (1-pr) * 100);
+        return `
+          <div class="posItem">
+            <div class="q">${esc(m?.q||mid)}</div>
+            <div class="posRow"><span>YES shares <strong>${p.yes||0}</strong></span><span>est value <strong>${yesVal}</strong></span></div>
+            <div class="posRow"><span>NO shares <strong>${p.no||0}</strong></span><span>est value <strong>${noVal}</strong></span></div>
+            <div class="posRow"><span>cost basis <strong>${p.cost||0}</strong></span><span>price YES <strong>${(pr*100).toFixed(0)}¢</strong></span></div>
+          </div>
+        `;
+      }).join('') : `<div class="small">No positions yet.</div>`;
+    }
+
+    window.addEventListener('load', () => { ensure(); render(); });
+  </script>
+</body>
+</html>
+
