@@ -13,14 +13,43 @@
   const KEY_BIO      = 'nut_bio_v1';
   const KEY_AVATAR   = 'nut_avatar_v1';
 
-  const AV_EMOJIS = [
-    '🥜','💀','🤖','👾','🦾','🐸','🦊','🐺','🦁','🐉',
-    '👑','🎯','⚡','🔥','❄️','🌙','⭐','💎','🎲','🏆',
-    '🎭','🧠','🦋','🌊','🔮','💥','🎸','🦀','🐙','🌵',
-  ];
-  const AV_COLORS = [
-    '#3d1200','#001a30','#0a2d00','#250030','#2d2000',
-    '#002d2d','#1a0030','#300015','#002800','#202020',
+  // 32 avatar images via DiceBear (pixel-art · bottts · adventurer)
+  const AV_URLS = [
+    // pixel-art characters (0–11)
+    'https://api.dicebear.com/9.x/pixel-art/svg?seed=NutDegen',
+    'https://api.dicebear.com/9.x/pixel-art/svg?seed=NutChad',
+    'https://api.dicebear.com/9.x/pixel-art/svg?seed=NutWagmi',
+    'https://api.dicebear.com/9.x/pixel-art/svg?seed=NutMoon',
+    'https://api.dicebear.com/9.x/pixel-art/svg?seed=NutDiamond',
+    'https://api.dicebear.com/9.x/pixel-art/svg?seed=NutApe',
+    'https://api.dicebear.com/9.x/pixel-art/svg?seed=NutBull',
+    'https://api.dicebear.com/9.x/pixel-art/svg?seed=NutBear',
+    'https://api.dicebear.com/9.x/pixel-art/svg?seed=NutWhale',
+    'https://api.dicebear.com/9.x/pixel-art/svg?seed=NutFren',
+    'https://api.dicebear.com/9.x/pixel-art/svg?seed=NutAlpha',
+    'https://api.dicebear.com/9.x/pixel-art/svg?seed=NutSigma',
+    // bottts robots (12–23)
+    'https://api.dicebear.com/9.x/bottts/svg?seed=NutBot1',
+    'https://api.dicebear.com/9.x/bottts/svg?seed=NutBot2',
+    'https://api.dicebear.com/9.x/bottts/svg?seed=NutBot3',
+    'https://api.dicebear.com/9.x/bottts/svg?seed=NutBot4',
+    'https://api.dicebear.com/9.x/bottts/svg?seed=NutBot5',
+    'https://api.dicebear.com/9.x/bottts/svg?seed=NutBot6',
+    'https://api.dicebear.com/9.x/bottts/svg?seed=NutBot7',
+    'https://api.dicebear.com/9.x/bottts/svg?seed=NutBot8',
+    'https://api.dicebear.com/9.x/bottts/svg?seed=NutBot9',
+    'https://api.dicebear.com/9.x/bottts/svg?seed=NutBot10',
+    'https://api.dicebear.com/9.x/bottts/svg?seed=NutBot11',
+    'https://api.dicebear.com/9.x/bottts/svg?seed=NutBot12',
+    // adventurer characters (24–31)
+    'https://api.dicebear.com/9.x/adventurer/svg?seed=NutAdv1',
+    'https://api.dicebear.com/9.x/adventurer/svg?seed=NutAdv2',
+    'https://api.dicebear.com/9.x/adventurer/svg?seed=NutAdv3',
+    'https://api.dicebear.com/9.x/adventurer/svg?seed=NutAdv4',
+    'https://api.dicebear.com/9.x/adventurer/svg?seed=NutAdv5',
+    'https://api.dicebear.com/9.x/adventurer/svg?seed=NutAdv6',
+    'https://api.dicebear.com/9.x/adventurer/svg?seed=NutAdv7',
+    'https://api.dicebear.com/9.x/adventurer/svg?seed=NutAdv8',
   ];
 
   function avHash(sid) {
@@ -28,20 +57,23 @@
     for (let i = 0; i < (sid||'').length; i++) h = ((h * 33) ^ sid.charCodeAt(i)) & 0x7fffffff;
     return h;
   }
+  function avIdxForSid(sid) { return avHash(sid) % AV_URLS.length; }
+
   function getAvatarFor(sid) {
     const mySid = typeof sessionId !== 'undefined' ? sessionId : null;
     if (sid && sid === mySid) {
       const s = loadJson(KEY_AVATAR, null);
-      if (s && s.emoji && s.bg) return s;
+      if (s && typeof s.idx === 'number') return { idx: s.idx, url: AV_URLS[s.idx] };
     }
-    const h = avHash(sid);
-    return { emoji: AV_EMOJIS[h % AV_EMOJIS.length], bg: AV_COLORS[(h >> 4) % AV_COLORS.length] };
+    const idx = avIdxForSid(sid);
+    return { idx, url: AV_URLS[idx] };
   }
   function getMyAvatar() {
     const s = loadJson(KEY_AVATAR, null);
-    if (s && s.emoji && s.bg) return s;
+    if (s && typeof s.idx === 'number') return { idx: s.idx, url: AV_URLS[s.idx] };
     const sid = typeof sessionId !== 'undefined' ? sessionId : 'anon';
-    return getAvatarFor(sid);
+    const idx = avIdxForSid(sid);
+    return { idx, url: AV_URLS[idx] };
   }
 
   let hubTab = 'passport';
@@ -145,7 +177,7 @@
         </div>
         <div class="pv2-mid">
           <div class="pv2-photo-col">
-            <div class="pv2-avatar" style="background:${av.bg}">${av.emoji}</div>
+            <div class="pv2-avatar"><img src="${av.url}" alt="avatar" loading="lazy" /></div>
             <div class="pv2-tier">${esc(p.tier)}</div>
             <button class="pv2-av-btn" onclick="NutAddons.openAvatarPicker()">edit</button>
           </div>
@@ -177,9 +209,8 @@
       </div>
       <div class="avatar-picker" id="avatarPicker" style="display:none">
         <div class="avatar-picker-title">CHOOSE YOUR AVATAR</div>
-        <div class="avatar-emoji-grid" id="avatarEmojiGrid"></div>
-        <div class="avatar-color-row" id="avatarColorRow"></div>
-        <div style="text-align:center;margin-top:8px">
+        <div class="avatar-img-grid" id="avatarImgGrid"></div>
+        <div style="text-align:center;margin-top:10px">
           <button class="hub-btn" onclick="NutAddons.closeAvatarPicker()">Done</button>
         </div>
       </div>`;
@@ -190,13 +221,11 @@
     if (!picker) return;
     picker.style.display = 'block';
     const av   = getMyAvatar();
-    const grid = document.getElementById('avatarEmojiGrid');
-    const crow = document.getElementById('avatarColorRow');
-    if (grid) grid.innerHTML = AV_EMOJIS.map(em =>
-      `<button class="av-em${av.emoji===em?' selected':''}" onclick="NutAddons.pickAvatarEmoji('${em}')">${em}</button>`
-    ).join('');
-    if (crow) crow.innerHTML = AV_COLORS.map(c =>
-      `<button class="av-col${av.bg===c?' selected':''}" style="background:${c}" onclick="NutAddons.pickAvatarColor('${esc(c)}')"></button>`
+    const grid = document.getElementById('avatarImgGrid');
+    if (grid) grid.innerHTML = AV_URLS.map((url, i) =>
+      `<button class="av-item${av.idx===i?' selected':''}" onclick="NutAddons.pickAvatar(${i})" title="Avatar ${i+1}">
+        <img src="${url}" alt="avatar ${i+1}" loading="lazy" />
+      </button>`
     ).join('');
   }
 
@@ -205,14 +234,8 @@
     if (picker) picker.style.display = 'none';
   }
 
-  function pickAvatarEmoji(em) {
-    saveJson(KEY_AVATAR, { ...getMyAvatar(), emoji: em });
-    renderPassport();
-    openAvatarPicker();
-  }
-
-  function pickAvatarColor(c) {
-    saveJson(KEY_AVATAR, { ...getMyAvatar(), bg: c });
+  function pickAvatar(idx) {
+    saveJson(KEY_AVATAR, { idx });
     renderPassport();
     openAvatarPicker();
   }
@@ -558,8 +581,7 @@
     setPulseHours,
     openAvatarPicker,
     closeAvatarPicker,
-    pickAvatarEmoji,
-    pickAvatarColor,
+    pickAvatar,
     editBio,
     saveBio,
     getAvatarFor,

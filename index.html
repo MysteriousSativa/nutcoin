@@ -1340,9 +1340,9 @@ position:relative;overflow:hidden;
   .pv2 .passport-stamps{padding:6px 10px !important;}
   .pv2 .hub-actions{padding:8px 10px !important;}
 
-  /* Avatar picker — 5 cols on narrow screens */
-  .avatar-emoji-grid{grid-template-columns:repeat(5,1fr);}
-  .av-em{font-size:16px;padding:5px 0;}
+  /* Avatar picker — keep 8 cols, reduce gap */
+  .avatar-img-grid{grid-template-columns:repeat(8,1fr);gap:4px;}
+  .av-item{border-radius:7px;}
 
   /* Roulette modal */
   .roulette-box{padding:16px 12px 14px;width:96%;}
@@ -1458,7 +1458,8 @@ position:relative;overflow:hidden;
 .pv2-serial{font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);}
 .pv2-mid{display:flex;gap:14px;padding:14px;border-bottom:1px solid rgba(200,169,110,0.1);}
 .pv2-photo-col{display:flex;flex-direction:column;align-items:center;gap:5px;flex-shrink:0;}
-.pv2-avatar{width:72px;height:72px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:36px;border:2px solid rgba(200,169,110,0.35);flex-shrink:0;}
+.pv2-avatar{width:72px;height:72px;border-radius:12px;overflow:hidden;border:2px solid rgba(200,169,110,0.35);flex-shrink:0;background:rgba(10,6,2,0.7);}
+.pv2-avatar img{width:100%;height:100%;object-fit:cover;display:block;}
 .pv2-tier{font-family:'Cinzel',serif;font-size:7px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold-bright);}
 .pv2-av-btn{background:none;border:1px solid rgba(200,169,110,0.2);color:var(--muted);border-radius:5px;padding:3px 9px;font-size:9px;letter-spacing:.07em;cursor:pointer;font-family:inherit;text-transform:uppercase;}
 .pv2-av-btn:hover{color:var(--cream);border-color:rgba(200,169,110,0.45);}
@@ -1480,19 +1481,19 @@ position:relative;overflow:hidden;
 .pv2-mrz{background:rgba(0,0,0,0.55);padding:8px 12px;font-family:'Space Mono',monospace;font-size:7px;color:rgba(122,104,85,0.45);letter-spacing:.04em;line-height:1.9;overflow:hidden;border-top:1px solid rgba(200,169,110,0.08);}
 
 /* ── NUT AVATAR ── */
-.nut-avatar{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0;border:1px solid rgba(200,169,110,0.18);}
-.nut-avatar-sm{width:26px;height:26px;border-radius:7px;font-size:14px;}
-.nut-avatar-lg{width:60px;height:60px;border-radius:14px;font-size:30px;}
+.nut-avatar{width:34px;height:34px;border-radius:10px;overflow:hidden;flex-shrink:0;border:1px solid rgba(200,169,110,0.2);background:rgba(10,6,2,0.7);}
+.nut-avatar img{width:100%;height:100%;object-fit:cover;display:block;}
+.nut-avatar-sm{width:26px;height:26px;border-radius:7px;}
+.nut-avatar-lg{width:60px;height:60px;border-radius:14px;}
 
 /* ── AVATAR PICKER ── */
 .avatar-picker{padding:14px;border-top:1px solid rgba(200,169,110,0.12);background:rgba(4,2,0,0.7);}
 .avatar-picker-title{font-family:'Cinzel',serif;font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;text-align:center;}
-.avatar-emoji-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:4px;margin-bottom:10px;}
-.av-em{background:rgba(20,13,4,0.8);border:1px solid rgba(200,169,110,0.12);border-radius:8px;padding:5px 0;font-size:18px;cursor:pointer;text-align:center;line-height:1;}
-.av-em:hover,.av-em.selected{border-color:rgba(200,169,110,0.55);background:rgba(200,169,110,0.1);}
-.avatar-color-row{display:flex;gap:6px;flex-wrap:wrap;}
-.av-col{width:26px;height:26px;border-radius:7px;cursor:pointer;border:2px solid transparent;flex-shrink:0;}
-.av-col:hover,.av-col.selected{border-color:rgba(255,217,125,0.8);}
+.avatar-img-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:6px;}
+.av-item{background:rgba(14,9,3,0.9);border:2px solid rgba(200,169,110,0.1);border-radius:10px;cursor:pointer;overflow:hidden;aspect-ratio:1;padding:0;line-height:0;transition:border-color .12s,transform .1s;}
+.av-item:hover{border-color:rgba(200,169,110,0.45);transform:scale(1.06);}
+.av-item.selected{border-color:rgba(255,217,125,0.8);box-shadow:0 0 10px rgba(255,217,125,0.3);}
+.av-item img{width:100%;height:100%;object-fit:cover;display:block;}
 .hub-btn{padding:9px 12px;border-radius:12px;border:1px solid rgba(200,169,110,0.35);background:rgba(200,100,10,0.16);color:var(--gold-bright);font-family:'Cinzel',serif;font-size:9px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;}
 .hub-btn.ghost{background:rgba(8,5,2,0.7);color:var(--muted);border-color:rgba(200,169,110,0.18);}
 .hub-btn.small{padding:7px 10px;font-size:8px;}
@@ -3884,26 +3885,54 @@ function pmReset() {
 // ═══════════════════════════════
 // AVATAR HELPERS (global — used by leaderboard + activity)
 // ═══════════════════════════════
-const _AV_EMOJIS = [
-  '🥜','💀','🤖','👾','🦾','🐸','🦊','🐺','🦁','🐉',
-  '👑','🎯','⚡','🔥','❄️','🌙','⭐','💎','🎲','🏆',
-  '🎭','🧠','🦋','🌊','🔮','💥','🎸','🦀','🐙','🌵',
-];
-const _AV_COLORS = [
-  '#3d1200','#001a30','#0a2d00','#250030','#2d2000',
-  '#002d2d','#1a0030','#300015','#002800','#202020',
+const _AV_URLS = [
+  'https://api.dicebear.com/9.x/pixel-art/svg?seed=NutDegen',
+  'https://api.dicebear.com/9.x/pixel-art/svg?seed=NutChad',
+  'https://api.dicebear.com/9.x/pixel-art/svg?seed=NutWagmi',
+  'https://api.dicebear.com/9.x/pixel-art/svg?seed=NutMoon',
+  'https://api.dicebear.com/9.x/pixel-art/svg?seed=NutDiamond',
+  'https://api.dicebear.com/9.x/pixel-art/svg?seed=NutApe',
+  'https://api.dicebear.com/9.x/pixel-art/svg?seed=NutBull',
+  'https://api.dicebear.com/9.x/pixel-art/svg?seed=NutBear',
+  'https://api.dicebear.com/9.x/pixel-art/svg?seed=NutWhale',
+  'https://api.dicebear.com/9.x/pixel-art/svg?seed=NutFren',
+  'https://api.dicebear.com/9.x/pixel-art/svg?seed=NutAlpha',
+  'https://api.dicebear.com/9.x/pixel-art/svg?seed=NutSigma',
+  'https://api.dicebear.com/9.x/bottts/svg?seed=NutBot1',
+  'https://api.dicebear.com/9.x/bottts/svg?seed=NutBot2',
+  'https://api.dicebear.com/9.x/bottts/svg?seed=NutBot3',
+  'https://api.dicebear.com/9.x/bottts/svg?seed=NutBot4',
+  'https://api.dicebear.com/9.x/bottts/svg?seed=NutBot5',
+  'https://api.dicebear.com/9.x/bottts/svg?seed=NutBot6',
+  'https://api.dicebear.com/9.x/bottts/svg?seed=NutBot7',
+  'https://api.dicebear.com/9.x/bottts/svg?seed=NutBot8',
+  'https://api.dicebear.com/9.x/bottts/svg?seed=NutBot9',
+  'https://api.dicebear.com/9.x/bottts/svg?seed=NutBot10',
+  'https://api.dicebear.com/9.x/bottts/svg?seed=NutBot11',
+  'https://api.dicebear.com/9.x/bottts/svg?seed=NutBot12',
+  'https://api.dicebear.com/9.x/adventurer/svg?seed=NutAdv1',
+  'https://api.dicebear.com/9.x/adventurer/svg?seed=NutAdv2',
+  'https://api.dicebear.com/9.x/adventurer/svg?seed=NutAdv3',
+  'https://api.dicebear.com/9.x/adventurer/svg?seed=NutAdv4',
+  'https://api.dicebear.com/9.x/adventurer/svg?seed=NutAdv5',
+  'https://api.dicebear.com/9.x/adventurer/svg?seed=NutAdv6',
+  'https://api.dicebear.com/9.x/adventurer/svg?seed=NutAdv7',
+  'https://api.dicebear.com/9.x/adventurer/svg?seed=NutAdv8',
 ];
 function nutAvatarFor(sid) {
   if (sid && sid === sessionId) {
-    try { const s = JSON.parse(localStorage.getItem('nut_avatar_v1') || 'null'); if (s && s.emoji && s.bg) return s; } catch(e) {}
+    try {
+      const s = JSON.parse(localStorage.getItem('nut_avatar_v1') || 'null');
+      if (s && typeof s.idx === 'number') return { url: _AV_URLS[s.idx] };
+    } catch(e) {}
   }
   let h = 5381;
   for (let i = 0; i < (sid||'').length; i++) h = ((h * 33) ^ sid.charCodeAt(i)) & 0x7fffffff;
-  return { emoji: _AV_EMOJIS[h % _AV_EMOJIS.length], bg: _AV_COLORS[(h >> 4) % _AV_COLORS.length] };
+  return { url: _AV_URLS[h % _AV_URLS.length] };
 }
 function nutAvatarHtml(sid, cls) {
   const av = nutAvatarFor(sid || '');
-  return `<div class="nut-avatar${cls ? ' '+cls : ''}" style="background:${av.bg}">${av.emoji}</div>`;
+  return `<div class="nut-avatar${cls ? ' '+cls : ''}"><img src="${av.url}" alt="" loading="lazy" /></div>`;
 }
 
 // ═══════════════════════════════
