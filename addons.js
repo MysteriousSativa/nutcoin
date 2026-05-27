@@ -404,7 +404,6 @@
   function onGlobalActivity(rows) {
     lastActivity = rows || [];
     renderPulse();
-    renderRadio();
   }
 
   function onGlobalCounts(today) {
