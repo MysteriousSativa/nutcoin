@@ -16,40 +16,40 @@
   // 32 avatar images via DiceBear (pixel-art · bottts · adventurer)
   const AV_URLS = [
     // pixel-art characters (0–11)
-    'https://api.dicebear.com/9.x/pixel-art/svg?seed=NutDegen',
-    'https://api.dicebear.com/9.x/pixel-art/svg?seed=NutChad',
-    'https://api.dicebear.com/9.x/pixel-art/svg?seed=NutWagmi',
-    'https://api.dicebear.com/9.x/pixel-art/svg?seed=NutMoon',
-    'https://api.dicebear.com/9.x/pixel-art/svg?seed=NutDiamond',
-    'https://api.dicebear.com/9.x/pixel-art/svg?seed=NutApe',
-    'https://api.dicebear.com/9.x/pixel-art/svg?seed=NutBull',
-    'https://api.dicebear.com/9.x/pixel-art/svg?seed=NutBear',
-    'https://api.dicebear.com/9.x/pixel-art/svg?seed=NutWhale',
-    'https://api.dicebear.com/9.x/pixel-art/svg?seed=NutFren',
-    'https://api.dicebear.com/9.x/pixel-art/svg?seed=NutAlpha',
-    'https://api.dicebear.com/9.x/pixel-art/svg?seed=NutSigma',
+    'https://api.dicebear.com/9.x/pixel-art/svg?seed=NutDegen&size=64',
+    'https://api.dicebear.com/9.x/pixel-art/svg?seed=NutChad&size=64',
+    'https://api.dicebear.com/9.x/pixel-art/svg?seed=NutWagmi&size=64',
+    'https://api.dicebear.com/9.x/pixel-art/svg?seed=NutMoon&size=64',
+    'https://api.dicebear.com/9.x/pixel-art/svg?seed=NutDiamond&size=64',
+    'https://api.dicebear.com/9.x/pixel-art/svg?seed=NutApe&size=64',
+    'https://api.dicebear.com/9.x/pixel-art/svg?seed=NutBull&size=64',
+    'https://api.dicebear.com/9.x/pixel-art/svg?seed=NutBear&size=64',
+    'https://api.dicebear.com/9.x/pixel-art/svg?seed=NutWhale&size=64',
+    'https://api.dicebear.com/9.x/pixel-art/svg?seed=NutFren&size=64',
+    'https://api.dicebear.com/9.x/pixel-art/svg?seed=NutAlpha&size=64',
+    'https://api.dicebear.com/9.x/pixel-art/svg?seed=NutSigma&size=64',
     // bottts robots (12–23)
-    'https://api.dicebear.com/9.x/bottts/svg?seed=NutBot1',
-    'https://api.dicebear.com/9.x/bottts/svg?seed=NutBot2',
-    'https://api.dicebear.com/9.x/bottts/svg?seed=NutBot3',
-    'https://api.dicebear.com/9.x/bottts/svg?seed=NutBot4',
-    'https://api.dicebear.com/9.x/bottts/svg?seed=NutBot5',
-    'https://api.dicebear.com/9.x/bottts/svg?seed=NutBot6',
-    'https://api.dicebear.com/9.x/bottts/svg?seed=NutBot7',
-    'https://api.dicebear.com/9.x/bottts/svg?seed=NutBot8',
-    'https://api.dicebear.com/9.x/bottts/svg?seed=NutBot9',
-    'https://api.dicebear.com/9.x/bottts/svg?seed=NutBot10',
-    'https://api.dicebear.com/9.x/bottts/svg?seed=NutBot11',
-    'https://api.dicebear.com/9.x/bottts/svg?seed=NutBot12',
+    'https://api.dicebear.com/9.x/bottts/svg?seed=NutBot1&size=64',
+    'https://api.dicebear.com/9.x/bottts/svg?seed=NutBot2&size=64',
+    'https://api.dicebear.com/9.x/bottts/svg?seed=NutBot3&size=64',
+    'https://api.dicebear.com/9.x/bottts/svg?seed=NutBot4&size=64',
+    'https://api.dicebear.com/9.x/bottts/svg?seed=NutBot5&size=64',
+    'https://api.dicebear.com/9.x/bottts/svg?seed=NutBot6&size=64',
+    'https://api.dicebear.com/9.x/bottts/svg?seed=NutBot7&size=64',
+    'https://api.dicebear.com/9.x/bottts/svg?seed=NutBot8&size=64',
+    'https://api.dicebear.com/9.x/bottts/svg?seed=NutBot9&size=64',
+    'https://api.dicebear.com/9.x/bottts/svg?seed=NutBot10&size=64',
+    'https://api.dicebear.com/9.x/bottts/svg?seed=NutBot11&size=64',
+    'https://api.dicebear.com/9.x/bottts/svg?seed=NutBot12&size=64',
     // adventurer characters (24–31)
-    'https://api.dicebear.com/9.x/adventurer/svg?seed=NutAdv1',
-    'https://api.dicebear.com/9.x/adventurer/svg?seed=NutAdv2',
-    'https://api.dicebear.com/9.x/adventurer/svg?seed=NutAdv3',
-    'https://api.dicebear.com/9.x/adventurer/svg?seed=NutAdv4',
-    'https://api.dicebear.com/9.x/adventurer/svg?seed=NutAdv5',
-    'https://api.dicebear.com/9.x/adventurer/svg?seed=NutAdv6',
-    'https://api.dicebear.com/9.x/adventurer/svg?seed=NutAdv7',
-    'https://api.dicebear.com/9.x/adventurer/svg?seed=NutAdv8',
+    'https://api.dicebear.com/9.x/adventurer/svg?seed=NutAdv1&size=64',
+    'https://api.dicebear.com/9.x/adventurer/svg?seed=NutAdv2&size=64',
+    'https://api.dicebear.com/9.x/adventurer/svg?seed=NutAdv3&size=64',
+    'https://api.dicebear.com/9.x/adventurer/svg?seed=NutAdv4&size=64',
+    'https://api.dicebear.com/9.x/adventurer/svg?seed=NutAdv5&size=64',
+    'https://api.dicebear.com/9.x/adventurer/svg?seed=NutAdv6&size=64',
+    'https://api.dicebear.com/9.x/adventurer/svg?seed=NutAdv7&size=64',
+    'https://api.dicebear.com/9.x/adventurer/svg?seed=NutAdv8&size=64',
   ];
 
   function avHash(sid) {
@@ -177,7 +177,7 @@
         </div>
         <div class="pv2-mid">
           <div class="pv2-photo-col">
-            <div class="pv2-avatar"><img src="${av.url}" alt="avatar" loading="lazy" /></div>
+            <div class="pv2-avatar"><img src="${av.url}" alt="avatar" /></div>
             <div class="pv2-tier">${esc(p.tier)}</div>
             <button class="pv2-av-btn" onclick="NutAddons.openAvatarPicker()">edit</button>
           </div>
@@ -224,7 +224,7 @@
     const grid = document.getElementById('avatarImgGrid');
     if (grid) grid.innerHTML = AV_URLS.map((url, i) =>
       `<button class="av-item${av.idx===i?' selected':''}" onclick="NutAddons.pickAvatar(${i})" title="Avatar ${i+1}">
-        <img src="${url}" alt="avatar ${i+1}" loading="lazy" />
+        <img src="${url}" alt="avatar ${i+1}" />
       </button>`
     ).join('');
   }
