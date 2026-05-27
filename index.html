@@ -318,8 +318,13 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .nick-btn:hover{transform:translateY(-2px);filter:drop-shadow(0 0 16px rgba(200,140,0,0.45));}
 
 /* ── CLOCK ── */
-.clock-bar{text-align:center;font-family:'Cinzel',serif;font-size:13px;color:var(--muted);padding:10px 0 22px;letter-spacing:.1em;}
+.clock-bar{text-align:center;font-family:'Cinzel',serif;font-size:13px;color:var(--muted);padding:10px 0 22px;letter-spacing:.1em;line-height:1.6;}
 .clock-bar span{color:var(--gold);text-shadow:0 0 10px rgba(200,169,110,0.28);}
+.clock-date{margin-bottom:8px;}
+.clock-zones{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:6px 14px;font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.04em;}
+.clock-tz{display:inline-flex;align-items:baseline;gap:5px;white-space:nowrap;}
+.clock-tz .tz-label{font-family:'Cinzel',serif;font-size:9px;font-weight:700;letter-spacing:.14em;color:var(--gold-bright);min-width:2.2em;text-align:right;}
+.clock-tz .tz-time{color:var(--cream);}
 
 /* ── WRAP ── */
 .wrap{max-width:920px;margin:0 auto;padding:0 16px 160px;position:relative;z-index:1;}
@@ -996,6 +1001,8 @@ position:relative;overflow:hidden;
 
   /* Clock */
   .clock-bar{font-size:10.5px;padding:6px 0 14px;letter-spacing:.07em;}
+  .clock-zones{gap:5px 10px;font-size:10px;}
+  .clock-tz .tz-label{font-size:8px;min-width:2em;}
 
   /* Counter card (continued) */
   .counter-label{font-size:8.5px;letter-spacing:.18em;margin-bottom:12px;}
@@ -2273,15 +2280,38 @@ function buildTicker() {
 // ═══════════════════════════════
 // CLOCK
 // ═══════════════════════════════
+const CLOCK_ZONES = [
+  ['UTC', 'UTC'],
+  ['EST', 'America/New_York'],
+  ['CST', 'America/Chicago'],
+  ['PST', 'America/Los_Angeles'],
+];
+
+function formatClockTime(date, timeZone) {
+  return new Intl.DateTimeFormat('en-GB', {
+    timeZone,
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false,
+  }).format(date);
+}
+
 function updateClock() {
-  const now=new Date();
-  const days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-  const months=['January','February','March','April','May','June','July','August','September','October','November','December'];
-  const h=String(now.getHours()).padStart(2,'0'),m=String(now.getMinutes()).padStart(2,'0'),s=String(now.getSeconds()).padStart(2,'0');
-  const midnight=new Date(now);midnight.setHours(24,0,0,0);
-  const secsLeft=Math.floor((midnight-now)/1000);
-  const hL=Math.floor(secsLeft/3600),mL=Math.floor((secsLeft%3600)/60);
-  document.getElementById('clockBar').innerHTML=`<span>${days[now.getDay()]}, ${months[now.getMonth()]} ${now.getDate()}</span> &nbsp;✦&nbsp; ${h}:${m}:${s} &nbsp;✦&nbsp; <span>Resets in ${hL}h ${mL}m</span>`;
+  const now = new Date();
+  const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  const midnight = new Date(now);
+  midnight.setHours(24, 0, 0, 0);
+  const secsLeft = Math.floor((midnight - now) / 1000);
+  const hL = Math.floor(secsLeft / 3600);
+  const mL = Math.floor((secsLeft % 3600) / 60);
+  const zones = CLOCK_ZONES.map(([label, tz]) =>
+    `<span class="clock-tz"><span class="tz-label">${label}</span><span class="tz-time">${formatClockTime(now, tz)}</span></span>`
+  ).join('');
+  document.getElementById('clockBar').innerHTML =
+    `<div class="clock-date"><span>${days[now.getDay()]}, ${months[now.getMonth()]} ${now.getDate()}</span> &nbsp;✦&nbsp; <span>Resets in ${hL}h ${mL}m</span></div>` +
+    `<div class="clock-zones">${zones}</div>`;
   updateCooldown();
 }
 
