@@ -290,6 +290,10 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
   font-size:9px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;
   color:var(--muted);
 }
+.tf-usd{
+  font-size:10px;font-weight:600;color:rgba(200,169,110,0.6);
+  letter-spacing:.01em;
+}
 .tf-buy{
   background:var(--btn-ember);border:1px solid rgba(255,160,40,0.5);
   color:#1a0a00;border-radius:9px;padding:7px 12px;
@@ -3548,6 +3552,7 @@ function downloadCert() {
 const KEY_PM_BAL = 'nut_pm_bal_v1';
 const KEY_PM_STATE = 'nut_pm_state_v1';
 const KEY_PM_DAY = 'nut_pm_day_v1';
+const NUT_SIM_PRICE = 0.000069; // simulated $NUT price per NUTTOKEN (play money)
 
 const PROJECT_NEWS = [
   { date: '2026-05-27', tag: 'HUB', title: 'Nut Hub is live', body: 'Passport, duels, global pulse, daily bounties, radio ticker, crews, and oracle picks. All local-first.' },
@@ -3577,13 +3582,22 @@ function renderProjectNews() {
 function pmGetBalance() {
   return Math.max(0, parseInt(localStorage.getItem(KEY_PM_BAL) || '0', 10) || 0);
 }
+function pmSimUSD(bal) {
+  const usd = bal * NUT_SIM_PRICE;
+  if (usd === 0) return '$0.00';
+  if (usd < 0.01) return '$' + usd.toFixed(6);
+  return '$' + usd.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:4});
+}
 function pmSetBalance(v) {
   localStorage.setItem(KEY_PM_BAL, String(Math.max(0, Math.floor(v))));
-  const bal = pmGetBalance().toLocaleString();
+  const bal = pmGetBalance();
+  const balStr = bal.toLocaleString();
   const el = document.getElementById('pmBal');
-  if (el) el.textContent = bal;
+  if (el) el.textContent = balStr;
   const fl = document.getElementById('pmBalFloat');
-  if (fl) fl.textContent = bal;
+  if (fl) fl.textContent = balStr;
+  const fu = document.getElementById('pmBalFloatUSD');
+  if (fu) fu.textContent = pmSimUSD(bal);
 }
 function pmEarnTokens(n) {
   pmSetBalance(pmGetBalance() + Math.max(0, Math.floor(n)));
@@ -3995,6 +4009,7 @@ scrollNutBtn.addEventListener('click', () => {
   <div class="tf-bal">
     <span class="tf-amount" id="pmBalFloat">0</span>
     <span class="tf-label">NUTS</span>
+    <span class="tf-usd" id="pmBalFloatUSD">$0.00</span>
   </div>
   <button type="button" class="tf-buy tba" onclick="openBuy()">BUY $NUT</button>
 </div>
