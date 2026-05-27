@@ -4,12 +4,45 @@
  */
 (function () {
   const KEY_PASSPORT = 'nut_passport_v1';
-  const KEY_DUEL = 'nut_duel_v1';
+  const KEY_DUEL     = 'nut_duel_v1';
   const KEY_BOUNTIES = 'nut_bounties_v1';
-  const KEY_CREW = 'nut_crew_v1';
-  const KEY_ORACLE = 'nut_oracle_v1';
-  const KEY_STAMPS = 'nut_stamps_v1';
-  const KEY_GENESIS = 'nut_genesis_seen_v1';
+  const KEY_CREW     = 'nut_crew_v1';
+  const KEY_ORACLE   = 'nut_oracle_v1';
+  const KEY_STAMPS   = 'nut_stamps_v1';
+  const KEY_GENESIS  = 'nut_genesis_seen_v1';
+  const KEY_BIO      = 'nut_bio_v1';
+  const KEY_AVATAR   = 'nut_avatar_v1';
+
+  const AV_EMOJIS = [
+    '🥜','💀','🤖','👾','🦾','🐸','🦊','🐺','🦁','🐉',
+    '👑','🎯','⚡','🔥','❄️','🌙','⭐','💎','🎲','🏆',
+    '🎭','🧠','🦋','🌊','🔮','💥','🎸','🦀','🐙','🌵',
+  ];
+  const AV_COLORS = [
+    '#3d1200','#001a30','#0a2d00','#250030','#2d2000',
+    '#002d2d','#1a0030','#300015','#002800','#202020',
+  ];
+
+  function avHash(sid) {
+    let h = 5381;
+    for (let i = 0; i < (sid||'').length; i++) h = ((h * 33) ^ sid.charCodeAt(i)) & 0x7fffffff;
+    return h;
+  }
+  function getAvatarFor(sid) {
+    const mySid = typeof sessionId !== 'undefined' ? sessionId : null;
+    if (sid && sid === mySid) {
+      const s = loadJson(KEY_AVATAR, null);
+      if (s && s.emoji && s.bg) return s;
+    }
+    const h = avHash(sid);
+    return { emoji: AV_EMOJIS[h % AV_EMOJIS.length], bg: AV_COLORS[(h >> 4) % AV_COLORS.length] };
+  }
+  function getMyAvatar() {
+    const s = loadJson(KEY_AVATAR, null);
+    if (s && s.emoji && s.bg) return s;
+    const sid = typeof sessionId !== 'undefined' ? sessionId : 'anon';
+    return getAvatarFor(sid);
+  }
 
   let hubTab = 'passport';
   let lastActivity = [];
@@ -78,7 +111,7 @@
     const serial = parseInt(localStorage.getItem('nut_receipt_serial_v1') || '4812', 10);
     return {
       name: typeof nickname !== 'undefined' && nickname ? nickname : 'Anonymous',
-      since: loadJson(KEY_PASSPORT, {}).since || dateStr,
+      since: loadJson(KEY_PASSPORT, {}).since || (typeof dateStr !== 'undefined' ? dateStr : '—'),
       tz: typeof selectedTimezone !== 'undefined' ? selectedTimezone : 'UTC',
       today: typeof countToday !== 'undefined' ? countToday : 0,
       allTime: typeof countAllTime !== 'undefined' ? countAllTime : 0,
@@ -95,33 +128,119 @@
     const el = document.getElementById('hubPassport');
     if (!el) return;
     const p = getPassportData();
-    if (!loadJson(KEY_PASSPORT, {}).since) saveJson(KEY_PASSPORT, { since: dateStr });
+    if (!loadJson(KEY_PASSPORT, {}).since) saveJson(KEY_PASSPORT, { since: typeof dateStr !== 'undefined' ? dateStr : '' });
+    const bio = localStorage.getItem(KEY_BIO) || '';
+    const av  = getMyAvatar();
+    const mrzName = (p.name.toUpperCase().replace(/\s+/g, '<') + '<<<<<<<<<<<<<<<<<<<<').slice(0, 22);
+    const mrzLine1 = `P<NUT${mrzName}`;
+    const mrzLine2 = `${String(p.serial).padStart(9,'0')}NUT${(p.since || '000000').replace(/-/g,'').slice(2,8)}<${String(p.allTime).padStart(9,'0')}`;
     el.innerHTML = `
-      <div class="passport-card">
-        <div class="passport-top">
-          <span class="passport-tier">${esc(p.tier)}</span>
-          <span class="passport-id">#${String(p.serial).padStart(6, '0')}</span>
+      <div class="pv2">
+        <div class="pv2-hdr">
+          <div>
+            <div class="pv2-country">REPUBLIC OF NUT</div>
+            <div class="pv2-doc">NUT PASSPORT</div>
+          </div>
+          <div class="pv2-serial">#${String(p.serial).padStart(6,'0')}</div>
         </div>
-        <div class="passport-name">${esc(p.name)}</div>
-        <div class="passport-meta">Since ${esc(p.since)} · ${esc(tzDisplayName(p.tz))}</div>
-        <div class="passport-stats">
-          <span>Today <strong>${p.today}</strong></span>
-          <span>All-time <strong>${p.allTime}</strong></span>
-          <span>Streak <strong>${p.streak}</strong></span>
-          <span>Crew <strong>${esc(p.crew)}</strong></span>
+        <div class="pv2-mid">
+          <div class="pv2-photo-col">
+            <div class="pv2-avatar" style="background:${av.bg}">${av.emoji}</div>
+            <div class="pv2-tier">${esc(p.tier)}</div>
+            <button class="pv2-av-btn" onclick="NutAddons.openAvatarPicker()">edit</button>
+          </div>
+          <div class="pv2-fields">
+            <div class="pv2-field"><span class="pv2-lbl">NAME</span><span class="pv2-val">${esc(p.name)}</span></div>
+            <div class="pv2-field"><span class="pv2-lbl">SINCE</span><span class="pv2-val">${esc(p.since)}</span></div>
+            <div class="pv2-field"><span class="pv2-lbl">CREW</span><span class="pv2-val">${esc(p.crew)}</span></div>
+            <div class="pv2-field"><span class="pv2-lbl">TZ</span><span class="pv2-val">${esc(tzDisplayName(p.tz))}</span></div>
+          </div>
         </div>
-        <div class="passport-methods">${p.methods.map(m => `<span class="passport-chip">${esc(m)}</span>`).join('')}</div>
-        <div class="passport-stamps">${p.stamps.length ? p.stamps.map(s => `<span class="stamp" title="${esc(s.at)}">${esc(s.label)}</span>`).join('') : '<span class="passport-muted">No stamps yet</span>'}</div>
-        <div class="hub-actions">
-          <button type="button" class="hub-btn" onclick="NutAddons.copyPassport()">Copy flex text</button>
-          <button type="button" class="hub-btn ghost" onclick="openCertificate()">Open receipt</button>
+        <div class="pv2-bio-wrap">
+          <div class="pv2-bio-text" id="pv2BioDisplay">${bio ? `&ldquo;${esc(bio)}&rdquo;` : '<span class="pv2-bio-empty">no bio · tell the world who you are</span>'}</div>
+          <button class="pv2-bio-edit" id="pv2BioBtn" onclick="NutAddons.editBio()">edit bio</button>
+        </div>
+        <div class="pv2-stats">
+          <div class="pv2-stat"><div class="pv2-stat-n">${p.today}</div><div class="pv2-stat-l">TODAY</div></div>
+          <div class="pv2-divider"></div>
+          <div class="pv2-stat"><div class="pv2-stat-n">${p.allTime}</div><div class="pv2-stat-l">ALL TIME</div></div>
+          <div class="pv2-divider"></div>
+          <div class="pv2-stat"><div class="pv2-stat-n">${p.streak}</div><div class="pv2-stat-l">STREAK</div></div>
+        </div>
+        <div class="passport-methods" style="padding:10px 14px 0">${p.methods.map(m => `<span class="passport-chip">${esc(m)}</span>`).join('')}</div>
+        <div class="passport-stamps" style="padding:8px 14px">${p.stamps.length ? p.stamps.map(s => `<span class="stamp" title="${esc(s.at)}">${esc(s.label)}</span>`).join('') : '<span class="passport-muted">no stamps yet · keep logging</span>'}</div>
+        <div class="pv2-mrz">${esc(mrzLine1)}<br>${esc(mrzLine2)}</div>
+        <div class="hub-actions" style="padding:10px 14px">
+          <button type="button" class="hub-btn" onclick="NutAddons.copyPassport()">Copy flex</button>
+          <button type="button" class="hub-btn ghost" onclick="openCertificate()">Receipt</button>
+        </div>
+      </div>
+      <div class="avatar-picker" id="avatarPicker" style="display:none">
+        <div class="avatar-picker-title">CHOOSE YOUR AVATAR</div>
+        <div class="avatar-emoji-grid" id="avatarEmojiGrid"></div>
+        <div class="avatar-color-row" id="avatarColorRow"></div>
+        <div style="text-align:center;margin-top:8px">
+          <button class="hub-btn" onclick="NutAddons.closeAvatarPicker()">Done</button>
         </div>
       </div>`;
   }
 
+  function openAvatarPicker() {
+    const picker = document.getElementById('avatarPicker');
+    if (!picker) return;
+    picker.style.display = 'block';
+    const av   = getMyAvatar();
+    const grid = document.getElementById('avatarEmojiGrid');
+    const crow = document.getElementById('avatarColorRow');
+    if (grid) grid.innerHTML = AV_EMOJIS.map(em =>
+      `<button class="av-em${av.emoji===em?' selected':''}" onclick="NutAddons.pickAvatarEmoji('${em}')">${em}</button>`
+    ).join('');
+    if (crow) crow.innerHTML = AV_COLORS.map(c =>
+      `<button class="av-col${av.bg===c?' selected':''}" style="background:${c}" onclick="NutAddons.pickAvatarColor('${esc(c)}')"></button>`
+    ).join('');
+  }
+
+  function closeAvatarPicker() {
+    const picker = document.getElementById('avatarPicker');
+    if (picker) picker.style.display = 'none';
+  }
+
+  function pickAvatarEmoji(em) {
+    saveJson(KEY_AVATAR, { ...getMyAvatar(), emoji: em });
+    renderPassport();
+    openAvatarPicker();
+  }
+
+  function pickAvatarColor(c) {
+    saveJson(KEY_AVATAR, { ...getMyAvatar(), bg: c });
+    renderPassport();
+    openAvatarPicker();
+  }
+
+  function editBio() {
+    const bioDisplay = document.getElementById('pv2BioDisplay');
+    const bioBtn     = document.getElementById('pv2BioBtn');
+    if (!bioDisplay || !bioBtn) return;
+    const bio = localStorage.getItem(KEY_BIO) || '';
+    bioDisplay.innerHTML = `<input class="pv2-bio-input" id="pv2BioInput" maxlength="100" value="${esc(bio)}" placeholder="tell the world who you are..." />`;
+    bioBtn.textContent = 'save';
+    bioBtn.onclick = () => NutAddons.saveBio();
+    const inp = document.getElementById('pv2BioInput');
+    if (inp) { inp.focus(); inp.setSelectionRange(inp.value.length, inp.value.length); }
+  }
+
+  function saveBio() {
+    const inp = document.getElementById('pv2BioInput');
+    if (!inp) return;
+    localStorage.setItem(KEY_BIO, inp.value.trim().slice(0, 100));
+    renderPassport();
+    if (typeof showToast === 'function') showToast('Bio saved ✦');
+  }
+
   function copyPassport() {
-    const p = getPassportData();
-    const text = `$NUT Passport · ${p.name}\nToday: ${p.today} · All-time: ${p.allTime} · Streak: ${p.streak}\nTier: ${p.tier} · Crew: ${p.crew}\n${typeof SITE_URL !== 'undefined' ? SITE_URL : ''}`;
+    const p   = getPassportData();
+    const bio = localStorage.getItem(KEY_BIO) || '';
+    const text = `$NUT Passport · ${p.name}${bio ? `\n"${bio}"` : ''}\nToday: ${p.today} · All-time: ${p.allTime} · Streak: ${p.streak}\nTier: ${p.tier} · Crew: ${p.crew}\n${typeof SITE_URL !== 'undefined' ? SITE_URL : ''}`;
     navigator.clipboard?.writeText(text).catch(() => {});
     if (typeof showToast === 'function') showToast('Passport copied ✦');
   }
@@ -437,5 +556,12 @@
     switchHubTab,
     renderAll,
     setPulseHours,
+    openAvatarPicker,
+    closeAvatarPicker,
+    pickAvatarEmoji,
+    pickAvatarColor,
+    editBio,
+    saveBio,
+    getAvatarFor,
   };
 })();
