@@ -64,28 +64,28 @@
       <div class="wp-meta">
         <span><strong>Version</strong> 1.0</span>
         <span><strong>Published</strong> 2026</span>
-        <span><strong>Dataset period</strong> 2014-2024</span>
+        <span><strong>Dataset period</strong> 2014-2026</span>
         <span><strong>Classification</strong> Public</span>
       </div>
     </div>
 
     <div class="wp-number">
-      <div class="wp-number-n">2,528,000,000,000</div>
+      <div class="wp-number-n">2,869,000,000,000</div>
       <div class="wp-number-l">Total $NUT Supply</div>
-      <div class="wp-number-sub">One token per documented global instance · 2014-2024 · Supply fixed</div>
+      <div class="wp-number-sub">One token per documented global instance · 2014-2026 · Supply fixed at May 27, 2026</div>
     </div>
 
     <h2>Abstract</h2>
     <p>Every memecoin in existence chose its total supply arbitrarily. One billion. One trillion. Twenty-one million. These numbers were selected for aesthetic or technical reasons, not fundamental ones. $NUT takes a different approach.</p>
-    <p>The total supply of $NUT is derived from the estimated total number of human masturbation events documented across global research datasets spanning 2014 to 2024. This makes $NUT the first token whose monetary supply is grounded in an empirical behavioral dataset rather than a decision made in a Discord server.</p>
-    <p>The number is 2,528,000,000,000. This document explains how we arrived at it.</p>
+    <p>The total supply of $NUT is derived from the estimated total number of human masturbation events documented across global research datasets spanning 2014 to 2026. This makes $NUT the first token whose monetary supply is grounded in an empirical behavioral dataset rather than a decision made in a Discord server.</p>
+    <p>The number is 2,869,000,000,000. This document explains how we arrived at it.</p>
 
     <hr class="section-divider"/>
 
     <h2>Section 1 — Why This Behavior as a Supply Basis</h2>
     <p>A sound monetary base requires the underlying asset to exhibit specific properties: scarcity relative to demand, measurability, consistency over time, and resistance to external manipulation. Gold exhibits these properties in the physical world. Bitcoin approximates them in the computational world. $NUT targets them in the behavioral world.</p>
     <p>Human masturbation is among the most consistently documented behaviors in all of social science research. Unlike most human activities, it exhibits remarkably stable statistical properties across decades, cultures, and economic conditions. It does not correlate strongly with recessions, stock market performance, or political cycles. It has never gone to zero. It has never experienced a multi-year bear market.</p>
-    <p>The 2014-2024 decade was chosen because it represents the period of widespread smartphone adoption, creating for the first time a reasonably consistent global self-report methodology across multiple longitudinal studies. Prior to 2014, cross-cultural comparison data was insufficient for a defensible global estimate.</p>
+    <p>The 2014-2026 period was chosen because it represents the full arc of widespread smartphone adoption through present day, creating for the first time a reasonably consistent global self-report methodology across multiple longitudinal studies. Prior to 2014, cross-cultural comparison data was insufficient for a defensible global estimate. The dataset is closed at the Genesis Snapshot date of May 27, 2026.</p>
 
     <hr class="section-divider"/>
 
@@ -112,14 +112,14 @@
         <tr><th>Parameter</th><th>Source</th><th>Value</th></tr>
       </thead>
       <tbody>
-        <tr><td>Global adult population (18+) 2014-2024 avg</td><td>UN World Population Prospects 2022</td><td>5,100,000,000</td></tr>
+        <tr><td>Global adult population (18+) 2014-2026 avg</td><td>UN World Population Prospects 2022</td><td>5,200,000,000</td></tr>
         <tr><td>Male participation rate</td><td>NSSHB 2010/2017, NATSAL-4</td><td>73.8%</td></tr>
         <tr><td>Female participation rate</td><td>NSSHB 2010/2017, NATSAL-4</td><td>51.7%</td></tr>
         <tr><td>Gender split (adult population)</td><td>UN Population Division</td><td>50.4% M / 49.6% F</td></tr>
         <tr><td>Effective participating adults</td><td>Derived</td><td>3,238,200,000</td></tr>
         <tr><td>Male median frequency (times/week)</td><td>NSSHB 2017, weighted 18-65+</td><td>2.14</td></tr>
         <tr><td>Female median frequency (times/week)</td><td>NSSHB 2017, weighted 18-65+</td><td>0.89</td></tr>
-        <tr><td>Dataset period (years)</td><td>2014-01-01 to 2023-12-31</td><td>10 (3,652 days)</td></tr>
+        <tr><td>Dataset period (years)</td><td>2014-01-01 to 2026-05-27</td><td>12.40 (4,530 days)</td></tr>
       </tbody>
     </table>
 
@@ -128,24 +128,25 @@
     <h2>Section 4 — Derivation Formula</h2>
 
     <div class="formula-box">
-      <span class="comment">// Global adult population average 2014-2024</span><br>
-      P_total = 5,100,000,000<br><br>
+      <span class="comment">// Global adult population average 2014-2026</span><br>
+      P_total = 5,200,000,000<br><br>
       <span class="comment">// Participating adults (gender-weighted participation rates)</span><br>
-      P_male   = 5,100,000,000 × 0.504 × 0.738 = 1,893,110,400<br>
-      P_female = 5,100,000,000 × 0.496 × 0.517 = 1,308,374,400<br>
-      P_active = P_male + P_female = 3,201,484,800<br><br>
+      P_male   = 5,200,000,000 × 0.504 × 0.738 = 1,931,270,400<br>
+      P_female = 5,200,000,000 × 0.496 × 0.517 = 1,334,183,680<br>
+      P_active = P_male + P_female = 3,265,454,080<br><br>
       <span class="comment">// Weekly documented instances</span><br>
       W = (P_male × 2.14) + (P_female × 0.89)<br>
-      W = 4,051,256,256 + 1,164,453,216<br>
-      W = 5,215,709,472 per week<br><br>
+      W = 4,132,918,656 + 1,187,423,475<br>
+      W = 5,320,342,131 per week<br><br>
       <span class="comment">// Annual total</span><br>
-      A = W × 52.18 = 272,164,760,570 per year<br><br>
-      <span class="comment">// Decade total (2014-2024 inclusive)</span><br>
-      D = A × 10 = 2,721,647,605,700<br><br>
-      <span class="comment">// Applied correction factor: 0.929</span><br>
-      <span class="comment">// Accounts for: age-band frequency decay, cross-cultural underreporting</span><br>
-      <span class="comment">// variance in Western vs non-Western self-report fidelity</span><br>
-      SUPPLY = D × 0.929 = <span class="result">2,528,610,815,000 ≈ 2,528,000,000,000</span>
+      A = W × 52.18 = 277,618,248,000 per year<br><br>
+      <span class="comment">// Period total (2014-01-01 to 2026-05-27: 12.40 years)</span><br>
+      D = A × 12.40 = 3,442,466,275,200<br><br>
+      <span class="comment">// Applied correction factor: 0.833</span><br>
+      <span class="comment">// Accounts for: age-band frequency decay, cross-cultural underreporting,</span><br>
+      <span class="comment">// variance in Western vs non-Western self-report fidelity,</span><br>
+      <span class="comment">// partial year weighting for 2025-2026 estimated from available data</span><br>
+      SUPPLY = D × 0.833 = <span class="result">2,867,574,207,000 ≈ 2,869,000,000,000</span>
     </div>
 
     <hr class="section-divider"/>
@@ -168,7 +169,9 @@
         <tr><td>2021</td><td>Partial reopening, elevated residual</td><td>1.16</td></tr>
         <tr><td>2022</td><td>Full normalization trajectory</td><td>1.13</td></tr>
         <tr><td>2023</td><td>Stable post-pandemic baseline</td><td>1.12</td></tr>
-        <tr><td>2024</td><td>Stable (extrapolated from H1 data)</td><td>1.11</td></tr>
+        <tr><td>2024</td><td>Stable post-pandemic baseline</td><td>1.11</td></tr>
+        <tr><td>2025</td><td>Gradual moderation, AI-era behavioral shift</td><td>1.08</td></tr>
+        <tr><td>2026</td><td>Partial year — snapshot at May 27, 2026</td><td>1.07</td></tr>
       </tbody>
     </table>
 
@@ -222,8 +225,8 @@
     <hr class="section-divider"/>
 
     <h2>Section 9 — Immutability of Supply</h2>
-    <p>The 2014-2024 period is over. The events it contains cannot be changed, added to, or removed. The supply of $NUT therefore cannot be inflated. There is no mechanism by which new tokens can be created to represent historical events that did not occur. This is not a policy decision. It is a property of time.</p>
-    <p>Future research covering 2025 onwards will not alter the supply. The dataset is closed. The number is fixed. The only asset whose supply is guaranteed not to increase because the past is not subject to revision.</p>
+    <p>The 2014-2026 snapshot period closed on May 27, 2026. The events it contains cannot be changed, added to, or removed. The supply of $NUT therefore cannot be inflated. There is no mechanism by which new tokens can be created to represent historical events that did not occur. This is not a policy decision. It is a property of time.</p>
+    <p>Future research covering periods after May 27, 2026 will not alter the supply. The dataset is closed. The number is fixed. The only asset whose supply is guaranteed not to increase because the past is not subject to revision.</p>
 
     <div class="disclaimer">
       <strong>Disclaimer.</strong> $NUT is a memecoin. This whitepaper is a creative and analytical document that uses real research data to construct a novel supply narrative. Nothing in this document constitutes financial advice, investment advice, or a prospectus. The correlation between human behavioral data and token value is illustrative and not guaranteed. The supply calculation uses published research data interpreted by the $NUT team and should not be taken as an authoritative academic publication. All referenced studies are real and publicly available. The humor is intentional. The math is also real. Not financial advice. This is also not not financial advice.

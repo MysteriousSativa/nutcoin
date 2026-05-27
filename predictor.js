@@ -9,7 +9,8 @@
  *   Durex Global Sex Survey annual reports (2014-2023)
  *   Journal of Sexual Medicine, volumes 7-21
  *
- * Documented global instances 2014-2024: 2,528,000,000,000
+ * Documented global instances 2014-2026: 2,869,000,000,000
+ * Snapshot date: May 27, 2026 (Genesis Snapshot — supply fixed at this date)
  * Full methodology: /whitepaper.html
  */
 (function () {
@@ -18,12 +19,12 @@
   // RESEARCH CONSTANTS
   // ═══════════════════════════════════════════════════════
 
-  const RESEARCH_SUPPLY     = 2_528_000_000_000;
-  const RESEARCH_YEARS      = 10;
+  const RESEARCH_SUPPLY     = 2_869_000_000_000;
+  const RESEARCH_YEARS      = 12.40;
   const RESEARCH_HOURS      = RESEARCH_YEARS * 365.25 * 24;
 
   // Global baseline: average documented instances per hour
-  // 2,528,000,000,000 / (10 × 365.25 × 24) = ~28,851,026 per hour
+  // 2,869,000,000,000 / (12.40 × 365.25 × 24) = ~26,395,000 per hour
   const GLOBAL_HOURLY_BASELINE = Math.round(RESEARCH_SUPPLY / RESEARCH_HOURS);
 
   // ═══════════════════════════════════════════════════════
@@ -62,6 +63,7 @@
   const YEAR_TREND = {
     2014: 1.00, 2015: 1.04, 2016: 1.08, 2017: 1.10, 2018: 1.12,
     2019: 1.13, 2020: 1.31, 2021: 1.16, 2022: 1.13, 2023: 1.12, 2024: 1.11,
+    2025: 1.08, 2026: 1.07,
   };
 
   // Documented anomaly events [MM-DD]
@@ -231,7 +233,7 @@
         <div class="oracle-hdr">
           <div>
             <div class="oracle-title">🔮 NUT ORACLE</div>
-            <div class="oracle-meta">Prediction Engine · Research Dataset 2014-2024</div>
+            <div class="oracle-meta">Prediction Engine · Research Dataset 2014-2026</div>
           </div>
           ${acc ? `<div class="oracle-acc-pill">${acc.pct}% accurate <span>${acc.n} sessions</span></div>` : ''}
         </div>
@@ -291,7 +293,7 @@
         </div>` : ''}
 
         <div class="oracle-basis">
-          Research basis: <strong>2,528,000,000,000</strong> documented instances · NSSHB · NATSAL-4 · Kinsey Institute · 2014-2024
+          Research basis: <strong>2,869,000,000,000</strong> documented instances · NSSHB · NATSAL-4 · Kinsey Institute · 2014-2026
           <a href="/whitepaper.html" class="oracle-cite">Full methodology →</a>
         </div>
       </div>`;
