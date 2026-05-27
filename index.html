@@ -1260,6 +1260,80 @@ position:relative;overflow:hidden;
 }
 .pm-pill{font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);margin-top:6px;}
 .pm-pill strong{color:var(--gold-bright);}
+.bottom-card.pm-wip{position:relative;overflow:hidden;}
+.pm-wip-tape{
+  position:absolute;inset:0;z-index:5;display:flex;align-items:center;justify-content:center;
+  background:rgba(5,3,1,0.78);pointer-events:auto;cursor:not-allowed;
+}
+.pm-wip-tape::before{
+  content:'';position:absolute;inset:-50%;
+  background:repeating-linear-gradient(-32deg,#FFD97D 0,#FFD97D 12px,#1a1208 12px,#1a1208 24px);
+  opacity:0.28;
+}
+.pm-wip-label{
+  position:relative;z-index:1;padding:16px 24px;background:rgba(12,8,4,0.96);
+  border:2px solid #FFD97D;font-family:'Cinzel',serif;font-size:11px;letter-spacing:.22em;
+  color:#FFD97D;text-transform:uppercase;transform:rotate(-4deg);
+  box-shadow:0 10px 40px rgba(0,0,0,0.55);text-align:center;line-height:1.5;
+}
+.pm-wip-label span{display:block;font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.08em;color:var(--muted);margin-top:6px;text-transform:none;}
+.pm-btn:disabled{opacity:0.45;cursor:not-allowed;transform:none !important;}
+
+/* ── NUT HUB (addons) ── */
+.nut-hub{max-width:920px;margin:0 auto 24px;padding:0 16px;position:relative;z-index:1;}
+.hub-card{background:rgba(12,8,4,0.82);border:1px solid rgba(200,169,110,0.25);border-radius:20px;padding:16px;box-shadow:0 16px 50px rgba(0,0,0,0.35);}
+.hub-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;}
+.hub-tab{padding:8px 10px;border-radius:12px;border:1px solid rgba(200,169,110,0.18);background:rgba(8,5,2,0.55);color:var(--muted);font-family:'Cinzel',serif;font-size:9px;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;}
+.hub-tab.active,.hub-tab:hover{border-color:rgba(200,169,110,0.45);color:var(--gold-bright);background:rgba(200,100,10,0.12);}
+.hub-panel{display:none;min-height:180px;}
+.hub-panel.active{display:block;}
+.passport-card{padding:4px 2px;}
+.passport-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+.passport-tier{font-family:'Cinzel',serif;font-size:10px;letter-spacing:.18em;color:var(--gold-bright);}
+.passport-id{font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);}
+.passport-name{font-weight:900;font-size:20px;color:var(--cream);margin-bottom:4px;}
+.passport-meta{font-size:11px;color:var(--muted);margin-bottom:10px;}
+.passport-stats{display:flex;gap:12px;flex-wrap:wrap;font-size:11px;color:var(--muted);margin-bottom:10px;}
+.passport-stats strong{color:var(--gold-bright);}
+.passport-methods{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;}
+.passport-chip{padding:6px 8px;border-radius:10px;border:1px solid rgba(200,169,110,0.14);background:rgba(8,5,2,0.55);font-size:11px;color:var(--cream);}
+.passport-stamps{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;}
+.stamp{padding:5px 8px;border-radius:999px;border:1px dashed rgba(200,169,110,0.35);font-size:10px;color:var(--gold);}
+.passport-muted{font-size:11px;color:var(--muted);line-height:1.4;}
+.hub-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;}
+.hub-btn{padding:9px 12px;border-radius:12px;border:1px solid rgba(200,169,110,0.35);background:rgba(200,100,10,0.16);color:var(--gold-bright);font-family:'Cinzel',serif;font-size:9px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;}
+.hub-btn.ghost{background:rgba(8,5,2,0.7);color:var(--muted);border-color:rgba(200,169,110,0.18);}
+.hub-btn.small{padding:7px 10px;font-size:8px;}
+.hub-btn.active{border-color:rgba(78,201,122,0.55);color:#8EE4A8;}
+.duel-box,.crew-box{padding:4px 0;}
+.duel-title{font-weight:800;font-size:14px;margin-bottom:6px;color:var(--cream);}
+.duel-scores{display:flex;gap:14px;font-size:12px;color:var(--muted);margin-bottom:6px;}
+.duel-status{font-size:12px;color:var(--muted);margin-bottom:8px;}
+.duel-status.win{color:#8EE4A8;}
+.pulse-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px;}
+@media(max-width:640px){.pulse-grid{grid-template-columns:repeat(2,1fr);}}
+.pulse-cell{position:relative;padding:12px 10px;border-radius:14px;border:1px solid rgba(200,169,110,0.14);background:rgba(8,5,2,0.55);overflow:hidden;}
+.pulse-glow{position:absolute;inset:0;background:linear-gradient(180deg,rgba(232,136,32,calc(var(--pulse,0)/400)),transparent);pointer-events:none;}
+.pulse-label{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);font-family:'Cinzel',serif;}
+.pulse-count{font-weight:800;font-size:16px;color:var(--cream);margin:4px 0;}
+.pulse-type{font-size:10px;color:var(--muted);}
+.bounty-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px;border-radius:12px;border:1px solid rgba(200,169,110,0.12);background:rgba(8,5,2,0.45);margin-bottom:8px;font-size:12px;color:var(--cream);}
+.bounty-row.done{border-color:rgba(78,201,122,0.35);}
+.radio-line{padding:8px 0;border-bottom:1px solid rgba(200,169,110,0.08);font-size:11px;color:var(--cream);}
+.radio-tag{font-family:'Space Mono',monospace;font-size:9px;color:#8EE4A8;margin-right:6px;}
+.crew-row{display:flex;gap:8px;margin:8px 0;}
+.crew-input{flex:1;max-width:120px;padding:9px 10px;border-radius:12px;background:rgba(8,5,2,0.85);border:1px solid rgba(200,169,110,0.22);color:var(--cream);font-family:'Space Mono',monospace;text-transform:uppercase;}
+.oracle-row{padding:10px 0;border-bottom:1px solid rgba(200,169,110,0.08);}
+.oracle-q{font-size:12px;color:var(--cream);margin-bottom:8px;font-weight:700;}
+body.genesis-mode .hero-badge{background:linear-gradient(90deg,rgba(255,217,125,0.25),rgba(232,136,32,0.2));border-color:rgba(255,217,125,0.5);}
+body.genesis-mode .hero-title{text-shadow:0 0 40px rgba(255,217,125,0.35);}
+.debrief-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:9999;display:none;align-items:center;justify-content:center;padding:16px;}
+.debrief-overlay.show{display:flex;}
+.debrief-box{max-width:360px;width:100%;background:rgba(12,8,4,0.95);border:1px solid rgba(200,169,110,0.35);border-radius:20px;padding:22px;text-align:center;}
+.debrief-box h3{font-family:'Cinzel',serif;font-size:14px;letter-spacing:.14em;color:var(--gold);margin-bottom:8px;}
+.debrief-box p{font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.45;}
+.debrief-moods{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;}
+.debrief-moods button{padding:12px 16px;border-radius:14px;border:1px solid rgba(200,169,110,0.22);background:rgba(8,5,2,0.7);font-size:22px;cursor:pointer;}
 </style>
 </head>
 <body>
@@ -1605,7 +1679,10 @@ position:relative;overflow:hidden;
     </div>
     <div class="news-list" id="newsList"></div>
   </div>
-  <div class="bottom-card" id="predictionMarket">
+  <div class="bottom-card pm-wip" id="predictionMarket">
+    <div class="pm-wip-tape" aria-hidden="false">
+      <div class="pm-wip-label">Work in progress<span>Prediction market closed for now</span></div>
+    </div>
     <div class="bottom-card-hdr">
       <div class="bottom-card-title">Predictions</div>
       <div class="bottom-card-sub" id="pmSub">play tokens</div>
@@ -1618,13 +1695,52 @@ position:relative;overflow:hidden;
       For fun only, no real money, no payouts, no cashout. Tokens are earned by logging nuts.
     </div>
     <div class="pm-mini" style="margin-bottom:10px;">
-      Open the full market board in a dedicated page.
+      Market board is being built. You still earn tokens by logging nuts.
     </div>
     <div class="pm-row">
-      <button class="pm-btn yes active" onclick="window.open('/predictions.html','_blank')">Open market ↗</button>
-      <button class="pm-btn" onclick="pmReset()">Reset (local)</button>
+      <button class="pm-btn yes active" type="button" disabled>Open market ↗</button>
+      <button class="pm-btn" type="button" onclick="pmReset()">Reset (local)</button>
     </div>
     <div class="pm-pill" id="pmMiniStatus"></div>
+  </div>
+</div>
+
+<!-- NUT HUB: Passport, Duels, Pulse, Bounties, Radio, Crew, Oracle -->
+<section class="nut-hub" id="nutHub">
+  <div class="hub-card">
+    <div class="bottom-card-hdr" style="margin-bottom:12px;">
+      <div class="bottom-card-title">Nut Hub</div>
+      <div class="bottom-card-sub">passport · duels · pulse · more</div>
+    </div>
+    <div class="hub-tabs">
+      <button type="button" class="hub-tab active" data-tab="passport">Passport</button>
+      <button type="button" class="hub-tab" data-tab="duel">Duels</button>
+      <button type="button" class="hub-tab" data-tab="pulse">Pulse</button>
+      <button type="button" class="hub-tab" data-tab="bounties">Bounties</button>
+      <button type="button" class="hub-tab" data-tab="radio">Radio</button>
+      <button type="button" class="hub-tab" data-tab="crew">Crew</button>
+      <button type="button" class="hub-tab" data-tab="oracle">Oracle</button>
+    </div>
+    <div class="hub-panel active" data-panel="passport" id="hubPassport"></div>
+    <div class="hub-panel" data-panel="duel" id="hubDuel"></div>
+    <div class="hub-panel" data-panel="pulse" id="hubPulse"></div>
+    <div class="hub-panel" data-panel="bounties" id="hubBounties"></div>
+    <div class="hub-panel" data-panel="radio" id="hubRadio"></div>
+    <div class="hub-panel" data-panel="crew" id="hubCrew"></div>
+    <div class="hub-panel" data-panel="oracle" id="hubOracle"></div>
+  </div>
+</section>
+
+<div class="debrief-overlay" id="debriefModal">
+  <div class="debrief-box">
+    <h3>Aftermath</h3>
+    <p>45 seconds later. How was that nut?</p>
+    <div class="debrief-moods">
+      <button type="button" onclick="NutAddons.logDebrief('fire')" title="Fire">🔥</button>
+      <button type="button" onclick="NutAddons.logDebrief('mid')" title="Mid">😐</button>
+      <button type="button" onclick="NutAddons.logDebrief('regret')" title="Regret">😬</button>
+      <button type="button" onclick="NutAddons.closeDebrief()" title="Skip">✕</button>
+    </div>
   </div>
 </div>
 
@@ -2095,6 +2211,7 @@ async function fetchGlobalCounts() {
     document.getElementById('globalAllTime').classList.remove('loading');
     if (ha) ha.textContent = a.toLocaleString();
     if (window.NutQuirks) NutQuirks.onGlobalCounts(t);
+    if (window.NutAddons) NutAddons.onGlobalCounts(t);
   } catch(e) {
     document.getElementById('globalTodaySub').textContent = 'connection error';
   }
@@ -2156,6 +2273,7 @@ async function fetchGlobalActivity() {
       </div>`;
     }).join('');
     if (window.NutQuirks) NutQuirks.onGlobalActivity(data);
+    if (window.NutAddons) NutAddons.onGlobalActivity(data);
   } catch (e) {
     if (empty) {
       empty.style.display = 'block';
@@ -2328,6 +2446,7 @@ function nut() {
   if (typeof pmEarnTokens === 'function') pmEarnTokens(points);
   showNutVerdict(method);
   if (window.NutQuirks) NutQuirks.onNutLogged(method, points);
+  if (window.NutAddons) NutAddons.onNutLogged(method, points);
 
   document.getElementById('bigCount').classList.add('bump');
   setTimeout(()=>document.getElementById('bigCount').classList.remove('bump'),100);
@@ -3217,8 +3336,16 @@ async function renderCertificate(canvas) {
     img.src = RECEIPT_BG_IMAGE;
   });
 
-  ctx.strokeStyle = 'rgba(200,169,110,0.55)';
-  ctx.lineWidth = 3;
+  const tier = window.NutAddons ? NutAddons.getReceiptTier() : { border: 'rgba(200,169,110,0.55)', label: 'PAPER', glow: 'transparent' };
+  if (tier.glow && tier.glow !== 'transparent') {
+    const tg = ctx.createRadialGradient(W / 2, H / 2, 0, W / 2, H / 2, W * 0.55);
+    tg.addColorStop(0, tier.glow);
+    tg.addColorStop(1, 'transparent');
+    ctx.fillStyle = tg;
+    ctx.fillRect(0, 0, W, H);
+  }
+  ctx.strokeStyle = tier.border;
+  ctx.lineWidth = tier.id === 'genesis' ? 5 : 3;
   rrect(ctx, 24, 24, W - 48, H - 48, 20);
   ctx.stroke();
   ctx.strokeStyle = 'rgba(255,160,40,0.2)';
@@ -3231,7 +3358,7 @@ async function renderCertificate(canvas) {
 
   ctx.font = '700 22px Inter,system-ui,sans-serif';
   ctx.fillStyle = MUTED;
-  ctx.fillText(`RECEIPT #${String(p.serial).padStart(6, '0')} · ${p.tzStamp} · HASH ${p.verifyHash}`, W / 2, 78);
+  ctx.fillText(`${tier.label} · RECEIPT #${String(p.serial).padStart(6, '0')} · ${p.tzStamp} · HASH ${p.verifyHash}`, W / 2, 78);
   ctx.font = '600 14px Inter,system-ui,sans-serif';
   ctx.fillStyle = 'rgba(200,80,80,0.45)';
   ctx.fillText('VOID IF REPRINTED', W / 2, 102);
@@ -3349,6 +3476,7 @@ function downloadCert() {
 
 </script>
 <script src="./quirks.js"></script>
+<script src="./addons.js"></script>
 <script>
 // ═══════════════════════════════
 // INIT
@@ -3361,10 +3489,11 @@ const KEY_PM_STATE = 'nut_pm_state_v1';
 const KEY_PM_DAY = 'nut_pm_day_v1';
 
 const PROJECT_NEWS = [
+  { date: '2026-05-27', tag: 'HUB', title: 'Nut Hub is live', body: 'Passport, duels, global pulse, daily bounties, radio ticker, crews, and oracle picks. All local-first.' },
+  { date: '2026-05-27', tag: 'MARKET', title: 'Play-token predictions', body: 'Earn NUTTOKENS by logging. Full AMM market board is work in progress.' },
+  { date: '2026-05-27', tag: 'RECEIPT', title: 'Receipt rarity tiers', body: 'Paper, foil, holographic, void black, and genesis overlays unlock as you grind.' },
   { date: '2026-05-27', tag: 'BUILD', title: 'Global Activity went live', body: 'Everyone’s logs now show up in Global Activity when Supabase is connected.' },
   { date: '2026-05-27', tag: 'UX', title: 'Timezone rules + morning lock', body: 'Pick a timezone, it pins at the bottom. Morning is only valid before 12pm in that zone.' },
-  { date: '2026-05-27', tag: 'RECEIPT', title: 'Receipts upgraded', body: 'Serials, hash, and timezone verification stamp added to make sharing feel official.' },
-  { date: '2026-05-27', tag: 'QUIRKS', title: 'Method gates + bonuses', body: 'Hotel, Sneaky, Round 2, Quickie, Revenge, plus variety and surge bonuses.' },
 ];
 
 function renderProjectNews() {
@@ -3471,7 +3600,7 @@ function pmRender() {
   const markets = pmDefaultMarkets();
   if (sub) sub.textContent = `${markets.length} markets`;
   if (day) day.textContent = pmNowDayKey();
-  mini.innerHTML = `open <strong>${markets.length}</strong> markets · balance <strong>${pmGetBalance().toLocaleString()}</strong> · <a href=\"/predictions.html\" target=\"_blank\" rel=\"noopener noreferrer\">launch ↗</a>`;
+  mini.innerHTML = `coming soon · balance <strong>${pmGetBalance().toLocaleString()}</strong> NUTTOKENS · market WIP`;
   pmSetBalance(pmGetBalance());
 }
 
@@ -3518,6 +3647,7 @@ renderProjectNews();
 pmResolveIfNewDay();
 pmResolveNow();
 pmRender();
+if (window.NutAddons) NutAddons.init();
 setInterval(()=>{ if(!document.hidden) fetchGlobalCounts(); },60000);
 setInterval(()=>{ if(!document.hidden) fetchLeaderboard(); },120000);
 setInterval(()=>{ if(!document.hidden) fetchGlobalActivity(); },30000);

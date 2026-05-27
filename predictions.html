@@ -49,9 +49,34 @@
     .posRow strong{color:var(--gold-bright);}
     .warn{margin-top:10px;color:var(--muted);font-size:12px;line-height:1.4;}
     a{color:var(--gold-bright);text-decoration:none;}
+    .wip-screen{
+      position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;
+      background:rgba(5,3,1,0.92);padding:24px;
+    }
+    .wip-screen::before{
+      content:'';position:absolute;inset:0;
+      background:repeating-linear-gradient(-32deg,#FFD97D 0,#FFD97D 14px,#1a1208 14px,#1a1208 28px);
+      opacity:0.22;pointer-events:none;
+    }
+    .wip-box{
+      position:relative;z-index:1;max-width:420px;text-align:center;padding:28px 24px;
+      background:rgba(12,8,4,0.96);border:2px solid #FFD97D;border-radius:18px;
+      box-shadow:0 20px 60px rgba(0,0,0,0.6);
+    }
+    .wip-box h1{font-family:system-ui,sans-serif;font-size:14px;letter-spacing:.22em;text-transform:uppercase;color:#FFD97D;margin-bottom:10px;}
+    .wip-box p{font-size:13px;color:var(--muted);line-height:1.5;margin-bottom:18px;}
+    .wip-box .btn{display:inline-block;}
+    body.wip-locked .wrap{visibility:hidden;height:0;overflow:hidden;}
   </style>
 </head>
-<body>
+<body class="wip-locked">
+  <div class="wip-screen">
+    <div class="wip-box">
+      <h1>Work in progress</h1>
+      <p>Prediction market is closed while we finish the board. Play tokens still earn on the main page when you log nuts.</p>
+      <button class="btn" onclick="window.location.href='/'">Back to $NUT ↩</button>
+    </div>
+  </div>
   <div class="wrap">
     <div class="top">
       <div>
