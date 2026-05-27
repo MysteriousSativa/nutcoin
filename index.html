@@ -294,6 +294,72 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
   font-size:10px;font-weight:600;color:rgba(200,169,110,0.6);
   letter-spacing:.01em;
 }
+.tf-spin{
+  background:rgba(20,12,4,0.9);border:1px solid rgba(200,169,110,0.3);
+  color:var(--gold-bright);border-radius:9px;padding:7px 10px;
+  font-size:16px;cursor:pointer;line-height:1;flex-shrink:0;
+}
+.tf-spin:active{transform:scale(0.88);}
+
+/* ── ROULETTE MODAL ── */
+.roulette-overlay{
+  display:none;position:fixed;inset:0;z-index:1100;
+  background:rgba(0,0,0,0.88);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);
+  align-items:center;justify-content:center;
+}
+.roulette-overlay.show{display:flex;}
+.roulette-box{
+  background:rgba(8,5,2,0.98);border:1px solid rgba(200,169,110,0.4);
+  border-radius:20px;padding:22px 18px 18px;max-width:320px;width:92%;
+  text-align:center;position:relative;
+  box-shadow:0 8px 40px rgba(0,0,0,0.75);
+}
+.roulette-close{
+  position:absolute;top:12px;right:14px;background:none;border:none;
+  color:var(--muted);font-size:18px;cursor:pointer;line-height:1;padding:4px;
+}
+.roulette-close:hover{color:var(--cream);}
+.roulette-title{
+  font-size:19px;font-weight:900;letter-spacing:.1em;color:var(--gold-bright);margin-bottom:2px;
+}
+.roulette-sub{
+  font-size:10px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;
+  color:var(--muted);margin-bottom:14px;
+}
+.wheel-wrap{position:relative;display:inline-block;margin-bottom:12px;}
+.wheel-pointer{
+  position:absolute;top:-8px;left:50%;transform:translateX(-50%);
+  font-size:20px;color:var(--gold-bright);z-index:2;line-height:1;
+  filter:drop-shadow(0 2px 6px rgba(255,190,0,0.7));
+}
+.bet-row{
+  display:flex;align-items:center;gap:6px;justify-content:center;margin-bottom:10px;
+}
+.bet-adj{
+  background:rgba(20,12,4,0.9);border:1px solid rgba(200,169,110,0.3);
+  color:var(--gold);border-radius:8px;padding:6px 14px;font-size:15px;
+  font-weight:900;cursor:pointer;font-family:inherit;
+}
+.bet-adj:active{opacity:.65;}
+.bet-display{font-size:13px;color:var(--cream);min-width:90px;text-align:center;font-weight:700;}
+.bet-max{
+  background:rgba(200,169,110,0.1);border:1px solid rgba(200,169,110,0.3);
+  color:var(--gold);border-radius:8px;padding:6px 10px;font-size:10px;
+  font-weight:800;letter-spacing:.06em;cursor:pointer;font-family:inherit;
+}
+.roulette-spin-btn{
+  width:100%;background:var(--btn-ember);border:1px solid rgba(255,160,40,0.5);
+  color:#1a0a00;border-radius:12px;padding:12px;font-size:14px;font-weight:900;
+  letter-spacing:.08em;font-family:inherit;cursor:pointer;margin-bottom:10px;
+}
+.roulette-spin-btn:disabled{opacity:.35;cursor:default;}
+.roulette-spin-btn:not(:disabled):active{opacity:.8;}
+.spin-result-line{
+  min-height:22px;font-size:13px;font-weight:700;margin-bottom:6px;
+}
+.roulette-bal-line{font-size:11px;color:var(--muted);}
+.roulette-bal-line strong{color:var(--gold);}
+
 .tf-buy{
   background:var(--btn-ember);border:1px solid rgba(255,160,40,0.5);
   color:#1a0a00;border-radius:9px;padding:7px 12px;
@@ -3549,9 +3615,10 @@ function downloadCert() {
 // ───────────────────────────────
 // Bottom: News + Predictions (play tokens)
 // ───────────────────────────────
-const KEY_PM_BAL = 'nut_pm_bal_v1';
+const KEY_PM_BAL   = 'nut_pm_bal_v1';
 const KEY_PM_STATE = 'nut_pm_state_v1';
-const KEY_PM_DAY = 'nut_pm_day_v1';
+const KEY_PM_DAY   = 'nut_pm_day_v1';
+const KEY_PM_SEED  = 'nut_pm_seed_v1'; // last countAllTime synced into balance
 let NUT_PRICE_USD = null; // null=not fetched, 0=no data, number=live price per token
 
 const PROJECT_NEWS = [
@@ -3613,7 +3680,12 @@ function pmSetBalance(v) {
   if (fu) fu.textContent = pmSimUSD(bal);
 }
 function pmEarnTokens(n) {
-  pmSetBalance(pmGetBalance() + Math.max(0, Math.floor(n)));
+  const earned = Math.max(0, Math.floor(n));
+  if (!earned) return;
+  pmSetBalance(pmGetBalance() + earned);
+  // Keep seed in sync so delta-seeding doesn't double-count on next load
+  const seed = parseInt(localStorage.getItem(KEY_PM_SEED) || '0', 10);
+  localStorage.setItem(KEY_PM_SEED, String(seed + earned));
 }
 
 function pmNowDayKey() {
@@ -3715,6 +3787,183 @@ function pmReset() {
   showToast('Predictions reset (local)');
 }
 
+// ═══════════════════════════════
+// ROULETTE WHEEL
+// ═══════════════════════════════
+const WHEEL_SEGS = [
+  { label:'BUST', mult:0,   bg:'#3a0000', fg:'#ff6060' },
+  { label:'2×',   mult:2,   bg:'#003300', fg:'#44ff88' },
+  { label:'BUST', mult:0,   bg:'#2d0000', fg:'#ff5050' },
+  { label:'1.5×', mult:1.5, bg:'#000830', fg:'#6699ff' },
+  { label:'BUST', mult:0,   bg:'#3a0000', fg:'#ff6060' },
+  { label:'3×',   mult:3,   bg:'#221000', fg:'#ffbb44' },
+  { label:'BUST', mult:0,   bg:'#2d0000', fg:'#ff5050' },
+  { label:'1.5×', mult:1.5, bg:'#000830', fg:'#6699ff' },
+  { label:'BUST', mult:0,   bg:'#3a0000', fg:'#ff6060' },
+  { label:'5×',   mult:5,   bg:'#221a00', fg:'#FFD97D' },
+  { label:'BUST', mult:0,   bg:'#2d0000', fg:'#ff5050' },
+  { label:'10×',  mult:10,  bg:'#130020', fg:'#cc88ff' },
+];
+// Visually 6/12 slots are BUST (~50%). Actual weighted draw: ~75% BUST.
+const WHEEL_WEIGHTS = [0.125,0.07,0.125,0.055,0.125,0.038,0.125,0.055,0.125,0.022,0.125,0.01];
+
+let wheelAngle = 0;
+let wheelAnimId = null;
+let rouletteBet = 10;
+let rouletteSpinning = false;
+
+function roulettePickSeg() {
+  const total = WHEEL_WEIGHTS.reduce((a,b) => a+b, 0);
+  let r = Math.random() * total;
+  for (let i = 0; i < WHEEL_WEIGHTS.length; i++) {
+    r -= WHEEL_WEIGHTS[i];
+    if (r <= 0) return i;
+  }
+  return WHEEL_WEIGHTS.length - 1;
+}
+
+function drawWheel(rotation) {
+  const canvas = document.getElementById('wheelCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const n = WHEEL_SEGS.length;
+  const arc = (2 * Math.PI) / n;
+  const cx = 140, cy = 140, r = 128, hub = 30;
+  ctx.clearRect(0, 0, 280, 280);
+  // Outer ring
+  ctx.beginPath(); ctx.arc(cx, cy, r+3, 0, 2*Math.PI);
+  ctx.strokeStyle = 'rgba(200,169,110,0.3)'; ctx.lineWidth = 3; ctx.stroke();
+  // Segments
+  for (let i = 0; i < n; i++) {
+    const start = rotation + i * arc - Math.PI/2;
+    const end   = start + arc;
+    const seg   = WHEEL_SEGS[i];
+    ctx.beginPath(); ctx.moveTo(cx,cy); ctx.arc(cx,cy,r,start,end); ctx.closePath();
+    ctx.fillStyle = seg.bg; ctx.fill();
+    ctx.strokeStyle = 'rgba(200,169,110,0.2)'; ctx.lineWidth = 1; ctx.stroke();
+    // Label
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(rotation + i * arc + arc/2 - Math.PI/2);
+    ctx.textAlign = 'center';
+    ctx.font = 'bold 11px system-ui,sans-serif';
+    ctx.fillStyle = seg.fg;
+    ctx.fillText(seg.label, r * 0.67, 4);
+    ctx.restore();
+  }
+  // Hub circle
+  ctx.beginPath(); ctx.arc(cx,cy,hub,0,2*Math.PI);
+  const g = ctx.createRadialGradient(cx-4,cy-4,2,cx,cy,hub);
+  g.addColorStop(0,'#1a0f00'); g.addColorStop(1,'#050301');
+  ctx.fillStyle = g; ctx.fill();
+  ctx.strokeStyle = 'rgba(200,169,110,0.5)'; ctx.lineWidth = 1.5; ctx.stroke();
+  ctx.textAlign = 'center'; ctx.font = 'bold 8px system-ui,sans-serif';
+  ctx.fillStyle = '#FFD97D'; ctx.fillText('$NUT', cx, cy+3);
+}
+
+function updateRouletteBal() {
+  const el = document.getElementById('rouletteBal');
+  if (el) el.textContent = pmGetBalance().toLocaleString();
+  const bal = pmGetBalance();
+  if (rouletteBet > bal) {
+    rouletteBet = Math.max(1, bal);
+    const bd = document.getElementById('betDisplay');
+    if (bd) bd.textContent = rouletteBet.toLocaleString();
+  }
+}
+
+function openRoulette() {
+  const modal = document.getElementById('rouletteModal');
+  if (!modal) return;
+  modal.classList.add('show');
+  const bal = pmGetBalance();
+  rouletteBet = Math.min(10, Math.max(1, bal));
+  const bd = document.getElementById('betDisplay');
+  if (bd) bd.textContent = rouletteBet.toLocaleString();
+  const res = document.getElementById('spinResult');
+  if (res) { res.textContent = ''; res.style.color = ''; }
+  updateRouletteBal();
+  requestAnimationFrame(() => drawWheel(wheelAngle));
+}
+
+function closeRoulette() {
+  document.getElementById('rouletteModal')?.classList.remove('show');
+  if (wheelAnimId) { cancelAnimationFrame(wheelAnimId); wheelAnimId = null; }
+}
+
+function rouletteBetAdj(delta) {
+  const bal = pmGetBalance();
+  rouletteBet = Math.max(1, Math.min(bal, rouletteBet + delta));
+  const bd = document.getElementById('betDisplay');
+  if (bd) bd.textContent = rouletteBet.toLocaleString();
+}
+
+function rouletteBetMax() {
+  rouletteBet = Math.max(1, pmGetBalance());
+  const bd = document.getElementById('betDisplay');
+  if (bd) bd.textContent = rouletteBet.toLocaleString();
+}
+
+function spinWheel() {
+  if (rouletteSpinning) return;
+  const bal = pmGetBalance();
+  if (bal < 1) { showToast('No NUTS to bet'); return; }
+  rouletteBet = Math.min(rouletteBet, bal);
+  if (rouletteBet < 1) { showToast('Bet at least 1 NUT'); return; }
+
+  rouletteSpinning = true;
+  const btn = document.getElementById('spinBtn');
+  const res = document.getElementById('spinResult');
+  if (btn) btn.disabled = true;
+  if (res) { res.textContent = ''; res.style.color = ''; }
+
+  pmSetBalance(bal - rouletteBet);
+  updateRouletteBal();
+
+  const segIdx = roulettePickSeg();
+  const seg = WHEEL_SEGS[segIdx];
+  const arc = (2 * Math.PI) / WHEEL_SEGS.length;
+  // Compute target angle so segIdx lands at top pointer
+  const segCenter = segIdx * arc + arc / 2;
+  let targetBase = ((-segCenter) % (2*Math.PI) + 2*Math.PI) % (2*Math.PI);
+  const curMod   = ((wheelAngle % (2*Math.PI)) + 2*Math.PI) % (2*Math.PI);
+  let diff = targetBase - curMod;
+  if (diff < 0.01) diff += 2 * Math.PI;
+  const targetAngle = wheelAngle + diff + 6 * 2 * Math.PI;
+  const startAngle  = wheelAngle;
+  const duration    = 4500;
+  const startTime   = performance.now();
+
+  function ease(t) { return 1 - Math.pow(1 - t, 5); }
+
+  function animate(now) {
+    const t = Math.min((now - startTime) / duration, 1);
+    wheelAngle = startAngle + (targetAngle - startAngle) * ease(t);
+    drawWheel(wheelAngle);
+    if (t < 1) {
+      wheelAnimId = requestAnimationFrame(animate);
+    } else {
+      wheelAngle = targetAngle % (2 * Math.PI);
+      drawWheel(wheelAngle);
+      const won = Math.floor(rouletteBet * seg.mult);
+      if (won > 0) {
+        pmSetBalance(pmGetBalance() + won);
+        const profit = won - rouletteBet;
+        if (res) { res.textContent = `${seg.label} — +${profit} NUTS profit`; res.style.color = '#44ff88'; }
+        showToast(`🎰 ${seg.label}! +${profit} NUTS`);
+      } else {
+        if (res) { res.textContent = `BUST — lost ${rouletteBet} NUTS`; res.style.color = '#ff6060'; }
+        showToast(`💸 BUST. −${rouletteBet} NUTS`);
+      }
+      updateRouletteBal();
+      rouletteSpinning = false;
+      if (btn) btn.disabled = false;
+      wheelAnimId = null;
+    }
+  }
+  wheelAnimId = requestAnimationFrame(animate);
+}
+
 setupBuyButtons();
 buildNutMethodChips();
 updateMethodAttachPreview(selectedNutType);
@@ -3744,6 +3993,17 @@ renderProjectNews();
 pmResolveIfNewDay();
 pmResolveNow();
 pmRender();
+// Seed NUTS balance from all-time nut count on first load + catch-up for missed logs
+(function seedNutsBalance() {
+  const seed  = parseInt(localStorage.getItem(KEY_PM_SEED) || '0', 10);
+  const delta = Math.max(0, countAllTime - seed);
+  if (delta > 0) {
+    pmSetBalance(pmGetBalance() + delta);
+    localStorage.setItem(KEY_PM_SEED, String(countAllTime));
+  } else {
+    pmSetBalance(pmGetBalance()); // sync display even if no delta
+  }
+})();
 fetchNutPrice();
 setInterval(fetchNutPrice, 60000);
 if (window.NutAddons) NutAddons.init();
@@ -4024,9 +4284,32 @@ scrollNutBtn.addEventListener('click', () => {
   <div class="tf-bal">
     <span class="tf-amount" id="pmBalFloat">0</span>
     <span class="tf-label">NUTS</span>
-    <span class="tf-usd" id="pmBalFloatUSD">$0.00</span>
+    <span class="tf-usd" id="pmBalFloatUSD">TBA</span>
   </div>
+  <button type="button" class="tf-spin" onclick="openRoulette()" title="Spin to win NUTS">🎰</button>
   <button type="button" class="tf-buy tba" onclick="openBuy()">BUY $NUT</button>
+</div>
+
+<!-- ROULETTE MODAL -->
+<div class="roulette-overlay" id="rouletteModal" onclick="if(event.target===this)closeRoulette()">
+  <div class="roulette-box">
+    <button class="roulette-close" onclick="closeRoulette()">✕</button>
+    <div class="roulette-title">🎰 NUT SPIN</div>
+    <div class="roulette-sub">spin to win · house always wins</div>
+    <div class="wheel-wrap">
+      <div class="wheel-pointer">▼</div>
+      <canvas id="wheelCanvas" width="280" height="280"></canvas>
+    </div>
+    <div class="bet-row">
+      <button class="bet-adj" onclick="rouletteBetAdj(-10)">−</button>
+      <span class="bet-display">Bet: <strong id="betDisplay">10</strong> NUTS</span>
+      <button class="bet-adj" onclick="rouletteBetAdj(10)">+</button>
+      <button class="bet-max" onclick="rouletteBetMax()">MAX</button>
+    </div>
+    <button class="roulette-spin-btn" id="spinBtn" onclick="spinWheel()">SPIN</button>
+    <div class="spin-result-line" id="spinResult"></div>
+    <div class="roulette-bal-line">Balance: <strong id="rouletteBal">0</strong> NUTS</div>
+  </div>
 </div>
 
 <div class="sticky-trade" id="stickyTrade">
