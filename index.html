@@ -453,6 +453,8 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 }
 .nut-method-chip .em{font-size:13px;line-height:1;}
 .nut-method-chip.is-2x{border-color:rgba(120,220,120,0.55);box-shadow:0 0 14px rgba(78,201,122,0.2);}
+.nut-method-chip.is-2x.pulse-2x{animation:chip-2x-pulse 1.6s ease-in-out infinite;}
+@keyframes chip-2x-pulse{0%,100%{box-shadow:0 0 14px rgba(78,201,122,0.2);}50%{box-shadow:0 0 22px rgba(78,201,122,0.55);}}
 .nut-method-chip.is-locked{opacity:.42;cursor:not-allowed;filter:grayscale(0.35);}
 .nut-method-chip.is-locked:hover{border-color:var(--border);color:var(--muted);}
 .nut-method-chip.is-2x::after{
@@ -582,8 +584,23 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 /* cooldown */
 .cooldown-bar-wrap{margin-top:18px;}
 .cd-header{display:flex;justify-content:space-between;font-family:'Cinzel',serif;font-size:10px;letter-spacing:.14em;color:var(--muted);text-transform:uppercase;margin-bottom:8px;}
-.cd-track{height:6px;background:rgba(20,14,6,0.9);border-radius:99px;overflow:hidden;border:1px solid rgba(200,169,110,0.09);}
+.cd-track{height:6px;background:rgba(20,14,6,0.9);border-radius:99px;overflow:hidden;border:1px solid rgba(200,169,110,0.09);position:relative;}
+.cd-track.cd-printer::after{
+  content:'';position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent,transparent 3px,rgba(200,169,110,0.06) 3px,rgba(200,169,110,0.06) 4px);
+  pointer-events:none;
+}
 .cd-fill{height:100%;background:linear-gradient(90deg,var(--red),var(--gold),var(--green));border-radius:99px;transition:width 1s linear;box-shadow:0 0 6px rgba(78,201,122,0.28);}
+.cd-fill.printing{animation:cd-print 1.2s linear infinite;}
+@keyframes cd-print{0%{filter:brightness(1);}50%{filter:brightness(1.15);}100%{filter:brightness(1);}}
+.quirks-strip{max-width:380px;margin:0 auto 14px;padding:0 4px;}
+.quirks-compare,.quirks-live{display:flex;flex-wrap:wrap;justify-content:center;gap:6px 12px;font-size:10px;color:var(--muted);margin-bottom:6px;}
+.quirks-compare strong,.quirks-live-pill strong{color:var(--gold-bright);font-weight:700;}
+.quirks-live-pill{padding:4px 8px;border-radius:999px;background:rgba(12,8,4,0.7);border:1px solid rgba(200,169,110,0.2);font-size:9px;letter-spacing:.04em;}
+.quirks-live-pill.muted{opacity:.7;}
+.lb-ghost{text-align:center;font-size:10px;color:var(--muted);margin:-8px 0 12px;letter-spacing:.06em;}
+.lb-ghost strong{color:var(--gold-bright);}
+.buy-btn-hero.has-ca,.hero .buy-btn-hero.has-ca{animation:ca-glow 2.5s ease-in-out infinite;}
+@keyframes ca-glow{0%,100%{box-shadow:0 0 20px rgba(255,200,80,0.25);}50%{box-shadow:0 0 36px rgba(255,200,80,0.55);}}
 
 /* fact panel */
 .fact-box{
@@ -1277,6 +1294,11 @@ position:relative;overflow:hidden;
     </div>
   </div>
 
+  <div class="quirks-strip" id="quirksStrip">
+    <div class="quirks-compare" id="quirksCompare"></div>
+    <div class="quirks-live" id="quirksLive"></div>
+  </div>
+
   <!-- NICKNAME BAR -->
   <div class="nick-bar" id="nickBar">
     <div class="nick-left">
@@ -1286,6 +1308,7 @@ position:relative;overflow:hidden;
     </div>
     <button class="nick-btn" onclick="openNickModal()">Set Name</button>
   </div>
+  <div class="lb-ghost" id="lbGhost"></div>
 
   <div class="clock-bar" id="clockBar">
     <button type="button" class="clock-head" id="clockToggle" onclick="toggleClockPanel()" aria-expanded="false" aria-controls="clockPanel">
@@ -1368,7 +1391,7 @@ position:relative;overflow:hidden;
       </div>
       <div class="cooldown-bar-wrap">
         <div class="cd-header"><span>Cooldown</span><span id="cdLabel">Ready</span></div>
-        <div class="cd-track"><div class="cd-fill" id="cdFill" style="width:100%"></div></div>
+        <div class="cd-track cd-printer"><div class="cd-fill" id="cdFill" style="width:100%"></div></div>
       </div>
     </div>
 
@@ -1738,6 +1761,7 @@ function is2xNutType(typeId) {
 }
 
 function getNutPoints(typeId) {
+  if (window.NutQuirks) return NutQuirks.calcNutPoints(typeId);
   return is2xNutType(typeId) ? 2 : 1;
 }
 
@@ -1770,42 +1794,29 @@ function uniqueMethodsToday() {
   return new Set(todayLog.map(logType)).size;
 }
 function buildNutMethodChips() {
+  if (window.NutQuirks) return NutQuirks.patchMethodUI();
   const grid = document.getElementById('nutMethodGrid');
   if (!grid) return;
-  if (selectedNutType === 'morning' && !isMorningMethodAllowed()) {
-    selectedNutType = 'solo';
-    localStorage.setItem('nut_method_selected_v1', selectedNutType);
-  }
-  grid.innerHTML = Object.entries(NUT_TYPES).map(([id, m]) => {
-    const locked = id === 'morning' && !isMorningMethodAllowed();
-    return `<button type="button" class="nut-method-chip${id === selectedNutType ? ' active' : ''}${is2xNutType(id) ? ' is-2x' : ''}${locked ? ' is-locked' : ''}" data-type="${id}" onclick="selectNutType('${id}')"${locked ? ' disabled' : ''}><span class="em">${m.em}</span>${m.label}</button>`;
-  }).join('');
+  grid.innerHTML = Object.entries(NUT_TYPES).map(([id, m]) =>
+    `<button type="button" class="nut-method-chip${id === selectedNutType ? ' active' : ''}${is2xNutType(id) ? ' is-2x' : ''}" data-type="${id}" onclick="selectNutType('${id}')"><span class="em">${m.em}</span>${m.label}</button>`
+  ).join('');
   renderBonusHour();
   updateMethodAttachPreview(selectedNutType);
 }
 function selectNutType(id) {
+  if (window.NutQuirks) { NutQuirks.patchSelectNutType(id); return; }
   if (!NUT_TYPES[id]) return;
-  if (id === 'morning' && !isMorningMethodAllowed()) {
-    if (typeof showToast === 'function') {
-      showToast(`Morning locked until before 12pm in ${tzDisplayName(selectedTimezone)} ✦`);
-    }
-    return;
-  }
   selectedNutType = id;
   localStorage.setItem('nut_method_selected_v1', id);
   buildNutMethodChips();
   updateMethodAttachPreview(id);
 }
 function updateMethodAttachPreview(id) {
+  if (window.NutQuirks) return NutQuirks.patchAttachPreview(id);
   const el = document.getElementById('methodAttachPreview');
   const m = NUT_TYPES[id] || NUT_TYPES.solo;
   const pts = getNutPoints(id);
-  const bonus = is2xNutType(id) ? ' · <strong>2× this hour</strong>' : '';
-  if (id === 'morning' && !isMorningMethodAllowed()) {
-    if (el) el.innerHTML = `${m.em} Morning locked · before 12pm in ${tzDisplayName(selectedTimezone)} only`;
-    return;
-  }
-  if (el) el.innerHTML = `${m.em} ${m.label} · ${pts} pt${pts > 1 ? 's' : ''}${bonus}`;
+  if (el) el.innerHTML = `${m.em} ${m.label} · ${pts} pt${pts > 1 ? 's' : ''}`;
 }
 function scrollMethods(dir) {
   const vp = document.getElementById('methodScrollViewport');
@@ -1826,9 +1837,9 @@ function initXFeed() {
 }
 function showNutVerdict(typeId) {
   const el = document.getElementById('nutVerdict');
-  const m = NUT_TYPES[typeId] || NUT_TYPES.solo;
-  const v = NUT_VERDICTS[Math.floor(Math.random() * NUT_VERDICTS.length)];
-  if (el) el.textContent = `${m.em} ${m.verb}, ${v}`;
+  const pts = getNutPoints(typeId);
+  if (el && window.NutQuirks) el.textContent = NutQuirks.getCouncilVerdict(typeId, pts);
+  else if (el) el.textContent = (NUT_TYPES[typeId] || NUT_TYPES.solo).em + ' Logged.';
 }
 function renderMethodLedger() {
   const el = document.getElementById('methodLedger');
@@ -1952,7 +1963,7 @@ function setupBuyButtons() {
     if (badge) { badge.textContent = 'LIVE ON SOLANA'; badge.classList.add('live'); }
     if (addr) addr.textContent = CONTRACT_ADDR;
     document.getElementById('bannerCA').textContent = CONTRACT_ADDR.slice(0,8)+'...'+CONTRACT_ADDR.slice(-6);
-    document.querySelectorAll('.buy-btn-hero,.buy-btn-sm,.st-st-buy').forEach(b => b.classList.remove('tba'));
+    document.querySelectorAll('.buy-btn-hero,.buy-btn-sm,.st-st-buy').forEach(b => { b.classList.remove('tba'); b.classList.add('has-ca'); });
   } else {
     if (addr) addr.textContent = 'Mint not live yet, follow @TheNutTracker on X';
     if (badge) badge.textContent = 'FOLLOW @TheNutTracker FOR LAUNCH';
@@ -1999,6 +2010,7 @@ async function fetchGlobalCounts() {
     document.getElementById('globalAllTime').textContent = a.toLocaleString();
     document.getElementById('globalAllTime').classList.remove('loading');
     if (ha) ha.textContent = a.toLocaleString();
+    if (window.NutQuirks) NutQuirks.onGlobalCounts(t);
   } catch(e) {
     document.getElementById('globalTodaySub').textContent = 'connection error';
   }
@@ -2059,6 +2071,7 @@ async function fetchGlobalActivity() {
         <span class="tl-time">${when}</span>
       </div>`;
     }).join('');
+    if (window.NutQuirks) NutQuirks.onGlobalActivity(data);
   } catch (e) {
     if (empty) {
       empty.style.display = 'block';
@@ -2126,6 +2139,7 @@ async function fetchLeaderboard() {
 
   renderLeaderboard(lbCache);
   updateNickRank(lbCache);
+  if (window.NutQuirks) NutQuirks.renderLbGhost(lbCache);
 }
 
 function renderLeaderboard(rows) {
@@ -2213,13 +2227,7 @@ function nut() {
     return;
   }
   const method = selectedNutType;
-  if (method === 'morning' && !isMorningMethodAllowed()) {
-    if (typeof showToast === 'function') {
-      showToast(`Morning nuts only before 12pm in ${tzDisplayName(selectedTimezone)} ✦`);
-    }
-    buildNutMethodChips();
-    return;
-  }
+  if (window.NutQuirks && !NutQuirks.patchNutGate(method)) return;
   const points = getNutPoints(method);
   countToday += points;
   countAllTime += points;
@@ -2233,6 +2241,7 @@ function nut() {
   localStorage.setItem(KEY_TYPE_ALL, JSON.stringify(typeStatsAll));
   save();
   showNutVerdict(method);
+  if (window.NutQuirks) NutQuirks.onNutLogged(method, points);
 
   document.getElementById('bigCount').classList.add('bump');
   setTimeout(()=>document.getElementById('bigCount').classList.remove('bump'),100);
@@ -2249,6 +2258,7 @@ function nut() {
   if (MILESTONES[countToday]) {
     const[em,ti,su]=MILESTONES[countToday];
     showMilestone(em,ti,su);
+    setTimeout(() => showToast('Milestone hit — Post Receipt to X'), 2500);
   }
   logToSupabase();
   // New features
@@ -2293,7 +2303,11 @@ function updateCooldown() {
   const ready=lastClick===0||el>=TEN_MIN;
   const pct=ready?100:Math.round((el/TEN_MIN)*100);
   const mLeft=ready?0:Math.ceil((TEN_MIN-el)/60000);
-  document.getElementById('cdFill').style.width=pct+'%';
+  const fill=document.getElementById('cdFill');
+  if (fill) {
+    fill.style.width=pct+'%';
+    fill.classList.toggle('printing', !ready);
+  }
   document.getElementById('cdLabel').textContent=ready?'Ready':`${mLeft}m remaining`;
   updateBuildUp();
 }
@@ -2396,7 +2410,7 @@ let selectedTimezone = localStorage.getItem(KEY_SELECTED_TZ) || Intl.DateTimeFor
 let tzSearchQuery = '';
 let tzElements = new Map();
 let clockPanelOpen = false;
-let lastMorningAllowed = null;
+let lastGateHour = -1;
 
 function getAllTimezones() {
   if (typeof Intl.supportedValuesOf === 'function') {
@@ -2633,9 +2647,16 @@ function updateClock() {
     dateEl.innerHTML = `<span>${days[now.getDay()]}, ${months[now.getMonth()]} ${now.getDate()}</span> &nbsp;✦&nbsp; <span>Resets in ${hL}h ${mL}m</span>`;
   }
   updateClockPinned();
-  const morningNow = isMorningMethodAllowed(now);
-  if (lastMorningAllowed !== null && lastMorningAllowed !== morningNow) buildNutMethodChips();
-  lastMorningAllowed = morningNow;
+  if (window.NutQuirks) {
+    const parts = new Intl.DateTimeFormat('en-US', { timeZone: selectedTimezone, hour: 'numeric', hour12: false }).formatToParts(now);
+    const hour = parseInt(parts.find(p => p.type === 'hour')?.value || '0', 10);
+    if (hour !== lastGateHour) {
+      lastGateHour = hour;
+      NutQuirks.enforceValidSelection();
+      buildNutMethodChips();
+    }
+    NutQuirks.renderQuirksStrip();
+  }
   updateClockTimes();
   updateCooldown();
 }
@@ -3026,6 +3047,7 @@ function getReceiptPayload() {
     date: dateStr,
     site: SITE_URL,
     x: X_HANDLE,
+    ...(window.NutQuirks ? NutQuirks.extraReceiptFields() : { serial: 0, verifyHash: '000000', tzStamp: '', shareMood: '' }),
   };
 }
 
@@ -3121,7 +3143,15 @@ async function renderCertificate(canvas) {
 
   ctx.font = '700 22px Inter,system-ui,sans-serif';
   ctx.fillStyle = MUTED;
-  ctx.fillText('OFFICIAL NUT RECEIPT · FORM 69-A · ALL METHODS COUNT', W / 2, 78);
+  ctx.fillText(`RECEIPT #${String(p.serial).padStart(6, '0')} · ${p.tzStamp} · HASH ${p.verifyHash}`, W / 2, 78);
+  ctx.font = '600 14px Inter,system-ui,sans-serif';
+  ctx.fillStyle = 'rgba(200,80,80,0.45)';
+  ctx.fillText('VOID IF REPRINTED', W / 2, 102);
+
+  ctx.globalAlpha = 0.06;
+  ctx.font = '900 420px Inter,system-ui,sans-serif';
+  ctx.fillText(p.lastEmoji || '🥜', W / 2, H / 2 + 40);
+  ctx.globalAlpha = 1;
 
   ctx.font = '900 118px Inter,system-ui,sans-serif';
   ctx.fillStyle = '#fff';
@@ -3229,6 +3259,9 @@ function downloadCert() {
   link.click();
 }
 
+</script>
+<script src="./quirks.js"></script>
+<script>
 // ═══════════════════════════════
 // INIT
 // ═══════════════════════════════
@@ -3306,7 +3339,8 @@ function renderFlameSvg(cfg, streak, dim) {
 }
 
 function renderFlame() {
-  const cfg = getFlameConfig(currentStreak);
+  let cfg = getFlameConfig(currentStreak);
+  if (window.NutQuirks) cfg = NutQuirks.patchFlameDim(cfg, currentStreak);
   document.getElementById('flameNum').textContent = currentStreak;
   document.getElementById('flameNum').style.color = cfg.c;
   document.getElementById('flameTier').textContent = cfg.tier;
@@ -3445,7 +3479,8 @@ const MIDDLES=[
 const OMENS=['⚔ the omen is: DRINK SOME FUCKING WATER','🌙 the omen is: GO OUTSIDE YOU DEGENERATE','🔮 the omen is: YOUR WRIST NEEDS A BREAK','⚗️ the omen is: EAT SOMETHING. YOU NEED THE PROTEIN','📜 the omen is: TELL ABSOLUTELY NO ONE','🌟 the omen is: WASH YOUR HANDS FOR GODS SAKE','🗝️ the omen is: HYDRATE OR SUFFER','⚡ the omen is: PACE YOURSELF YOU MANIAC','🌊 the omen is: THE CODEX APPROVES BUT IS WORRIED','🍵 the omen is: CALL YOUR MOTHER. LATER THOUGH','🏃 the omen is: TOUCH GRASS. NOW. RIGHT NOW.'];
 
 function generateProphecy() {
-  if (countAllTime===0) return;
+  if (countAllTime === 0) return;
+  if (window.NutQuirks) { NutQuirks.patchProphecy(); return; }
   const stats={t:countToday,str:currentStreak,all:countAllTime};
   const open=OPENINGS[(countAllTime+countToday)%OPENINGS.length];
   const mid=MIDDLES[countAllTime%MIDDLES.length](stats);
