@@ -1435,6 +1435,77 @@ position:relative;overflow:hidden;
 .pm-wip-label span{display:block;font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.08em;color:var(--muted);margin-top:6px;text-transform:none;}
 .pm-btn:disabled{opacity:0.45;cursor:not-allowed;transform:none !important;}
 
+/* ── ALLOCATION + CHAOS + DREAM ── */
+.alloc-card{background:rgba(8,5,2,0.75);border:1px solid rgba(200,169,110,0.28);border-radius:16px;padding:14px;margin-bottom:14px;}
+.alloc-kicker{font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);}
+.alloc-amt{font-size:28px;font-weight:900;color:var(--gold-bright);line-height:1.1;}
+.alloc-amt span{font-size:12px;color:var(--muted);font-weight:600;}
+.alloc-hdr{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:10px;}
+.alloc-tier{text-align:center;font-size:22px;line-height:1.2;}
+.alloc-tier span{font-size:8px;letter-spacing:.12em;color:var(--muted);display:block;margin-top:4px;}
+.snap-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;}
+.snap-pill{flex:1;min-width:120px;padding:8px 10px;border-radius:10px;border:1px solid rgba(200,169,110,0.18);background:rgba(12,8,4,0.6);font-size:10px;color:var(--muted);}
+.snap-pill strong{display:block;color:var(--cream);margin-top:2px;font-size:11px;}
+.snap-pill.active{border-color:rgba(78,201,122,0.4);}
+.snap-pill.locked{opacity:.75;}
+.alloc-breakdown{display:flex;gap:8px;flex-wrap:wrap;font-size:10px;color:var(--muted);margin-bottom:10px;}
+.alloc-actions{display:flex;gap:8px;flex-wrap:wrap;}
+.alloc-btn{padding:8px 12px;border-radius:10px;border:1px solid rgba(200,169,110,0.35);background:rgba(200,100,10,0.14);color:var(--gold-bright);font-size:9px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;}
+.alloc-btn.ghost{background:rgba(8,5,2,0.7);color:var(--muted);}
+.evt-history-title{font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);margin:14px 0 8px;}
+.evt-history-row{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);padding:6px 0;border-bottom:1px solid rgba(200,169,110,0.08);}
+.chaos-banner{display:none;position:fixed;top:36px;left:0;right:0;z-index:490;padding:0 10px;}
+.chaos-banner.show{display:block;}
+.chaos-inner{background:rgba(12,4,4,0.96);border:1px solid rgba(201,78,78,0.45);border-radius:12px;padding:8px 12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:11px;}
+.chaos-banner.evt-green .chaos-inner{border-color:rgba(78,201,122,0.5);background:rgba(4,12,6,0.96);}
+.chaos-tag{font-weight:900;letter-spacing:.1em;color:#ffb0b0;text-transform:uppercase;}
+.chaos-banner.evt-green .chaos-tag{color:#8EE4A8;}
+.chaos-msg{flex:1;color:var(--cream);min-width:120px;}
+.chaos-time{font-family:'Space Mono',monospace;color:var(--muted);font-size:10px;}
+.chaos-bar{flex:1 1 100%;height:4px;background:rgba(255,255,255,0.06);border-radius:999px;overflow:hidden;}
+.chaos-bar-fill{height:100%;background:linear-gradient(90deg,#C94E4E,#FFD97D);}
+.chaos-pump-wrap{position:fixed;top:36px;left:0;right:0;z-index:489;padding:0 10px;display:flex;align-items:center;gap:8px;font-size:10px;color:var(--muted);}
+.chaos-pump-wrap:empty{display:none;}
+.pump-track{flex:1;height:6px;background:rgba(255,255,255,0.06);border-radius:999px;overflow:hidden;max-width:200px;}
+.pump-fill{height:100%;background:linear-gradient(90deg,#4EC97A,#FFD97D);}
+body.chaos-active.evt-red::before{opacity:0.9;background:radial-gradient(ellipse 80% 50% at 50% -10%,rgba(120,20,20,0.18) 0%,transparent 60%),radial-gradient(ellipse 60% 40% at 80% 90%,rgba(100,40,10,0.06) 0%,transparent 55%);}
+body.chaos-invert-lb .lb-list{transform:scaleY(-1);}
+body.chaos-invert-lb .lb-row{transform:scaleY(-1);}
+.liq-flash{color:#ff6060 !important;animation:liq-pulse .8s ease infinite;}
+@keyframes liq-pulse{50%{opacity:.5;}}
+#tokenFloat.unlock-live{box-shadow:0 0 20px rgba(78,201,122,0.35);border-color:rgba(78,201,122,0.45);}
+#tokenFloat.evt-shimmer{animation:tf-shimmer 2s ease infinite;}
+@keyframes tf-shimmer{50%{box-shadow:0 0 24px rgba(255,217,125,0.45);}}
+.tf-usd{cursor:pointer;}
+#dreamPanel{display:none;position:fixed;bottom:70px;left:16px;z-index:895;width:min(340px,calc(100vw - 32px));max-height:min(70vh,520px);overflow:auto;background:rgba(4,2,0,0.97);border:1px solid rgba(200,169,110,0.4);border-radius:16px;padding:14px;box-shadow:0 12px 40px rgba(0,0,0,0.6);}
+#dreamPanel.open{display:block;}
+.dream-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);}
+.dream-x{background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px;}
+.dream-bal{font-size:22px;font-weight:900;color:var(--gold-bright);margin-bottom:10px;}
+.dream-bal span{font-size:11px;color:var(--muted);}
+.dream-tabs{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;}
+.dream-tab{padding:6px 8px;border-radius:8px;border:1px solid rgba(200,169,110,0.2);background:rgba(8,5,2,0.6);color:var(--muted);font-size:9px;cursor:pointer;}
+.dream-tab.active{color:var(--gold-bright);border-color:rgba(200,169,110,0.45);}
+.dream-ladder{display:flex;flex-direction:column;gap:6px;}
+.dream-rung{display:flex;align-items:center;gap:8px;font-size:11px;}
+.dream-rung-bar{width:8px;background:linear-gradient(180deg,#FFD97D,#C8A96E);border-radius:4px;min-height:8px;}
+.dream-rung-cap{flex:1;color:var(--muted);}
+.dream-hist{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.dream-hist-card{padding:10px;border-radius:10px;border:1px solid rgba(200,169,110,0.15);background:rgba(8,5,2,0.55);font-size:11px;}
+.dream-hist-card strong{display:block;color:var(--gold-bright);margin-top:4px;}
+.dream-note{grid-column:1/-1;font-size:10px;color:var(--muted);margin-top:6px;}
+.dream-rank-box{text-align:center;padding:12px;}
+.dream-rank-big{font-size:32px;font-weight:900;color:var(--gold-bright);}
+.dream-rank-sub{font-size:11px;color:var(--muted);margin-top:8px;}
+.dream-wallet{margin-top:12px;padding-top:10px;border-top:1px solid rgba(200,169,110,0.12);font-size:11px;color:var(--muted);}
+.dream-wallet-row{display:flex;gap:8px;margin:8px 0;}
+.dream-wallet-row input{flex:1;padding:8px;border-radius:8px;background:rgba(8,5,2,0.85);border:1px solid rgba(200,169,110,0.22);color:var(--cream);}
+.dream-wallet-row button{padding:8px 12px;border-radius:8px;border:1px solid rgba(200,169,110,0.35);background:rgba(200,100,10,0.14);color:var(--gold-bright);cursor:pointer;font-weight:800;}
+.dream-share{width:100%;margin-top:10px;padding:10px;border-radius:10px;border:1px solid rgba(255,160,40,0.45);background:var(--btn-ember);color:#1a0a00;font-weight:900;cursor:pointer;letter-spacing:.06em;}
+.dream-rank-line{font-size:10px;color:var(--muted);margin-top:10px;line-height:1.4;}
+body.dream-5m .passport-tier,body.dream-5m .pv2-tier{animation:dream-border 2s ease infinite;}
+@keyframes dream-border{50%{text-shadow:0 0 12px rgba(170,187,255,0.6);}}
+
 /* ── NUT HUB (addons) ── */
 .nut-hub{max-width:920px;margin:0 auto 24px;padding:0 16px;position:relative;z-index:1;}
 .hub-card{background:rgba(12,8,4,0.82);border:1px solid rgba(200,169,110,0.25);border-radius:20px;padding:16px;box-shadow:0 16px 50px rgba(0,0,0,0.35);}
@@ -1538,6 +1609,10 @@ body.genesis-mode .hero-title{text-shadow:0 0 40px rgba(255,217,125,0.35);}
   <span class="contract">CA: <span id="bannerCA">TBA, deploy on pump.fun to activate</span></span>
   <button class="buy-btn-sm tba" id="bannerBuyBtn" onclick="openBuy()">BUY $NUT</button>
 </div>
+
+<!-- CHAOS ENGINE -->
+<div class="chaos-pump-wrap" id="chaosPumpBar"></div>
+<div class="chaos-banner" id="chaosBanner"></div>
 
 <!-- TOP DRIPS -->
 <div class="drip-wrap" id="topDrips">
@@ -1771,10 +1846,12 @@ body.genesis-mode .hero-title{text-shadow:0 0 40px rgba(255,217,125,0.35);}
 
     <!-- 5: Global Leaderboard -->
     <div class="panel" id="panel-5">
+      <div id="lbAllocation"></div>
       <div class="panel-title">Global Leaderboard, All Time Top 20</div>
       <div id="lbContent">
         <div class="lb-empty">Connecting to the ledger...</div>
       </div>
+      <div id="lbEventHistory"></div>
       <div class="lb-join" id="lbJoin" style="display:none">
         <button class="lb-join-btn" onclick="openNickModal()">Join Leaderboard</button>
       </div>
@@ -2492,6 +2569,7 @@ async function fetchGlobalActivity() {
     }).join('');
     if (window.NutQuirks) NutQuirks.onGlobalActivity(data);
     if (window.NutAddons) NutAddons.onGlobalActivity(data);
+    if (window.NutChaos) NutChaos.onGlobalActivity(data);
   } catch (e) {
     if (empty) {
       empty.style.display = 'block';
@@ -2561,11 +2639,17 @@ async function fetchLeaderboard() {
   renderLeaderboard(lbCache);
   updateNickRank(lbCache);
   if (window.NutQuirks) NutQuirks.renderLbGhost(lbCache);
+  if (window.NutAllocation) NutAllocation.onLeaderboard(lbCache);
+  if (window.NutChaos) NutChaos.renderHistory();
 }
 
 function renderLeaderboard(rows) {
   const el = document.getElementById('lbContent');
-  if (!rows.length) {
+  let rowsToShow = rows;
+  if (window.NutChaos && NutChaos.isInvertLb && NutChaos.isInvertLb()) {
+    rowsToShow = [...rows].reverse();
+  }
+  if (!rowsToShow.length) {
     el.innerHTML=`<div class="lb-empty">No nuts logged yet. Be the first.</div>`;
     if (!nickname) document.getElementById('lbJoin').style.display='block';
     return;
@@ -2577,10 +2661,10 @@ function renderLeaderboard(rows) {
   ];
   const rowClass = i => i===0?'top1':i===1?'top2':i===2?'top3':'';
   let html = `<div class="lb-header">
-    <span class="lb-count-label">ALL TIME &nbsp;<span>${rows.length} NUTTERS</span></span>
+    <span class="lb-count-label">ALL TIME &nbsp;<span>${rowsToShow.length} NUTTERS</span>${window.NutChaos && NutChaos.isInvertLb && NutChaos.isInvertLb() ? ' · BAG HOLDERS MODE' : ''}</span>
   </div>`;
   html += `<div class="lb-list">`;
-  rows.forEach((r,i)=>{
+  rowsToShow.forEach((r,i)=>{
     const isYou = r.isYou || (r.session_id === sessionId) || (!r.isAnon && r.nickname === nickname);
     const ri = i < 3 ? rankIcons[i] : null;
     const rankEl = ri
@@ -2667,6 +2751,8 @@ function nut() {
   showNutVerdict(method);
   if (window.NutQuirks) NutQuirks.onNutLogged(method, points);
   if (window.NutAddons) NutAddons.onNutLogged(method, points);
+  if (window.NutAllocation) NutAllocation.onNutLogged();
+  if (window.NutChaos) NutChaos.onNutLogged();
 
   document.getElementById('bigCount').classList.add('bump');
   setTimeout(()=>document.getElementById('bigCount').classList.remove('bump'),100);
@@ -3703,6 +3789,9 @@ function downloadCert() {
 
 <script src="./quirks.js"></script>
 <script src="./addons.js"></script>
+<script src="./allocation.js"></script>
+<script src="./chaos.js"></script>
+<script src="./dream.js"></script>
 <script>
 // ═══════════════════════════════
 // INIT
@@ -3717,6 +3806,9 @@ const KEY_PM_SEED  = 'nut_pm_seed_v1'; // last countAllTime synced into balance
 let NUT_PRICE_USD = null; // null=not fetched, 0=no data, number=live price per token
 
 const PROJECT_NEWS = [
+  { date: '2026-05-27', tag: 'AIRDROP', title: 'Allocation machine live', body: 'Live airdrop score on the leaderboard. Genesis bonus, tiers, Wave 2 snapshot countdown, ref links.' },
+  { date: '2026-05-27', tag: 'CHAOS', title: 'Chaos Engine online', body: 'NUT PUMP, Golden Hour, Bear Trap, Liquidation Hour, and community-triggered events.' },
+  { date: '2026-05-27', tag: 'DREAM', title: 'Dream Machine', body: 'Tap NUTS USD in the float box for mcap ladder, what-if coins, holder rank, and bag share card.' },
   { date: '2026-05-27', tag: 'HUB', title: 'Nut Hub is live', body: 'Passport, duels, global pulse, daily bounties, radio ticker, crews, and oracle picks. All local-first.' },
   { date: '2026-05-27', tag: 'MARKET', title: 'Play-token predictions', body: 'Earn NUTTOKENS by logging. Full AMM market board is work in progress.' },
   { date: '2026-05-27', tag: 'RECEIPT', title: 'Receipt rarity tiers', body: 'Paper, foil, holographic, void black, and genesis overlays unlock as you grind.' },
@@ -3775,7 +3867,9 @@ function pmSetBalance(v) {
   if (fu) fu.textContent = pmSimUSD(bal);
 }
 function pmEarnTokens(n) {
-  const earned = Math.max(0, Math.floor(n));
+  let mult = 1;
+  if (window.NutChaos) mult *= NutChaos.getEarnMultiplier();
+  const earned = Math.max(0, Math.floor(n * mult));
   if (!earned) return;
   pmSetBalance(pmGetBalance() + earned);
   // Keep seed in sync so delta-seeding doesn't double-count on next load
@@ -4093,7 +4187,8 @@ function spinWheel() {
     } else {
       wheelAngle = targetAngle % (2 * Math.PI);
       drawWheel(wheelAngle);
-      const won = Math.floor(rouletteBet * seg.mult);
+      const rmult = window.NutChaos ? NutChaos.getRouletteMultiplier() : 1;
+      const won = Math.floor(rouletteBet * seg.mult * rmult);
       if (won > 0) {
         pmSetBalance(pmGetBalance() + won);
         const profit = won - rouletteBet;
@@ -4155,6 +4250,9 @@ pmRender();
 fetchNutPrice();
 setInterval(fetchNutPrice, 60000);
 if (window.NutAddons) NutAddons.init();
+if (window.NutAllocation) NutAllocation.init();
+if (window.NutChaos) NutChaos.init();
+if (window.NutDream) NutDream.init();
 setInterval(()=>{ if(!document.hidden) fetchGlobalCounts(); },60000);
 setInterval(()=>{ if(!document.hidden) fetchLeaderboard(); },120000);
 setInterval(()=>{ if(!document.hidden) fetchGlobalActivity(); },30000);
@@ -4428,6 +4526,7 @@ scrollNutBtn.addEventListener('click', () => {
 </script>
 
 <!-- FLOATING TOKEN BALANCE BOX (bottom-left) -->
+<div id="dreamPanel"></div>
 <div id="tokenFloat">
   <div class="tf-bal">
     <span class="tf-amount" id="pmBalFloat"><span class="tf-loading"></span></span>
