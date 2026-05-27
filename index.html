@@ -1319,21 +1319,12 @@ position:relative;overflow:hidden;
 .pulse-type{font-size:10px;color:var(--muted);}
 .bounty-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px;border-radius:12px;border:1px solid rgba(200,169,110,0.12);background:rgba(8,5,2,0.45);margin-bottom:8px;font-size:12px;color:var(--cream);}
 .bounty-row.done{border-color:rgba(78,201,122,0.35);}
-.radio-line{padding:8px 0;border-bottom:1px solid rgba(200,169,110,0.08);font-size:11px;color:var(--cream);}
-.radio-tag{font-family:'Space Mono',monospace;font-size:9px;color:#8EE4A8;margin-right:6px;}
 .crew-row{display:flex;gap:8px;margin:8px 0;}
 .crew-input{flex:1;max-width:120px;padding:9px 10px;border-radius:12px;background:rgba(8,5,2,0.85);border:1px solid rgba(200,169,110,0.22);color:var(--cream);font-family:'Space Mono',monospace;text-transform:uppercase;}
 .oracle-row{padding:10px 0;border-bottom:1px solid rgba(200,169,110,0.08);}
 .oracle-q{font-size:12px;color:var(--cream);margin-bottom:8px;font-weight:700;}
 body.genesis-mode .hero-badge{background:linear-gradient(90deg,rgba(255,217,125,0.25),rgba(232,136,32,0.2));border-color:rgba(255,217,125,0.5);}
 body.genesis-mode .hero-title{text-shadow:0 0 40px rgba(255,217,125,0.35);}
-.debrief-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:9999;display:none;align-items:center;justify-content:center;padding:16px;}
-.debrief-overlay.show{display:flex;}
-.debrief-box{max-width:360px;width:100%;background:rgba(12,8,4,0.95);border:1px solid rgba(200,169,110,0.35);border-radius:20px;padding:22px;text-align:center;}
-.debrief-box h3{font-family:'Cinzel',serif;font-size:14px;letter-spacing:.14em;color:var(--gold);margin-bottom:8px;}
-.debrief-box p{font-size:12px;color:var(--muted);margin-bottom:14px;line-height:1.45;}
-.debrief-moods{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;}
-.debrief-moods button{padding:12px 16px;border-radius:14px;border:1px solid rgba(200,169,110,0.22);background:rgba(8,5,2,0.7);font-size:22px;cursor:pointer;}
 </style>
 </head>
 <body>
@@ -1491,6 +1482,30 @@ body.genesis-mode .hero-title{text-shadow:0 0 40px rgba(255,217,125,0.35);}
       <button class="share-btn" onclick="shareTwitter()">Post Receipt to X</button>
     </div>
   </div>
+
+  <!-- NUT HUB: Passport, Duels, Pulse, Bounties, Crew, Oracle -->
+  <section class="nut-hub" id="nutHub">
+    <div class="hub-card">
+      <div class="bottom-card-hdr" style="margin-bottom:12px;">
+        <div class="bottom-card-title">Nut Hub</div>
+        <div class="bottom-card-sub">passport · duels · pulse · more</div>
+      </div>
+      <div class="hub-tabs">
+        <button type="button" class="hub-tab active" data-tab="passport">Passport</button>
+        <button type="button" class="hub-tab" data-tab="duel">Duels</button>
+        <button type="button" class="hub-tab" data-tab="pulse">Pulse</button>
+        <button type="button" class="hub-tab" data-tab="bounties">Bounties</button>
+        <button type="button" class="hub-tab" data-tab="crew">Crew</button>
+        <button type="button" class="hub-tab" data-tab="oracle">Oracle</button>
+      </div>
+      <div class="hub-panel active" data-panel="passport" id="hubPassport"></div>
+      <div class="hub-panel" data-panel="duel" id="hubDuel"></div>
+      <div class="hub-panel" data-panel="pulse" id="hubPulse"></div>
+      <div class="hub-panel" data-panel="bounties" id="hubBounties"></div>
+      <div class="hub-panel" data-panel="crew" id="hubCrew"></div>
+      <div class="hub-panel" data-panel="oracle" id="hubOracle"></div>
+    </div>
+  </section>
 
   <!-- PANEL INDICATORS -->
   <div class="ornament" aria-hidden="true"><span class="ornament-line"></span><span class="ornament-gem">✦</span><span class="ornament-line"></span></div>
@@ -1705,44 +1720,6 @@ body.genesis-mode .hero-title{text-shadow:0 0 40px rgba(255,217,125,0.35);}
   </div>
 </div>
 
-<!-- NUT HUB: Passport, Duels, Pulse, Bounties, Radio, Crew, Oracle -->
-<section class="nut-hub" id="nutHub">
-  <div class="hub-card">
-    <div class="bottom-card-hdr" style="margin-bottom:12px;">
-      <div class="bottom-card-title">Nut Hub</div>
-      <div class="bottom-card-sub">passport · duels · pulse · more</div>
-    </div>
-    <div class="hub-tabs">
-      <button type="button" class="hub-tab active" data-tab="passport">Passport</button>
-      <button type="button" class="hub-tab" data-tab="duel">Duels</button>
-      <button type="button" class="hub-tab" data-tab="pulse">Pulse</button>
-      <button type="button" class="hub-tab" data-tab="bounties">Bounties</button>
-      <button type="button" class="hub-tab" data-tab="radio">Radio</button>
-      <button type="button" class="hub-tab" data-tab="crew">Crew</button>
-      <button type="button" class="hub-tab" data-tab="oracle">Oracle</button>
-    </div>
-    <div class="hub-panel active" data-panel="passport" id="hubPassport"></div>
-    <div class="hub-panel" data-panel="duel" id="hubDuel"></div>
-    <div class="hub-panel" data-panel="pulse" id="hubPulse"></div>
-    <div class="hub-panel" data-panel="bounties" id="hubBounties"></div>
-    <div class="hub-panel" data-panel="radio" id="hubRadio"></div>
-    <div class="hub-panel" data-panel="crew" id="hubCrew"></div>
-    <div class="hub-panel" data-panel="oracle" id="hubOracle"></div>
-  </div>
-</section>
-
-<div class="debrief-overlay" id="debriefModal">
-  <div class="debrief-box">
-    <h3>Aftermath</h3>
-    <p>45 seconds later. How was that nut?</p>
-    <div class="debrief-moods">
-      <button type="button" onclick="NutAddons.logDebrief('fire')" title="Fire">🔥</button>
-      <button type="button" onclick="NutAddons.logDebrief('mid')" title="Mid">😐</button>
-      <button type="button" onclick="NutAddons.logDebrief('regret')" title="Regret">😬</button>
-      <button type="button" onclick="NutAddons.closeDebrief()" title="Skip">✕</button>
-    </div>
-  </div>
-</div>
 
 <div class="wrap" style="padding-top:0">
   <div class="footer">

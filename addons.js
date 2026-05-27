@@ -8,14 +8,12 @@
   const KEY_BOUNTIES = 'nut_bounties_v1';
   const KEY_CREW = 'nut_crew_v1';
   const KEY_ORACLE = 'nut_oracle_v1';
-  const KEY_DEBRIEF = 'nut_debrief_v1';
   const KEY_STAMPS = 'nut_stamps_v1';
   const KEY_GENESIS = 'nut_genesis_seen_v1';
 
   let hubTab = 'passport';
   let lastActivity = [];
   let globalToday = 0;
-  let debriefTimer = null;
   let pulseHours = 24;
 
   function esc(s) {
@@ -294,21 +292,6 @@
     if (typeof showToast === 'function') showToast('+5 tokens ✦');
   }
 
-  // ── Radio ──────────────────────────────────────────────────
-  function renderRadio() {
-    const el = document.getElementById('hubRadio');
-    if (!el) return;
-    const rows = lastActivity.length ? lastActivity : activityRowsForPulse().slice().reverse();
-    const headlines = rows.slice(0, 12).map(r => {
-      const name = r.nickname || (typeof anonName === 'function' ? anonName(r.session_id) : 'Anon');
-      const ty = r.nut_type || 'solo';
-      const m = (typeof NUT_TYPES !== 'undefined' && NUT_TYPES[ty]) || { em: '🥜', label: ty };
-      const when = typeof formatActivityTime === 'function' ? formatActivityTime(r.created_at) : 'now';
-      return `<div class="radio-line"><span class="radio-tag">LIVE</span> ${esc(name)} · ${m.em} ${esc(m.label)} · ${when}</div>`;
-    });
-    el.innerHTML = headlines.length ? headlines.join('') : '<div class="passport-muted">Waiting for global activity…</div>';
-  }
-
   // ── Crew ───────────────────────────────────────────────────
   function renderCrew() {
     const el = document.getElementById('hubCrew');
@@ -394,36 +377,6 @@
     renderOracle();
   }
 
-  // ── Debrief ────────────────────────────────────────────────
-  function scheduleDebrief() {
-    if (debriefTimer) clearTimeout(debriefTimer);
-    debriefTimer = setTimeout(() => {
-      const pending = loadJson(KEY_DEBRIEF, { pending: false });
-      if (!pending.pending) return;
-      showDebriefModal();
-    }, 45000);
-    saveJson(KEY_DEBRIEF, { pending: true, lastMethod: selectedNutType });
-  }
-
-  function showDebriefModal() {
-    const el = document.getElementById('debriefModal');
-    if (!el) return;
-    el.classList.add('show');
-  }
-
-  function closeDebrief() {
-    document.getElementById('debriefModal')?.classList.remove('show');
-    saveJson(KEY_DEBRIEF, { pending: false });
-  }
-
-  function logDebrief(mood) {
-    const log = loadJson('nut_debrief_log_v1', []);
-    log.push({ mood, at: new Date().toISOString(), method: selectedNutType });
-    saveJson('nut_debrief_log_v1', log.slice(-50));
-    closeDebrief();
-    if (typeof showToast === 'function') showToast('Debrief logged ✦');
-  }
-
   // ── Hub tabs ───────────────────────────────────────────────
   function switchHubTab(tab) {
     hubTab = tab;
@@ -437,7 +390,6 @@
     renderDuel();
     renderPulse();
     renderBounties();
-    renderRadio();
     renderCrew();
     renderOracle();
   }
@@ -446,7 +398,6 @@
     if (countToday === pts) addStamp('first', 'First Log');
     if (countToday >= 10) addStamp('ten', '10 Pt Day');
     if (countToday >= 69) addStamp('nice', 'Nice.');
-    scheduleDebrief();
     renderAll();
   }
 
@@ -468,7 +419,6 @@
       btn.addEventListener('click', () => switchHubTab(btn.dataset.tab));
     });
     renderAll();
-    setInterval(renderRadio, 30000);
   }
 
   window.NutAddons = {
@@ -485,8 +435,6 @@
     saveCrew,
     oraclePick,
     scoreOracle,
-    closeDebrief,
-    logDebrief,
     switchHubTab,
     renderAll,
     setPulseHours,
