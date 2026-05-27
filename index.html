@@ -318,48 +318,62 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .nick-btn:hover{transform:translateY(-2px);filter:drop-shadow(0 0 16px rgba(200,140,0,0.45));}
 
 /* ── CLOCK ── */
-.clock-bar{text-align:center;font-family:'Cinzel',serif;font-size:13px;color:var(--muted);padding:10px 0 22px;letter-spacing:.08em;line-height:1.5;}
+.clock-bar{text-align:center;font-family:'Cinzel',serif;font-size:12px;color:var(--muted);padding:6px 0 14px;letter-spacing:.07em;line-height:1.4;max-width:380px;margin:0 auto;}
 .clock-bar span{color:var(--gold);text-shadow:0 0 10px rgba(200,169,110,0.28);}
-.clock-date{margin-bottom:10px;}
+.clock-head{
+  width:100%;display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;
+  padding:8px 12px;border-radius:12px;border:1px solid rgba(200,169,110,0.2);
+  background:rgba(8,5,2,0.65);cursor:pointer;font-family:inherit;color:inherit;
+  transition:border-color .15s,background .15s;
+}
+.clock-head:hover{border-color:rgba(200,169,110,0.4);background:rgba(12,8,4,0.85);}
+.clock-head-meta{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);}
+.clock-chevron{font-size:10px;color:var(--gold-bright);transition:transform .2s;line-height:1;}
+.clock-bar.is-open .clock-chevron{transform:rotate(180deg);}
+.clock-panel{
+  max-height:0;overflow:hidden;opacity:0;transition:max-height .25s ease,opacity .2s ease,margin .2s ease;
+  margin-top:0;
+}
+.clock-bar.is-open .clock-panel{max-height:200px;opacity:1;margin-top:8px;}
 .clock-toolbar{
-  display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:8px;margin-bottom:10px;padding:0 4px;
+  display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:5px;margin-bottom:6px;padding:0 2px;
 }
 .clock-search{
-  flex:1 1 160px;max-width:280px;padding:8px 12px;border-radius:999px;
+  flex:1 1 120px;min-width:0;padding:6px 10px;border-radius:999px;
   background:rgba(12,8,4,0.9);border:1px solid var(--border-hi);color:var(--cream);
-  font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.03em;
+  font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.02em;
 }
 .clock-search::placeholder{color:var(--muted);}
-.clock-search:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 2px rgba(200,169,110,0.15);}
+.clock-search:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 2px rgba(200,169,110,0.12);}
 .clock-filter-btn{
-  padding:8px 14px;border-radius:999px;border:1px solid var(--border-hi);
-  background:rgba(12,8,4,0.85);color:var(--muted);font-family:inherit;font-size:9px;font-weight:700;
-  letter-spacing:.12em;text-transform:uppercase;cursor:pointer;transition:background .15s,border-color .15s,color .15s;
+  padding:6px 10px;border-radius:999px;border:1px solid var(--border-hi);
+  background:rgba(12,8,4,0.85);color:var(--muted);font-family:inherit;font-size:8px;font-weight:700;
+  letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:background .15s,border-color .15s,color .15s;
 }
 .clock-filter-btn:hover{border-color:var(--gold);color:var(--cream);}
 .clock-filter-btn.active{background:rgba(200,100,10,0.2);border-color:var(--gold-bright);color:var(--gold-bright);}
 .clock-filter-btn.is-local{border-color:rgba(78,201,122,0.45);}
 .clock-filter-btn.is-local.active{background:rgba(78,201,122,0.15);color:#8EE4A8;}
 .clock-zones{
-  display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:4px 10px;
-  max-height:240px;overflow-y:auto;padding:8px 6px;margin:0 auto;
-  background:rgba(8,5,2,0.55);border:1px solid rgba(200,169,110,0.15);border-radius:14px;
+  display:grid;grid-template-columns:repeat(2,1fr);gap:2px 6px;
+  max-height:72px;overflow-y:auto;padding:5px;border-radius:10px;
+  background:rgba(8,5,2,0.55);border:1px solid rgba(200,169,110,0.15);
   scrollbar-width:thin;scrollbar-color:rgba(200,169,110,0.35) transparent;
 }
-.clock-zones::-webkit-scrollbar{width:5px;}
+.clock-zones::-webkit-scrollbar{width:4px;}
 .clock-zones::-webkit-scrollbar-thumb{background:rgba(200,169,110,0.35);border-radius:4px;}
 .clock-tz{
-  display:flex;align-items:center;justify-content:space-between;gap:6px;padding:5px 8px;border-radius:8px;
-  font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.02em;text-align:left;
-  background:rgba(12,8,4,0.45);border:1px solid transparent;
+  display:flex;align-items:center;justify-content:space-between;gap:4px;padding:3px 5px;border-radius:6px;
+  font-family:'Space Mono',monospace;font-size:9px;letter-spacing:0;text-align:left;
+  background:rgba(12,8,4,0.4);border:1px solid transparent;
 }
 .clock-tz.is-you{border-color:rgba(78,201,122,0.45);background:rgba(78,201,122,0.08);}
 .clock-tz .tz-label{
-  font-family:'Cinzel',serif;font-size:8px;font-weight:700;letter-spacing:.08em;color:var(--gold-bright);
+  font-family:'Cinzel',serif;font-size:7px;font-weight:700;letter-spacing:.06em;color:var(--gold-bright);
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;flex:1;
 }
-.clock-tz .tz-time{color:var(--cream);flex-shrink:0;font-variant-numeric:tabular-nums;}
-.clock-tz-count{font-size:9px;color:var(--muted);margin-top:6px;letter-spacing:.1em;text-transform:uppercase;}
+.clock-tz .tz-time{color:var(--cream);flex-shrink:0;font-variant-numeric:tabular-nums;font-size:8px;}
+.clock-tz-count{font-size:8px;color:var(--muted);margin-top:4px;letter-spacing:.08em;text-transform:uppercase;}
 
 /* ── WRAP ── */
 .wrap{max-width:920px;margin:0 auto;padding:0 16px 160px;position:relative;z-index:1;}
@@ -1035,13 +1049,11 @@ position:relative;overflow:hidden;
   .nick-btn{padding:5px 10px;font-size:9px;}
 
   /* Clock */
-  .clock-bar{font-size:10.5px;padding:6px 0 14px;letter-spacing:.06em;}
-  .clock-toolbar{gap:6px;}
-  .clock-search{max-width:100%;font-size:10px;padding:7px 10px;}
-  .clock-filter-btn{padding:7px 10px;font-size:8px;}
-  .clock-zones{grid-template-columns:repeat(auto-fill,minmax(128px,1fr));max-height:180px;gap:3px 6px;}
-  .clock-tz{font-size:9px;padding:4px 6px;}
-  .clock-tz .tz-label{font-size:7px;}
+  .clock-bar{max-width:100%;padding:4px 0 10px;font-size:10px;}
+  .clock-head{padding:7px 10px;gap:6px;}
+  .clock-zones{max-height:64px;}
+  .clock-tz{font-size:8px;}
+  .clock-tz .tz-time{font-size:7px;}
 
   /* Counter card (continued) */
   .counter-label{font-size:8.5px;letter-spacing:.18em;margin-bottom:12px;}
@@ -1262,14 +1274,20 @@ position:relative;overflow:hidden;
   </div>
 
   <div class="clock-bar" id="clockBar">
-    <div class="clock-date" id="clockDate">Loading...</div>
-    <div class="clock-toolbar">
-      <input type="search" class="clock-search" id="tzSearch" placeholder="Filter timezones..." autocomplete="off" aria-label="Filter timezones"/>
-      <button type="button" class="clock-filter-btn active" id="tzAllBtn" onclick="setTzFilter('all')">All</button>
-      <button type="button" class="clock-filter-btn is-local" id="tzNearBtn" onclick="requestLocationFilter()">Near me</button>
+    <button type="button" class="clock-head" id="clockToggle" onclick="toggleClockPanel()" aria-expanded="false" aria-controls="clockPanel">
+      <span id="clockDate">Loading...</span>
+      <span class="clock-head-meta" id="clockHeadMeta">world time</span>
+      <span class="clock-chevron" aria-hidden="true">▾</span>
+    </button>
+    <div class="clock-panel" id="clockPanel">
+      <div class="clock-toolbar">
+        <input type="search" class="clock-search" id="tzSearch" placeholder="Filter..." autocomplete="off" aria-label="Filter timezones"/>
+        <button type="button" class="clock-filter-btn active" id="tzAllBtn" onclick="setTzFilter('all')">All</button>
+        <button type="button" class="clock-filter-btn is-local" id="tzNearBtn" onclick="requestLocationFilter()">Near me</button>
+      </div>
+      <div class="clock-zones" id="clockZones"></div>
+      <div class="clock-tz-count" id="clockTzCount"></div>
     </div>
-    <div class="clock-zones" id="clockZones"></div>
-    <div class="clock-tz-count" id="clockTzCount"></div>
   </div>
   <p class="section-kicker">solo · partnered · unhinged, all nuts count</p>
 
@@ -2333,6 +2351,7 @@ let tzFilterMode = 'all';
 let userTimezone = null;
 let tzSearchQuery = '';
 let tzElements = new Map();
+let clockPanelOpen = false;
 
 function getAllTimezones() {
   if (typeof Intl.supportedValuesOf === 'function') {
@@ -2401,6 +2420,27 @@ function getFilteredTimezones(now) {
   return list;
 }
 
+function toggleClockPanel(force) {
+  clockPanelOpen = typeof force === 'boolean' ? force : !clockPanelOpen;
+  const bar = document.getElementById('clockBar');
+  const btn = document.getElementById('clockToggle');
+  if (bar) bar.classList.toggle('is-open', clockPanelOpen);
+  if (btn) btn.setAttribute('aria-expanded', clockPanelOpen ? 'true' : 'false');
+  if (clockPanelOpen) renderTimezoneList();
+}
+
+function updateClockHeadMeta(listLen) {
+  const el = document.getElementById('clockHeadMeta');
+  if (!el) return;
+  const total = allTimezones.length;
+  if (tzFilterMode === 'near' && userTimezone) {
+    el.textContent = `${listLen} near you`;
+  } else if (tzSearchQuery.trim()) {
+    el.textContent = `${listLen} matches`;
+  } else {
+    el.textContent = `${total} zones`;
+  }
+}
 function setTzFilter(mode) {
   tzFilterMode = mode;
   document.getElementById('tzAllBtn')?.classList.toggle('active', mode === 'all');
@@ -2414,6 +2454,7 @@ function requestLocationFilter() {
     tzFilterMode = 'near';
     document.getElementById('tzAllBtn')?.classList.remove('active');
     document.getElementById('tzNearBtn')?.classList.add('active');
+    toggleClockPanel(true);
     renderTimezoneList();
     if (typeof showToast === 'function') showToast(`Showing zones near ${tzDisplayName(userTimezone)} ✦`);
   };
@@ -2450,12 +2491,14 @@ function renderTimezoneList() {
   if (countEl) {
     const total = allTimezones.length;
     countEl.textContent = tzFilterMode === 'near' && userTimezone
-      ? `${list.length} zones near ${tzDisplayName(userTimezone)} · ${total} total`
-      : `${list.length} of ${total} timezones`;
+      ? `${list.length} near ${tzDisplayName(userTimezone)} · ${total} total`
+      : `${list.length} of ${total}`;
   }
+  updateClockHeadMeta(list.length);
 }
 
 function updateClockTimes() {
+  if (!clockPanelOpen || !tzElements.size) return;
   const now = new Date();
   tzElements.forEach((el, tz) => {
     const timeEl = el.querySelector('.tz-time');
@@ -2469,10 +2512,11 @@ function initClock() {
   if (search) {
     search.addEventListener('input', () => {
       tzSearchQuery = search.value;
+      if (!clockPanelOpen) toggleClockPanel(true);
       renderTimezoneList();
     });
   }
-  renderTimezoneList();
+  updateClockHeadMeta(allTimezones.length);
   updateClock();
 }
 
