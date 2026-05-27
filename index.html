@@ -3524,6 +3524,12 @@ function downloadCert() {
 }
 
 </script>
+
+<!-- SCROLL TO NUT FLOATING BUTTON (must precede INIT script that queries it) -->
+<button class="scroll-nut-btn" id="scrollNutBtn" aria-label="Scroll to nut button">
+  🥜 NUT
+</button>
+
 <script src="./quirks.js"></script>
 <script src="./addons.js"></script>
 <script>
@@ -3974,11 +3980,6 @@ scrollNutBtn.addEventListener('click', () => {
   nutCard.scrollIntoView({behavior:'smooth', block:'center'});
 });
 </script>
-
-<!-- SCROLL TO NUT FLOATING BUTTON -->
-<button class="scroll-nut-btn" id="scrollNutBtn" aria-label="Scroll to nut button">
-  🥜 NUT
-</button>
 
 <div class="sticky-trade" id="stickyTrade">
   <button type="button" class="st-st-buy tba" id="stickyBuy" onclick="openBuy()">BUY $NUT</button>
