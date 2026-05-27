@@ -269,6 +269,35 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .st-st-buy{background:var(--btn-ember);border-color:rgba(255,160,40,0.5);color:#1a0a00;}
 .st-st-ca{background:rgba(12,8,4,0.9);color:var(--cream);}
 .st-st-chart{background:rgba(12,8,4,0.9);color:var(--gold-bright);}
+
+/* ── FLOATING TOKEN BALANCE (bottom-left) ── */
+#tokenFloat{
+  position:fixed;bottom:16px;left:16px;z-index:900;
+  display:flex;align-items:center;gap:8px;
+  background:rgba(4,2,0,0.94);border:1px solid rgba(200,169,110,0.35);
+  border-radius:14px;padding:8px 12px;
+  box-shadow:0 4px 18px rgba(0,0,0,0.55);
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+}
+.tf-bal{
+  display:flex;flex-direction:column;gap:1px;line-height:1.15;
+}
+.tf-amount{
+  font-size:15px;font-weight:800;color:var(--gold-bright);
+  letter-spacing:.02em;font-family:inherit;
+}
+.tf-label{
+  font-size:9px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;
+  color:var(--muted);
+}
+.tf-buy{
+  background:var(--btn-ember);border:1px solid rgba(255,160,40,0.5);
+  color:#1a0a00;border-radius:9px;padding:7px 12px;
+  font-size:11px;font-weight:800;letter-spacing:.07em;
+  font-family:inherit;cursor:pointer;white-space:nowrap;
+}
+.tf-buy:active{opacity:.8;}
+
 .section-kicker{
   text-align:center;font-size:11px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;
   color:var(--muted);margin:8px 0 14px;
@@ -3550,8 +3579,11 @@ function pmGetBalance() {
 }
 function pmSetBalance(v) {
   localStorage.setItem(KEY_PM_BAL, String(Math.max(0, Math.floor(v))));
+  const bal = pmGetBalance().toLocaleString();
   const el = document.getElementById('pmBal');
-  if (el) el.textContent = pmGetBalance().toLocaleString();
+  if (el) el.textContent = bal;
+  const fl = document.getElementById('pmBalFloat');
+  if (fl) fl.textContent = bal;
 }
 function pmEarnTokens(n) {
   pmSetBalance(pmGetBalance() + Math.max(0, Math.floor(n)));
@@ -3957,6 +3989,15 @@ scrollNutBtn.addEventListener('click', () => {
   nutCard.scrollIntoView({behavior:'smooth', block:'center'});
 });
 </script>
+
+<!-- FLOATING TOKEN BALANCE BOX (bottom-left) -->
+<div id="tokenFloat">
+  <div class="tf-bal">
+    <span class="tf-amount" id="pmBalFloat">0</span>
+    <span class="tf-label">NUTS</span>
+  </div>
+  <button type="button" class="tf-buy tba" onclick="openBuy()">BUY $NUT</button>
+</div>
 
 <div class="sticky-trade" id="stickyTrade">
   <button type="button" class="st-st-buy tba" id="stickyBuy" onclick="openBuy()">BUY $NUT</button>
