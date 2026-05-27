@@ -126,8 +126,8 @@
     const recent = win.filter(t => now - t < 5 * 60000);
     recent.push(now);
     localStorage.setItem(KEY_PUMP_WIN, JSON.stringify(recent.slice(-30)));
-    const unique = new Set(recent.map((_, i) => i));
-    const count = Math.min(20, recent.length + communityIds.size % 3);
+    // count = recent log events + unique session IDs seen this page load
+    const count = recent.length + communityIds.size;
     updatePumpBar(count);
     if (count >= 20 && !current) startEvent('nut_pump', 'community');
   }
@@ -238,11 +238,13 @@
 
   function scheduleRandom() {
     if (current) return;
+    // Checked every 10 minutes. Target cadence: ~2 events/day on average.
+    // nut_pump: ~1/day, golden_hour: ~0.6/day, bear_trap: ~0.3/day, crash: ~0.1/day
     const roll = Math.random();
-    if (roll < 0.002) startEvent('nut_crash', 'random');
-    else if (roll < 0.008) startEvent('nut_pump', 'random');
-    else if (roll < 0.012) startEvent('golden_hour', 'random');
-    else if (roll < 0.016) startEvent('bear_trap', 'random');
+    if (roll < 0.0007) startEvent('nut_crash', 'random');       // ~1 per week
+    else if (roll < 0.003) startEvent('nut_pump', 'random');    // ~1 per day
+    else if (roll < 0.005) startEvent('golden_hour', 'random'); // ~0.7 per day
+    else if (roll < 0.007) startEvent('bear_trap', 'random');   // ~0.5 per day
   }
 
   function onGlobalActivity(rows) {
@@ -260,7 +262,7 @@
     askPush();
     tickEvent();
     setInterval(tickEvent, 5000);
-    setInterval(scheduleRandom, 120000);
+    setInterval(scheduleRandom, 600000);
     setInterval(pollSupabase, 30000);
     pollSupabase();
   }

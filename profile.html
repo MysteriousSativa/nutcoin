@@ -57,8 +57,36 @@
     const AV_URLS = [
       'https://api.dicebear.com/9.x/pixel-art/svg?seed=NutDegen&size=128',
       'https://api.dicebear.com/9.x/pixel-art/svg?seed=NutChad&size=128',
+      'https://api.dicebear.com/9.x/pixel-art/svg?seed=NutWagmi&size=128',
+      'https://api.dicebear.com/9.x/pixel-art/svg?seed=NutMoon&size=128',
+      'https://api.dicebear.com/9.x/pixel-art/svg?seed=NutDiamond&size=128',
+      'https://api.dicebear.com/9.x/pixel-art/svg?seed=NutApe&size=128',
+      'https://api.dicebear.com/9.x/pixel-art/svg?seed=NutBull&size=128',
+      'https://api.dicebear.com/9.x/pixel-art/svg?seed=NutBear&size=128',
+      'https://api.dicebear.com/9.x/pixel-art/svg?seed=NutWhale&size=128',
+      'https://api.dicebear.com/9.x/pixel-art/svg?seed=NutFren&size=128',
+      'https://api.dicebear.com/9.x/pixel-art/svg?seed=NutAlpha&size=128',
+      'https://api.dicebear.com/9.x/pixel-art/svg?seed=NutSigma&size=128',
       'https://api.dicebear.com/9.x/bottts/svg?seed=NutBot1&size=128',
+      'https://api.dicebear.com/9.x/bottts/svg?seed=NutBot2&size=128',
+      'https://api.dicebear.com/9.x/bottts/svg?seed=NutBot3&size=128',
+      'https://api.dicebear.com/9.x/bottts/svg?seed=NutBot4&size=128',
+      'https://api.dicebear.com/9.x/bottts/svg?seed=NutBot5&size=128',
+      'https://api.dicebear.com/9.x/bottts/svg?seed=NutBot6&size=128',
+      'https://api.dicebear.com/9.x/bottts/svg?seed=NutBot7&size=128',
+      'https://api.dicebear.com/9.x/bottts/svg?seed=NutBot8&size=128',
+      'https://api.dicebear.com/9.x/bottts/svg?seed=NutBot9&size=128',
+      'https://api.dicebear.com/9.x/bottts/svg?seed=NutBot10&size=128',
+      'https://api.dicebear.com/9.x/bottts/svg?seed=NutBot11&size=128',
+      'https://api.dicebear.com/9.x/bottts/svg?seed=NutBot12&size=128',
       'https://api.dicebear.com/9.x/adventurer/svg?seed=NutAdv1&size=128',
+      'https://api.dicebear.com/9.x/adventurer/svg?seed=NutAdv2&size=128',
+      'https://api.dicebear.com/9.x/adventurer/svg?seed=NutAdv3&size=128',
+      'https://api.dicebear.com/9.x/adventurer/svg?seed=NutAdv4&size=128',
+      'https://api.dicebear.com/9.x/adventurer/svg?seed=NutAdv5&size=128',
+      'https://api.dicebear.com/9.x/adventurer/svg?seed=NutAdv6&size=128',
+      'https://api.dicebear.com/9.x/adventurer/svg?seed=NutAdv7&size=128',
+      'https://api.dicebear.com/9.x/adventurer/svg?seed=NutAdv8&size=128',
     ];
 
     function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
@@ -68,12 +96,8 @@
       if (sid === mySid) {
         try {
           const s = JSON.parse(localStorage.getItem('nut_avatar_v1') || 'null');
-          if (s && typeof s.idx === 'number') {
-            const urls = [
-              'https://api.dicebear.com/9.x/pixel-art/svg?seed=NutDegen&size=128',
-              'https://api.dicebear.com/9.x/pixel-art/svg?seed=NutChad&size=128',
-            ];
-            return urls[s.idx % urls.length] || AV_URLS[0];
+          if (s && typeof s.idx === 'number' && s.idx >= 0 && s.idx < AV_URLS.length) {
+            return AV_URLS[s.idx];
           }
         } catch (_) {}
       }

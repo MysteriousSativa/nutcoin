@@ -585,5 +585,6 @@
     editBio,
     saveBio,
     getAvatarFor,
+    addStamp,
   };
 })();
