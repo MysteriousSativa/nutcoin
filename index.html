@@ -734,6 +734,11 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 }
 .tl-text{font-family:'Crimson Text',serif;font-size:15px;color:var(--text);flex:1;min-width:0;}
 .tl-user{font-weight:700;color:var(--gold-bright);}
+.nut-name-link{color:inherit;text-decoration:none;border-bottom:1px dotted rgba(200,169,110,0.4);cursor:pointer;}
+.nut-name-link:hover{color:var(--gold-bright);border-bottom-color:var(--gold-bright);}
+.lb-row-name .nut-name-link{font-family:inherit;}
+.nut-avatar-link{display:inline-flex;text-decoration:none;flex-shrink:0;border-radius:50%;}
+.nut-avatar-link:hover{opacity:0.9;transform:scale(1.04);}
 .tl-you{font-size:9px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--ember);margin-left:6px;}
 .tl-time{font-family:'Space Mono',monospace;font-size:11px;color:var(--muted);}
 .tl-empty{font-family:'Crimson Text',serif;font-size:17px;color:var(--muted);font-style:italic;text-align:center;padding:20px 0;}
@@ -2563,7 +2568,7 @@ async function fetchGlobalActivity() {
       return `<div class="tl-item">
         <span class="tl-num">${data.length - i}</span>
         ${nutAvatarHtml(row.session_id, 'nut-avatar-sm')}
-        <span class="tl-text"><span class="tl-user">${escHtml(name)}</span>${isYou ? '<span class="tl-you">you</span>' : ''} · ${nutLogText(ty, pts)}</span>
+        <span class="tl-text">${window.NutProfiles ? NutProfiles.nameHtml(row.session_id, name, 'tl-user') : `<span class="tl-user">${escHtml(name)}</span>`}${isYou ? '<span class="tl-you">you</span>' : ''} · ${nutLogText(ty, pts)}</span>
         <span class="tl-time">${when}</span>
       </div>`;
     }).join('');
@@ -2674,7 +2679,7 @@ function renderLeaderboard(rows) {
     html += `<div class="lb-row ${rowClass(i)} ${isYou?'you':''}">
       ${rankEl}
       ${nutAvatarHtml(r.session_id, 'nut-avatar-sm')}
-      <span class="lb-row-name" style="${nameStyle}">${escHtml(r.nickname)}</span>
+      <span class="lb-row-name" style="${nameStyle}">${window.NutProfiles ? NutProfiles.nameHtml(r.session_id, r.nickname, '') : escHtml(r.nickname)}</span>
       ${isYou ? '<span class="lb-you-badge">YOU</span>' : ''}
       <span class="lb-row-count">${Number(r.deeds).toLocaleString()}</span>
       <span class="lb-row-nuts">NUTS</span>
@@ -2701,7 +2706,11 @@ function escHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;')
 // NICKNAME
 // ═══════════════════════════════
 function renderNickBar() {
-  document.getElementById('nickDisplay').textContent = nickname || 'Anonymous';
+  const el = document.getElementById('nickDisplay');
+  if (!el) return;
+  const name = nickname || 'Anonymous';
+  if (window.NutProfiles) el.innerHTML = NutProfiles.nameHtml(sessionId, name, 'nick-name');
+  else el.textContent = name;
 }
 function openNickModal() {
   document.getElementById('nickInput').value = nickname || '';
@@ -3788,6 +3797,7 @@ function downloadCert() {
 </button>
 
 <script src="./quirks.js"></script>
+<script src="./profiles.js"></script>
 <script src="./addons.js"></script>
 <script src="./allocation.js"></script>
 <script src="./chaos.js"></script>
@@ -4026,7 +4036,8 @@ function nutAvatarFor(sid) {
 }
 function nutAvatarHtml(sid, cls) {
   const av = nutAvatarFor(sid || '');
-  return `<div class="nut-avatar${cls ? ' '+cls : ''}"><img src="${av.url}" alt="" /></div>`;
+  const href = window.NutProfiles ? NutProfiles.profileUrl(sid) : '#';
+  return `<a class="nut-avatar-link" href="${href}" title="View profile"><div class="nut-avatar${cls ? ' '+cls : ''}"><img src="${av.url}" alt="" /></div></a>`;
 }
 
 // ═══════════════════════════════
@@ -4208,6 +4219,7 @@ function spinWheel() {
 }
 
 setupBuyButtons();
+if (window.NutProfiles) NutProfiles.init();
 buildNutMethodChips();
 updateMethodAttachPreview(selectedNutType);
 initXFeed();
@@ -4249,6 +4261,7 @@ pmRender();
 })();
 fetchNutPrice();
 setInterval(fetchNutPrice, 60000);
+if (window.NutProfiles) NutProfiles.init();
 if (window.NutAddons) NutAddons.init();
 if (window.NutAllocation) NutAllocation.init();
 if (window.NutChaos) NutChaos.init();

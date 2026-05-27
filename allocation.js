@@ -71,7 +71,8 @@
 
   function getReferralLink() {
     const sid = typeof sessionId !== 'undefined' ? sessionId : '';
-    return `${typeof SITE_URL !== 'undefined' ? SITE_URL : window.location.origin}/?ref=${encodeURIComponent(sid)}`;
+    const base = typeof SITE_URL !== 'undefined' ? SITE_URL : window.location.origin;
+    return `${base}/profile.html?p=${encodeURIComponent(sid)}&ref=${encodeURIComponent(sid)}`;
   }
 
   function crewRankBonus() {
@@ -167,7 +168,7 @@
         </div>
         <div class="alloc-actions">
           <button type="button" class="alloc-btn" onclick="NutAllocation.copyRefLink()">Copy ref link</button>
-          <button type="button" class="alloc-btn ghost" onclick="NutAllocation.shareCard()">Share allocation</button>
+          <button type="button" class="alloc-btn" onclick="NutAllocation.shareProfile()">Share profile</button>
         </div>
       </div>`;
   }
@@ -175,6 +176,12 @@
   function copyRefLink() {
     navigator.clipboard?.writeText(getReferralLink()).catch(() => {});
     if (typeof showToast === 'function') showToast('Referral link copied ✦');
+  }
+
+  function shareProfile() {
+    const sid = typeof sessionId !== 'undefined' ? sessionId : '';
+    const name = typeof nickname !== 'undefined' && nickname ? nickname : (window.NutProfiles ? NutProfiles.anonName(sid) : 'Anon');
+    if (window.NutProfiles) NutProfiles.shareProfile(sid, name);
   }
 
   async function shareCard() {
@@ -238,6 +245,6 @@
 
   window.NutAllocation = {
     init, onNutLogged, onLeaderboard, computeAllocation,
-    copyRefLink, shareCard, getReferralLink, hasGenesisBonus,
+    copyRefLink, shareProfile, getReferralLink, hasGenesisBonus,
   };
 })();

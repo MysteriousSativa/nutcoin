@@ -182,7 +182,8 @@
             <button class="pv2-av-btn" onclick="NutAddons.openAvatarPicker()">edit</button>
           </div>
           <div class="pv2-fields">
-            <div class="pv2-field"><span class="pv2-lbl">NAME</span><span class="pv2-val">${esc(p.name)}</span></div>
+            <div class="pv2-field"><span class="pv2-lbl">NAME</span><span class="pv2-val">${typeof NutProfiles !== 'undefined' ? NutProfiles.nameHtml(typeof sessionId !== 'undefined' ? sessionId : '', p.name, '') : esc(p.name)}</span></div>
+            <div class="pv2-field"><span class="pv2-lbl">ID</span><span class="pv2-val">${typeof NutProfiles !== 'undefined' ? esc(NutProfiles.nutDisplayId(typeof sessionId !== 'undefined' ? sessionId : '')) : '—'}</span></div>
             <div class="pv2-field"><span class="pv2-lbl">SINCE</span><span class="pv2-val">${esc(p.since)}</span></div>
             <div class="pv2-field"><span class="pv2-lbl">CREW</span><span class="pv2-val">${esc(p.crew)}</span></div>
             <div class="pv2-field"><span class="pv2-lbl">TZ</span><span class="pv2-val">${esc(tzDisplayName(p.tz))}</span></div>
@@ -203,7 +204,7 @@
         <div class="passport-stamps" style="padding:8px 14px">${p.stamps.length ? p.stamps.map(s => `<span class="stamp" title="${esc(s.at)}">${esc(s.label)}</span>`).join('') : '<span class="passport-muted">no stamps yet · keep logging</span>'}</div>
         <div class="pv2-mrz">${esc(mrzLine1)}<br>${esc(mrzLine2)}</div>
         <div class="hub-actions" style="padding:10px 14px">
-          <button type="button" class="hub-btn" onclick="NutAddons.copyPassport()">Copy flex</button>
+          <button type="button" class="hub-btn" onclick="NutAddons.shareProfile()">Share profile</button>
           <button type="button" class="hub-btn ghost" onclick="openCertificate()">Receipt</button>
         </div>
       </div>
@@ -260,12 +261,11 @@
     if (typeof showToast === 'function') showToast('Bio saved ✦');
   }
 
-  function copyPassport() {
-    const p   = getPassportData();
-    const bio = localStorage.getItem(KEY_BIO) || '';
-    const text = `$NUT Passport · ${p.name}${bio ? `\n"${bio}"` : ''}\nToday: ${p.today} · All-time: ${p.allTime} · Streak: ${p.streak}\nTier: ${p.tier} · Crew: ${p.crew}\n${typeof SITE_URL !== 'undefined' ? SITE_URL : ''}`;
-    navigator.clipboard?.writeText(text).catch(() => {});
-    if (typeof showToast === 'function') showToast('Passport copied ✦');
+  function shareProfile() {
+    const sid = typeof sessionId !== 'undefined' ? sessionId : '';
+    const p = getPassportData();
+    if (window.NutProfiles) NutProfiles.shareProfile(sid, p.name);
+    else if (typeof showToast === 'function') showToast('Profile link copied ✦');
   }
 
   // ── Duels ──────────────────────────────────────────────────
@@ -569,7 +569,7 @@
     onGlobalCounts,
     getReceiptTier,
     getPassportData,
-    copyPassport,
+    shareProfile,
     createDuelLink,
     clearDuel,
     claimBounty,
