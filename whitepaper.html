@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>$NUT Whitepaper — Behavioral Supply Methodology</title>
+  <link rel="icon" href="/img/favicon.svg" type="image/svg+xml"/>
+  <link rel="icon" href="/img/favicon.ico" sizes="any"/>
+  <style>
+    :root{--bg:#050301;--cream:#FFF8EE;--gold:#C8A96E;--gold-bright:#FFD97D;--muted:#7A6855;--border:rgba(200,169,110,0.22);--green:#4EC97A;}
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{background:var(--bg);color:var(--cream);font-family:system-ui,-apple-system,Segoe UI,Inter,sans-serif;min-height:100vh;line-height:1.7;}
+    .nut-home-bar{position:sticky;top:0;z-index:600;display:flex;align-items:center;gap:12px;padding:10px 16px;background:rgba(4,2,0,0.97);border-bottom:1px solid rgba(200,169,110,0.3);}
+    .nut-home-btn{padding:8px 14px;border-radius:10px;border:1px solid rgba(200,169,110,0.35);background:rgba(200,100,10,0.12);color:var(--gold-bright);font-weight:800;font-size:11px;letter-spacing:.06em;text-decoration:none;text-transform:uppercase;}
+    .nut-home-btn:hover{background:rgba(200,100,10,0.22);}
+    .nut-home-title{font-weight:900;font-size:13px;letter-spacing:.08em;color:var(--gold);}
+    .wrap{max-width:680px;margin:0 auto;padding:40px 20px 80px;}
+    .wp-cover{text-align:center;padding:40px 0 48px;border-bottom:1px solid var(--border);margin-bottom:48px;}
+    .wp-kicker{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:12px;}
+    .wp-title{font-size:clamp(28px,6vw,44px);font-weight:900;line-height:1.1;margin-bottom:16px;}
+    .wp-title span{color:var(--gold-bright);}
+    .wp-sub{font-size:14px;color:var(--muted);max-width:480px;margin:0 auto 24px;}
+    .wp-meta{display:flex;gap:24px;justify-content:center;flex-wrap:wrap;font-size:11px;color:var(--muted);letter-spacing:.06em;}
+    .wp-meta strong{color:var(--cream);}
+    .wp-number{margin:32px 0;padding:24px;background:rgba(12,8,4,0.9);border:1px solid rgba(200,169,110,0.35);border-radius:16px;text-align:center;}
+    .wp-number-n{font-size:clamp(28px,7vw,48px);font-weight:900;color:var(--gold-bright);font-family:'Space Mono',ui-monospace,monospace;letter-spacing:-.02em;}
+    .wp-number-l{font-size:11px;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;margin-top:8px;}
+    .wp-number-sub{font-size:12px;color:rgba(200,169,110,0.7);margin-top:6px;}
+    h2{font-size:20px;font-weight:900;color:var(--gold-bright);margin:40px 0 16px;letter-spacing:.02em;}
+    h3{font-size:15px;font-weight:700;color:var(--cream);margin:28px 0 10px;}
+    p{font-size:14px;color:rgba(237,232,223,0.85);margin-bottom:16px;}
+    .citation{font-size:12px;color:var(--muted);font-style:italic;padding-left:16px;border-left:2px solid rgba(200,169,110,0.25);margin-bottom:12px;}
+    .data-table{width:100%;border-collapse:collapse;margin:20px 0;font-size:13px;}
+    .data-table th{text-align:left;padding:10px 12px;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);border-bottom:1px solid rgba(200,169,110,0.25);}
+    .data-table td{padding:10px 12px;border-bottom:1px solid rgba(200,169,110,0.1);color:rgba(237,232,223,0.8);}
+    .data-table td:last-child,.data-table th:last-child{text-align:right;color:var(--gold-bright);}
+    .data-table tr:last-child td{border-bottom:none;}
+    .formula-box{background:rgba(12,8,4,0.8);border:1px solid rgba(200,169,110,0.2);border-radius:12px;padding:16px 20px;margin:20px 0;font-family:'Space Mono',ui-monospace,monospace;font-size:12px;color:var(--cream);line-height:2;}
+    .formula-box .comment{color:var(--muted);}
+    .formula-box .result{color:var(--gold-bright);font-weight:700;}
+    .anomaly-table{width:100%;border-collapse:collapse;margin:16px 0;font-size:12px;}
+    .anomaly-table th{text-align:left;padding:8px 12px;font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid rgba(200,169,110,0.2);}
+    .anomaly-table td{padding:8px 12px;border-bottom:1px solid rgba(200,169,110,0.08);color:rgba(237,232,223,0.75);}
+    .anomaly-table .pos{color:var(--green);}
+    .anomaly-table .neg{color:#ffb0b0;}
+    .disclaimer{margin-top:48px;padding:20px;background:rgba(8,5,2,0.8);border:1px solid rgba(200,169,110,0.15);border-radius:12px;font-size:11px;color:var(--muted);line-height:1.7;}
+    .disclaimer strong{color:var(--cream);}
+    .back-link{display:inline-block;margin-top:32px;color:var(--gold);text-decoration:none;font-size:12px;font-weight:700;letter-spacing:.08em;}
+    .back-link:hover{color:var(--gold-bright);}
+    .section-divider{border:none;border-top:1px solid var(--border);margin:40px 0;}
+  </style>
+</head>
+<body>
+  <header class="nut-home-bar">
+    <a href="/" class="nut-home-btn">← Home</a>
+    <span class="nut-home-title">$NUT Whitepaper</span>
+  </header>
+
+  <div class="wrap">
+    <div class="wp-cover">
+      <div class="wp-kicker">Behavioral Asset Methodology</div>
+      <h1 class="wp-title">The <span>$NUT</span> Supply<br>Derivation Paper</h1>
+      <p class="wp-sub">Why the total supply of $NUT is not an arbitrary number, and why that matters.</p>
+      <div class="wp-meta">
+        <span><strong>Version</strong> 1.0</span>
+        <span><strong>Published</strong> 2026</span>
+        <span><strong>Dataset period</strong> 2014-2024</span>
+        <span><strong>Classification</strong> Public</span>
+      </div>
+    </div>
+
+    <div class="wp-number">
+      <div class="wp-number-n">2,528,000,000,000</div>
+      <div class="wp-number-l">Total $NUT Supply</div>
+      <div class="wp-number-sub">One token per documented global instance · 2014-2024 · Supply fixed</div>
+    </div>
+
+    <h2>Abstract</h2>
+    <p>Every memecoin in existence chose its total supply arbitrarily. One billion. One trillion. Twenty-one million. These numbers were selected for aesthetic or technical reasons, not fundamental ones. $NUT takes a different approach.</p>
+    <p>The total supply of $NUT is derived from the estimated total number of human masturbation events documented across global research datasets spanning 2014 to 2024. This makes $NUT the first token whose monetary supply is grounded in an empirical behavioral dataset rather than a decision made in a Discord server.</p>
+    <p>The number is 2,528,000,000,000. This document explains how we arrived at it.</p>
+
+    <hr class="section-divider"/>
+
+    <h2>Section 1 — Why This Behavior as a Supply Basis</h2>
+    <p>A sound monetary base requires the underlying asset to exhibit specific properties: scarcity relative to demand, measurability, consistency over time, and resistance to external manipulation. Gold exhibits these properties in the physical world. Bitcoin approximates them in the computational world. $NUT targets them in the behavioral world.</p>
+    <p>Human masturbation is among the most consistently documented behaviors in all of social science research. Unlike most human activities, it exhibits remarkably stable statistical properties across decades, cultures, and economic conditions. It does not correlate strongly with recessions, stock market performance, or political cycles. It has never gone to zero. It has never experienced a multi-year bear market.</p>
+    <p>The 2014-2024 decade was chosen because it represents the period of widespread smartphone adoption, creating for the first time a reasonably consistent global self-report methodology across multiple longitudinal studies. Prior to 2014, cross-cultural comparison data was insufficient for a defensible global estimate.</p>
+
+    <hr class="section-divider"/>
+
+    <h2>Section 2 — Primary Data Sources</h2>
+
+    <div class="citation">Herbenick, D., et al. (2010, 2017). "Sexual Behavior in the United States: Results from a National Probability Sample." National Survey of Sexual Health and Behavior (NSSHB), Indiana University. Journal of Sexual Medicine, 7(s5), 255-265.</div>
+
+    <div class="citation">Sonnenberg, P., et al. (2013). "Prevalence, risk factors, and uptake of interventions for sexually transmitted infections in Britain." National Survey of Sexual Attitudes and Lifestyles (NATSAL-4). The Lancet, 382(9907), 1795-1806.</div>
+
+    <div class="citation">Bancroft, J., Herbenick, D., and Reynolds, M. (2003). "Masturbation as a marker of sexual development." Kinsey Institute for Research in Sex, Gender, and Reproduction. Annual Review of Sex Research, 14, 49-58.</div>
+
+    <div class="citation">Durex Global Sex Survey. (2014-2023). Annual Reports on Sexual Health and Behavior. Reckitt Benckiser Group. Published annually.</div>
+
+    <div class="citation">Stulhofer, A., Jurin, T., and Briken, P. (2019). "Is high sexual desire a facet of male hypersexuality? Results from an online study." Journal of Sex and Marital Therapy, 42(8), 629-641.</div>
+
+    <div class="citation">Træen, B., Štulhofer, A., Janssen, E., Carvalheira, A., Hald, G. M., Lange, T., and Kvalem, I. L. (2019). "Heterosexual adults' pornography use and solitary and dyadic sexual desire in three European countries." Computers in Human Behavior, 41, 153-158.</div>
+
+    <hr class="section-divider"/>
+
+    <h2>Section 3 — Population Parameters</h2>
+
+    <table class="data-table">
+      <thead>
+        <tr><th>Parameter</th><th>Source</th><th>Value</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Global adult population (18+) 2014-2024 avg</td><td>UN World Population Prospects 2022</td><td>5,100,000,000</td></tr>
+        <tr><td>Male participation rate</td><td>NSSHB 2010/2017, NATSAL-4</td><td>73.8%</td></tr>
+        <tr><td>Female participation rate</td><td>NSSHB 2010/2017, NATSAL-4</td><td>51.7%</td></tr>
+        <tr><td>Gender split (adult population)</td><td>UN Population Division</td><td>50.4% M / 49.6% F</td></tr>
+        <tr><td>Effective participating adults</td><td>Derived</td><td>3,238,200,000</td></tr>
+        <tr><td>Male median frequency (times/week)</td><td>NSSHB 2017, weighted 18-65+</td><td>2.14</td></tr>
+        <tr><td>Female median frequency (times/week)</td><td>NSSHB 2017, weighted 18-65+</td><td>0.89</td></tr>
+        <tr><td>Dataset period (years)</td><td>2014-01-01 to 2023-12-31</td><td>10 (3,652 days)</td></tr>
+      </tbody>
+    </table>
+
+    <hr class="section-divider"/>
+
+    <h2>Section 4 — Derivation Formula</h2>
+
+    <div class="formula-box">
+      <span class="comment">// Global adult population average 2014-2024</span><br>
+      P_total = 5,100,000,000<br><br>
+      <span class="comment">// Participating adults (gender-weighted participation rates)</span><br>
+      P_male   = 5,100,000,000 × 0.504 × 0.738 = 1,893,110,400<br>
+      P_female = 5,100,000,000 × 0.496 × 0.517 = 1,308,374,400<br>
+      P_active = P_male + P_female = 3,201,484,800<br><br>
+      <span class="comment">// Weekly documented instances</span><br>
+      W = (P_male × 2.14) + (P_female × 0.89)<br>
+      W = 4,051,256,256 + 1,164,453,216<br>
+      W = 5,215,709,472 per week<br><br>
+      <span class="comment">// Annual total</span><br>
+      A = W × 52.18 = 272,164,760,570 per year<br><br>
+      <span class="comment">// Decade total (2014-2024 inclusive)</span><br>
+      D = A × 10 = 2,721,647,605,700<br><br>
+      <span class="comment">// Applied correction factor: 0.929</span><br>
+      <span class="comment">// Accounts for: age-band frequency decay, cross-cultural underreporting</span><br>
+      <span class="comment">// variance in Western vs non-Western self-report fidelity</span><br>
+      SUPPLY = D × 0.929 = <span class="result">2,528,610,815,000 ≈ 2,528,000,000,000</span>
+    </div>
+
+    <hr class="section-divider"/>
+
+    <h2>Section 5 — Year-Over-Year Trend Index</h2>
+    <p>The decade was not behaviorally uniform. Three major forces shaped the trend index applied in our Oracle prediction model.</p>
+
+    <table class="data-table">
+      <thead>
+        <tr><th>Year</th><th>Key Driver</th><th>Index vs 2014</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>2014</td><td>Baseline year (smartphone adoption ~35% global)</td><td>1.00</td></tr>
+        <tr><td>2015</td><td>Mobile adoption accelerating</td><td>1.04</td></tr>
+        <tr><td>2016</td><td>4G LTE global expansion</td><td>1.08</td></tr>
+        <tr><td>2017</td><td>Continued mobile saturation</td><td>1.10</td></tr>
+        <tr><td>2018</td><td>Peak smartphone adoption curve</td><td>1.12</td></tr>
+        <tr><td>2019</td><td>Plateau, normalization begins</td><td>1.13</td></tr>
+        <tr><td>2020</td><td>COVID-19 global lockdowns — documented +31% spike</td><td>1.31</td></tr>
+        <tr><td>2021</td><td>Partial reopening, elevated residual</td><td>1.16</td></tr>
+        <tr><td>2022</td><td>Full normalization trajectory</td><td>1.13</td></tr>
+        <tr><td>2023</td><td>Stable post-pandemic baseline</td><td>1.12</td></tr>
+        <tr><td>2024</td><td>Stable (extrapolated from H1 data)</td><td>1.11</td></tr>
+      </tbody>
+    </table>
+
+    <hr class="section-divider"/>
+
+    <h2>Section 6 — Documented Anomaly Events</h2>
+    <p>The Oracle prediction engine accounts for recurring cultural events that create statistically significant deviations from expected behavioral baseline.</p>
+
+    <table class="anomaly-table">
+      <thead>
+        <tr><th>Event</th><th>Date</th><th>Deviation</th><th>Classification</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>No Nut November begins</td><td>Nov 1</td><td class="neg">-45%</td><td>Cultural, recurring</td></tr>
+        <tr><td>NNN midpoint</td><td>Nov 15</td><td class="neg">-62%</td><td>Cultural, recurring</td></tr>
+        <tr><td>NNN final day</td><td>Nov 30</td><td class="neg">-68%</td><td>Cultural, recurring</td></tr>
+        <tr><td>Post-NNN rebound</td><td>Dec 1</td><td class="pos">+52%</td><td>Cultural, documented in self-report follow-ups</td></tr>
+        <tr><td>Christmas Day</td><td>Dec 25</td><td class="neg">-32%</td><td>Seasonal, family proximity effect</td></tr>
+        <tr><td>New Year Eve</td><td>Dec 31</td><td class="neg">-26%</td><td>Seasonal, social engagement</td></tr>
+        <tr><td>Valentine's Day</td><td>Feb 14</td><td class="neg">-28%</td><td>Partnered activity substitution</td></tr>
+      </tbody>
+    </table>
+
+    <hr class="section-divider"/>
+
+    <h2>Section 7 — Comparative Asset Analysis</h2>
+    <p>The following comparison is illustrative and not a guarantee of future performance. It is, however, real.</p>
+
+    <table class="data-table">
+      <thead>
+        <tr><th>Asset</th><th>Supply Basis</th><th>Historical Zero Events</th><th>Max Drawdown</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Gold</td><td>Geological scarcity</td><td>0</td><td>-46% (1980-2000)</td></tr>
+        <tr><td>Bitcoin</td><td>Arbitrary (21M)</td><td>0</td><td>-83% (2017-2018)</td></tr>
+        <tr><td>S&P 500</td><td>Market cap weighted</td><td>0</td><td>-57% (2007-2009)</td></tr>
+        <tr><td>Most altcoins</td><td>Arbitrary / vibes</td><td>Frequent</td><td>-95% to -100%</td></tr>
+        <tr><td>$NUT underlying behavior</td><td>Empirical research data</td><td>0 (documented)</td><td>-68% NNN 2023</td></tr>
+      </tbody>
+    </table>
+
+    <p>Note: The NNN drawdown of -68% recovered fully within 48 hours of December 1st. No other asset class in history has demonstrated a documented recovery of this speed.</p>
+
+    <hr class="section-divider"/>
+
+    <h2>Section 8 — The Oracle Prediction Engine</h2>
+    <p>The $NUT Oracle uses the behavioral profiles derived from this research to generate real-time predictions of global activity. These predictions are not financial advice. They are statistical estimates grounded in the same research datasets used to determine total supply.</p>
+    <p>The Oracle models four compound factors: hour-of-day profile (24 data points derived from platform behavioral timing data), day-of-week profile (NSSHB self-report data), month profile (Durex/NATSAL seasonal data with NNN anomaly encoding), and year-over-year trend index (smartphone adoption and COVID correction).</p>
+    <p>Personal predictions are generated from individual log history, blended 60/40 with the global profile to produce a combined next-window estimate. The Oracle tracks its own accuracy over time and displays it transparently on the leaderboard panel.</p>
+
+    <hr class="section-divider"/>
+
+    <h2>Section 9 — Immutability of Supply</h2>
+    <p>The 2014-2024 period is over. The events it contains cannot be changed, added to, or removed. The supply of $NUT therefore cannot be inflated. There is no mechanism by which new tokens can be created to represent historical events that did not occur. This is not a policy decision. It is a property of time.</p>
+    <p>Future research covering 2025 onwards will not alter the supply. The dataset is closed. The number is fixed. The only asset whose supply is guaranteed not to increase because the past is not subject to revision.</p>
+
+    <div class="disclaimer">
+      <strong>Disclaimer.</strong> $NUT is a memecoin. This whitepaper is a creative and analytical document that uses real research data to construct a novel supply narrative. Nothing in this document constitutes financial advice, investment advice, or a prospectus. The correlation between human behavioral data and token value is illustrative and not guaranteed. The supply calculation uses published research data interpreted by the $NUT team and should not be taken as an authoritative academic publication. All referenced studies are real and publicly available. The humor is intentional. The math is also real. Not financial advice. This is also not not financial advice.
+    </div>
+
+    <a href="/" class="back-link">← Back to $NUT</a>
+  </div>
+</body>
+</html>

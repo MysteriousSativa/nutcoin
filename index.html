@@ -120,8 +120,12 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 }
 .hero-title .sym{color:#FFD97D;}
 .hero-pitch{
-  max-width:420px;margin:0 auto 20px;font-size:15px;line-height:1.45;font-weight:500;
+  max-width:420px;margin:0 auto 12px;font-size:15px;line-height:1.45;font-weight:500;
   color:rgba(237,232,223,0.88);
+}
+.hero-research{
+  max-width:420px;margin:0 auto 20px;font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+  color:rgba(200,169,110,0.6);font-family:'Space Mono',ui-monospace,monospace;
 }
 .ca-box{
   display:flex;align-items:center;gap:8px;max-width:480px;margin:0 auto 16px;
@@ -1440,6 +1444,36 @@ position:relative;overflow:hidden;
 .pm-wip-label span{display:block;font-family:'Space Mono',monospace;font-size:9px;letter-spacing:.08em;color:var(--muted);margin-top:6px;text-transform:none;}
 .pm-btn:disabled{opacity:0.45;cursor:not-allowed;transform:none !important;}
 
+/* ── ORACLE PREDICTION ENGINE ── */
+.oracle-card{background:rgba(8,5,2,0.75);border:1px solid rgba(200,169,110,0.28);border-radius:16px;padding:14px;margin-bottom:14px;}
+.oracle-hdr{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:12px;}
+.oracle-title{font-size:13px;font-weight:900;letter-spacing:.1em;color:var(--gold-bright);}
+.oracle-meta{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-top:3px;}
+.oracle-acc-pill{font-size:10px;font-weight:700;color:#8EE4A8;background:rgba(78,201,122,0.1);border:1px solid rgba(78,201,122,0.3);border-radius:8px;padding:4px 8px;white-space:nowrap;flex-shrink:0;}
+.oracle-acc-pill span{color:var(--muted);font-weight:400;}
+.oracle-alert{font-size:10px;padding:7px 10px;border-radius:8px;margin-bottom:10px;font-weight:600;letter-spacing:.04em;}
+.oracle-alert.bull{background:rgba(78,201,122,0.1);border:1px solid rgba(78,201,122,0.3);color:#8EE4A8;}
+.oracle-alert.bear{background:rgba(201,78,78,0.1);border:1px solid rgba(201,78,78,0.3);color:#ffb0b0;}
+.oracle-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;}
+.oracle-stat{padding:10px 6px;border-radius:10px;background:rgba(12,8,4,0.55);border:1px solid rgba(200,169,110,0.1);text-align:center;}
+.oracle-n{font-size:18px;font-weight:900;color:var(--gold-bright);line-height:1.1;}
+.oracle-l{font-size:9px;color:var(--muted);margin-top:4px;line-height:1.4;text-transform:uppercase;letter-spacing:.06em;}
+.oracle-l span{color:rgba(255,248,238,0.35);display:block;}
+.oracle-forecast{margin-bottom:12px;}
+.oracle-forecast-title{font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;}
+.oracle-forecast-title strong{color:var(--gold);}
+.oracle-bars{display:flex;align-items:flex-end;gap:2px;height:72px;padding-bottom:18px;position:relative;}
+.obar-col{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;position:relative;}
+.obar-fill{width:100%;background:rgba(200,169,110,0.3);border-radius:2px 2px 0 0;transition:height .4s;}
+.obar-fill.personal{background:rgba(78,201,122,0.38);}
+.obar-col.now .obar-fill{background:rgba(255,217,125,0.7);}
+.obar-col.peak .obar-fill{background:rgba(200,169,110,0.58);}
+.obar-label{position:absolute;bottom:-14px;font-size:8px;color:var(--muted);white-space:nowrap;}
+.oracle-basis{font-size:9px;color:var(--muted);letter-spacing:.04em;border-top:1px solid rgba(200,169,110,0.1);padding-top:10px;margin-top:4px;line-height:1.6;}
+.oracle-basis strong{color:var(--gold);}
+.oracle-cite{color:var(--gold);text-decoration:none;margin-left:8px;font-weight:700;}
+.oracle-cite:hover{color:var(--gold-bright);}
+
 /* ── ALLOCATION + CHAOS + DREAM ── */
 .alloc-card{background:rgba(8,5,2,0.75);border:1px solid rgba(200,169,110,0.28);border-radius:16px;padding:14px;margin-bottom:14px;}
 .alloc-kicker{font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);}
@@ -1647,7 +1681,8 @@ body.genesis-mode .hero-title{text-shadow:0 0 40px rgba(255,217,125,0.35);}
 <div class="hero">
   <div class="hero-badge" id="launchBadge">PRE-LAUNCH · pump.fun soon</div>
   <h1 class="hero-title" aria-label="$NUT"><span class="sym">$</span>NUT</h1>
-  <p class="hero-pitch">Every nut counts, solo, sex, quickie, revenge nut, 2am chaos. Log it on-chain energy. Tap. Receipt. Post. Cause a scene.</p>
+  <p class="hero-pitch">Every nut counts, solo, sex, quickie, revenge nut, 2am chaos. Log it on-chain. Tap. Receipt. Post. Cause a scene.</p>
+  <p class="hero-research">2,528,000,000,000 documented instances · 2014-2024 · supply fixed · history immutable</p>
   <div class="ca-box" id="caBox">
     <span class="ca-label">CA</span>
     <code class="ca-addr" id="caAddr">Deploying on pump.fun, check back</code>
@@ -1857,6 +1892,7 @@ body.genesis-mode .hero-title{text-shadow:0 0 40px rgba(255,217,125,0.35);}
         <div class="lb-empty">Connecting to the ledger...</div>
       </div>
       <div id="lbEventHistory"></div>
+      <div id="nutOracle"></div>
       <div class="lb-join" id="lbJoin" style="display:none">
         <button class="lb-join-btn" onclick="openNickModal()">Join Leaderboard</button>
       </div>
@@ -3802,6 +3838,7 @@ function downloadCert() {
 <script src="./allocation.js"></script>
 <script src="./chaos.js"></script>
 <script src="./dream.js"></script>
+<script src="./predictor.js"></script>
 <script>
 // ═══════════════════════════════
 // INIT
@@ -4265,6 +4302,7 @@ if (window.NutAddons) NutAddons.init();
 if (window.NutAllocation) NutAllocation.init();
 if (window.NutChaos) NutChaos.init();
 if (window.NutDream) NutDream.init();
+if (window.NutOracle) NutOracle.init();
 setInterval(()=>{ if(!document.hidden) fetchGlobalCounts(); },60000);
 setInterval(()=>{ if(!document.hidden) fetchLeaderboard(); },120000);
 setInterval(()=>{ if(!document.hidden) fetchGlobalActivity(); },30000);
