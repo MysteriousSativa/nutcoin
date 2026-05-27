@@ -294,6 +294,15 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
   font-size:10px;font-weight:600;color:rgba(200,169,110,0.6);
   letter-spacing:.01em;
 }
+.tf-loading{
+  display:inline-block;width:13px;height:13px;
+  border:2px solid rgba(255,217,125,0.18);
+  border-top-color:var(--gold-bright);
+  border-radius:50%;
+  animation:tf-spin .7s linear infinite;
+  vertical-align:middle;
+}
+@keyframes tf-spin{to{transform:rotate(360deg);}}
 .tf-spin{
   background:rgba(20,12,4,0.9);border:1px solid rgba(200,169,110,0.3);
   color:var(--gold-bright);border-radius:9px;padding:7px 10px;
@@ -4282,7 +4291,7 @@ scrollNutBtn.addEventListener('click', () => {
 <!-- FLOATING TOKEN BALANCE BOX (bottom-left) -->
 <div id="tokenFloat">
   <div class="tf-bal">
-    <span class="tf-amount" id="pmBalFloat">-</span>
+    <span class="tf-amount" id="pmBalFloat"><span class="tf-loading"></span></span>
     <span class="tf-label">NUTS</span>
     <span class="tf-usd" id="pmBalFloatUSD">TBA</span>
   </div>
