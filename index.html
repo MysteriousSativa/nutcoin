@@ -318,13 +318,48 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .nick-btn:hover{transform:translateY(-2px);filter:drop-shadow(0 0 16px rgba(200,140,0,0.45));}
 
 /* ── CLOCK ── */
-.clock-bar{text-align:center;font-family:'Cinzel',serif;font-size:13px;color:var(--muted);padding:10px 0 22px;letter-spacing:.1em;line-height:1.6;}
+.clock-bar{text-align:center;font-family:'Cinzel',serif;font-size:13px;color:var(--muted);padding:10px 0 22px;letter-spacing:.08em;line-height:1.5;}
 .clock-bar span{color:var(--gold);text-shadow:0 0 10px rgba(200,169,110,0.28);}
-.clock-date{margin-bottom:8px;}
-.clock-zones{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:6px 14px;font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.04em;}
-.clock-tz{display:inline-flex;align-items:baseline;gap:5px;white-space:nowrap;}
-.clock-tz .tz-label{font-family:'Cinzel',serif;font-size:9px;font-weight:700;letter-spacing:.14em;color:var(--gold-bright);min-width:2.2em;text-align:right;}
-.clock-tz .tz-time{color:var(--cream);}
+.clock-date{margin-bottom:10px;}
+.clock-toolbar{
+  display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:8px;margin-bottom:10px;padding:0 4px;
+}
+.clock-search{
+  flex:1 1 160px;max-width:280px;padding:8px 12px;border-radius:999px;
+  background:rgba(12,8,4,0.9);border:1px solid var(--border-hi);color:var(--cream);
+  font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.03em;
+}
+.clock-search::placeholder{color:var(--muted);}
+.clock-search:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 2px rgba(200,169,110,0.15);}
+.clock-filter-btn{
+  padding:8px 14px;border-radius:999px;border:1px solid var(--border-hi);
+  background:rgba(12,8,4,0.85);color:var(--muted);font-family:inherit;font-size:9px;font-weight:700;
+  letter-spacing:.12em;text-transform:uppercase;cursor:pointer;transition:background .15s,border-color .15s,color .15s;
+}
+.clock-filter-btn:hover{border-color:var(--gold);color:var(--cream);}
+.clock-filter-btn.active{background:rgba(200,100,10,0.2);border-color:var(--gold-bright);color:var(--gold-bright);}
+.clock-filter-btn.is-local{border-color:rgba(78,201,122,0.45);}
+.clock-filter-btn.is-local.active{background:rgba(78,201,122,0.15);color:#8EE4A8;}
+.clock-zones{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:4px 10px;
+  max-height:240px;overflow-y:auto;padding:8px 6px;margin:0 auto;
+  background:rgba(8,5,2,0.55);border:1px solid rgba(200,169,110,0.15);border-radius:14px;
+  scrollbar-width:thin;scrollbar-color:rgba(200,169,110,0.35) transparent;
+}
+.clock-zones::-webkit-scrollbar{width:5px;}
+.clock-zones::-webkit-scrollbar-thumb{background:rgba(200,169,110,0.35);border-radius:4px;}
+.clock-tz{
+  display:flex;align-items:center;justify-content:space-between;gap:6px;padding:5px 8px;border-radius:8px;
+  font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.02em;text-align:left;
+  background:rgba(12,8,4,0.45);border:1px solid transparent;
+}
+.clock-tz.is-you{border-color:rgba(78,201,122,0.45);background:rgba(78,201,122,0.08);}
+.clock-tz .tz-label{
+  font-family:'Cinzel',serif;font-size:8px;font-weight:700;letter-spacing:.08em;color:var(--gold-bright);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;flex:1;
+}
+.clock-tz .tz-time{color:var(--cream);flex-shrink:0;font-variant-numeric:tabular-nums;}
+.clock-tz-count{font-size:9px;color:var(--muted);margin-top:6px;letter-spacing:.1em;text-transform:uppercase;}
 
 /* ── WRAP ── */
 .wrap{max-width:920px;margin:0 auto;padding:0 16px 160px;position:relative;z-index:1;}
@@ -1000,9 +1035,13 @@ position:relative;overflow:hidden;
   .nick-btn{padding:5px 10px;font-size:9px;}
 
   /* Clock */
-  .clock-bar{font-size:10.5px;padding:6px 0 14px;letter-spacing:.07em;}
-  .clock-zones{gap:5px 10px;font-size:10px;}
-  .clock-tz .tz-label{font-size:8px;min-width:2em;}
+  .clock-bar{font-size:10.5px;padding:6px 0 14px;letter-spacing:.06em;}
+  .clock-toolbar{gap:6px;}
+  .clock-search{max-width:100%;font-size:10px;padding:7px 10px;}
+  .clock-filter-btn{padding:7px 10px;font-size:8px;}
+  .clock-zones{grid-template-columns:repeat(auto-fill,minmax(128px,1fr));max-height:180px;gap:3px 6px;}
+  .clock-tz{font-size:9px;padding:4px 6px;}
+  .clock-tz .tz-label{font-size:7px;}
 
   /* Counter card (continued) */
   .counter-label{font-size:8.5px;letter-spacing:.18em;margin-bottom:12px;}
@@ -1222,7 +1261,16 @@ position:relative;overflow:hidden;
     <button class="nick-btn" onclick="openNickModal()">Set Name</button>
   </div>
 
-  <div class="clock-bar" id="clockBar">Loading...</div>
+  <div class="clock-bar" id="clockBar">
+    <div class="clock-date" id="clockDate">Loading...</div>
+    <div class="clock-toolbar">
+      <input type="search" class="clock-search" id="tzSearch" placeholder="Filter timezones..." autocomplete="off" aria-label="Filter timezones"/>
+      <button type="button" class="clock-filter-btn active" id="tzAllBtn" onclick="setTzFilter('all')">All</button>
+      <button type="button" class="clock-filter-btn is-local" id="tzNearBtn" onclick="requestLocationFilter()">Near me</button>
+    </div>
+    <div class="clock-zones" id="clockZones"></div>
+    <div class="clock-tz-count" id="clockTzCount"></div>
+  </div>
   <p class="section-kicker">solo · partnered · unhinged, all nuts count</p>
 
   <!-- COUNTER CARD -->
@@ -2278,14 +2326,45 @@ function buildTicker() {
 }
 
 // ═══════════════════════════════
-// CLOCK
+// CLOCK / WORLD TIMEZONES
 // ═══════════════════════════════
-const CLOCK_ZONES = [
-  ['UTC', 'UTC'],
-  ['EST', 'America/New_York'],
-  ['CST', 'America/Chicago'],
-  ['PST', 'America/Los_Angeles'],
-];
+let allTimezones = [];
+let tzFilterMode = 'all';
+let userTimezone = null;
+let tzSearchQuery = '';
+let tzElements = new Map();
+
+function getAllTimezones() {
+  if (typeof Intl.supportedValuesOf === 'function') {
+    return Intl.supportedValuesOf('timeZone').sort();
+  }
+  return [
+    'UTC','Africa/Cairo','Africa/Johannesburg','Africa/Lagos','Africa/Nairobi',
+    'America/Anchorage','America/Argentina/Buenos_Aires','America/Bogota','America/Caracas',
+    'America/Chicago','America/Denver','America/Edmonton','America/Halifax','America/Havana',
+    'America/Lima','America/Los_Angeles','America/Mexico_City','America/New_York',
+    'America/Phoenix','America/Santiago','America/Sao_Paulo','America/Toronto','America/Vancouver',
+    'Asia/Bangkok','Asia/Dubai','Asia/Hong_Kong','Asia/Jakarta','Asia/Kolkata','Asia/Manila',
+    'Asia/Seoul','Asia/Shanghai','Asia/Singapore','Asia/Taipei','Asia/Tokyo',
+    'Atlantic/Reykjavik','Australia/Brisbane','Australia/Melbourne','Australia/Perth','Australia/Sydney',
+    'Europe/Amsterdam','Europe/Athens','Europe/Berlin','Europe/Dublin','Europe/Helsinki',
+    'Europe/Istanbul','Europe/Lisbon','Europe/London','Europe/Madrid','Europe/Moscow',
+    'Europe/Paris','Europe/Prague','Europe/Rome','Europe/Stockholm','Europe/Warsaw','Europe/Zurich',
+    'Pacific/Auckland','Pacific/Fiji','Pacific/Honolulu','Pacific/Guam',
+  ].sort();
+}
+
+function tzDisplayName(tz) {
+  const city = tz.split('/').pop().replace(/_/g, ' ');
+  const region = tz.includes('/') ? tz.split('/')[0].replace(/_/g, ' ') : '';
+  return region && city !== region ? `${city}` : city;
+}
+
+function tzOffsetMinutes(date, timeZone) {
+  const utc = new Date(date.toLocaleString('en-US', { timeZone: 'UTC' }));
+  const local = new Date(date.toLocaleString('en-US', { timeZone }));
+  return Math.round((local - utc) / 60000);
+}
 
 function formatClockTime(date, timeZone) {
   return new Intl.DateTimeFormat('en-GB', {
@@ -2297,6 +2376,106 @@ function formatClockTime(date, timeZone) {
   }).format(date);
 }
 
+function getFilteredTimezones(now) {
+  let list = allTimezones;
+  if (tzFilterMode === 'near' && userTimezone) {
+    const userOff = tzOffsetMinutes(now, userTimezone);
+    list = list.filter(tz => Math.abs(tzOffsetMinutes(now, tz) - userOff) <= 60);
+    if (!list.includes(userTimezone)) list = [userTimezone, ...list];
+  }
+  const q = tzSearchQuery.trim().toLowerCase();
+  if (q) {
+    list = list.filter(tz =>
+      tz.toLowerCase().includes(q) || tzDisplayName(tz).toLowerCase().includes(q)
+    );
+  }
+  if (userTimezone) {
+    list = [...list].sort((a, b) => {
+      if (a === userTimezone) return -1;
+      if (b === userTimezone) return 1;
+      return tzDisplayName(a).localeCompare(tzDisplayName(b));
+    });
+  } else {
+    list = [...list].sort((a, b) => tzDisplayName(a).localeCompare(tzDisplayName(b)));
+  }
+  return list;
+}
+
+function setTzFilter(mode) {
+  tzFilterMode = mode;
+  document.getElementById('tzAllBtn')?.classList.toggle('active', mode === 'all');
+  document.getElementById('tzNearBtn')?.classList.toggle('active', mode === 'near');
+  renderTimezoneList();
+}
+
+function requestLocationFilter() {
+  const applyNear = () => {
+    userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    tzFilterMode = 'near';
+    document.getElementById('tzAllBtn')?.classList.remove('active');
+    document.getElementById('tzNearBtn')?.classList.add('active');
+    renderTimezoneList();
+    if (typeof showToast === 'function') showToast(`Showing zones near ${tzDisplayName(userTimezone)} ✦`);
+  };
+  if (!navigator.geolocation) {
+    applyNear();
+    return;
+  }
+  navigator.geolocation.getCurrentPosition(
+    () => applyNear(),
+    () => {
+      if (typeof showToast === 'function') showToast('Location denied, showing browser timezone only');
+      applyNear();
+    },
+    { enableHighAccuracy: false, timeout: 12000, maximumAge: 300000 }
+  );
+}
+
+function renderTimezoneList() {
+  const wrap = document.getElementById('clockZones');
+  const countEl = document.getElementById('clockTzCount');
+  if (!wrap) return;
+  const now = new Date();
+  const list = getFilteredTimezones(now);
+  wrap.innerHTML = '';
+  tzElements.clear();
+  list.forEach(tz => {
+    const el = document.createElement('div');
+    el.className = 'clock-tz' + (tz === userTimezone ? ' is-you' : '');
+    el.dataset.tz = tz;
+    el.innerHTML = `<span class="tz-label" title="${tz}">${tzDisplayName(tz)}</span><span class="tz-time">${formatClockTime(now, tz)}</span>`;
+    wrap.appendChild(el);
+    tzElements.set(tz, el);
+  });
+  if (countEl) {
+    const total = allTimezones.length;
+    countEl.textContent = tzFilterMode === 'near' && userTimezone
+      ? `${list.length} zones near ${tzDisplayName(userTimezone)} · ${total} total`
+      : `${list.length} of ${total} timezones`;
+  }
+}
+
+function updateClockTimes() {
+  const now = new Date();
+  tzElements.forEach((el, tz) => {
+    const timeEl = el.querySelector('.tz-time');
+    if (timeEl) timeEl.textContent = formatClockTime(now, tz);
+  });
+}
+
+function initClock() {
+  allTimezones = getAllTimezones();
+  const search = document.getElementById('tzSearch');
+  if (search) {
+    search.addEventListener('input', () => {
+      tzSearchQuery = search.value;
+      renderTimezoneList();
+    });
+  }
+  renderTimezoneList();
+  updateClock();
+}
+
 function updateClock() {
   const now = new Date();
   const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -2306,12 +2485,11 @@ function updateClock() {
   const secsLeft = Math.floor((midnight - now) / 1000);
   const hL = Math.floor(secsLeft / 3600);
   const mL = Math.floor((secsLeft % 3600) / 60);
-  const zones = CLOCK_ZONES.map(([label, tz]) =>
-    `<span class="clock-tz"><span class="tz-label">${label}</span><span class="tz-time">${formatClockTime(now, tz)}</span></span>`
-  ).join('');
-  document.getElementById('clockBar').innerHTML =
-    `<div class="clock-date"><span>${days[now.getDay()]}, ${months[now.getMonth()]} ${now.getDate()}</span> &nbsp;✦&nbsp; <span>Resets in ${hL}h ${mL}m</span></div>` +
-    `<div class="clock-zones">${zones}</div>`;
+  const dateEl = document.getElementById('clockDate');
+  if (dateEl) {
+    dateEl.innerHTML = `<span>${days[now.getDay()]}, ${months[now.getMonth()]} ${now.getDate()}</span> &nbsp;✦&nbsp; <span>Resets in ${hL}h ${mL}m</span>`;
+  }
+  updateClockTimes();
   updateCooldown();
 }
 
@@ -2919,8 +3097,8 @@ buildTicker();
 seedLogs();
 renderNickBar();
 updateUI();
-updateClock();
-setInterval(updateClock,1000);
+initClock();
+setInterval(updateClock, 1000);
 setInterval(updateCooldown,10000);
 initMobile();
 fetchGlobalCounts();
