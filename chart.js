@@ -1,19 +1,29 @@
 /**
- * $NUT Index Chart — 12-Year Behavioral Activity Index
- * TradingView-style canvas · 2014-2026 · 150 monthly data points
+ * $NUT Index Chart — 12-Year Global Orgasm Activity Index
+ * All activities · Solo + Partnered blended · 2014-2026 · 150 monthly data points
+ *
+ * MONTH_PROFILE is a blended index:
+ *   Solo weight   57.4% (2,869B / 4,998B) — NSSHB masturbation frequency data
+ *   Partner weight 42.6% (2,129B / 4,998B) — Durex/IPSOS partnered activity data
+ *
+ * Key differences vs solo-only:
+ *   Feb: solo 1.07 → blended 1.13  (Valentine's Day partnered spike, Frederick et al. +40%)
+ *   Nov: solo 0.40 → blended 0.61  (NNN suppresses solo; partnered virtually unaffected)
+ *   Dec: solo 1.19 → blended 1.15  (rebound is mostly solo; family proximity dampens partner)
+ *   2020 YEAR_TREND: 1.31 → 1.25   (solo +31% NSSHB; partnered more modest; blended ≈ +25%)
  */
 (function () {
 
   // ─────────────────────────────────────────────────────────────────
-  // DATA LAYER
+  // DATA LAYER  — all-activities blended index
   // ─────────────────────────────────────────────────────────────────
   const MONTH_PROFILE = [
-    1.11, 1.07, 1.03, 0.99, 0.96, 0.93,
-    0.91, 0.89, 0.96, 1.04, 0.40, 1.19,
+    1.07, 1.13, 1.04, 1.01, 0.98, 0.97,
+    0.95, 0.93, 0.98, 1.03, 0.61, 1.15,
   ];
   const YEAR_TREND = {
     2014:1.00, 2015:1.04, 2016:1.08, 2017:1.10, 2018:1.12,
-    2019:1.13, 2020:1.31, 2021:1.16, 2022:1.13, 2023:1.12,
+    2019:1.13, 2020:1.25, 2021:1.16, 2022:1.13, 2023:1.12,
     2024:1.11, 2025:1.08, 2026:1.07,
   };
   const BASE       = 1000;
@@ -74,7 +84,7 @@
     },
     {
       aidx: ALL_DATA.findIndex(p => p.y === 2020 && p.m === 10),
-      label: ['NNN 2020', '▼ 62%'],
+      label: ['NNN 2020', '▼ 41%'],
       side: 'bot', type: 'bear',
     },
     {
