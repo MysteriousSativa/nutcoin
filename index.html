@@ -2191,7 +2191,7 @@ function setupBuyButtons() {
     if (badge) { badge.textContent = 'LIVE ON SOLANA'; badge.classList.add('live'); }
     if (addr) addr.textContent = CONTRACT_ADDR;
     document.getElementById('bannerCA').textContent = CONTRACT_ADDR.slice(0,8)+'...'+CONTRACT_ADDR.slice(-6);
-    document.querySelectorAll('.buy-btn-hero,.buy-btn-sm,.st-st-buy').forEach(b => { b.classList.remove('tba'); b.classList.add('has-ca'); });
+    document.querySelectorAll('.buy-btn-hero,.buy-btn-sm,.st-st-buy,.tf-buy').forEach(b => { b.classList.remove('tba'); b.classList.add('has-ca'); });
   } else {
     if (addr) addr.textContent = 'Mint not live yet, follow @TheNutTracker on X';
     if (badge) badge.textContent = 'FOLLOW @TheNutTracker FOR LAUNCH';
@@ -3552,7 +3552,7 @@ function downloadCert() {
 const KEY_PM_BAL = 'nut_pm_bal_v1';
 const KEY_PM_STATE = 'nut_pm_state_v1';
 const KEY_PM_DAY = 'nut_pm_day_v1';
-const NUT_SIM_PRICE = 0.000069; // simulated $NUT price per NUTTOKEN (play money)
+let NUT_PRICE_USD = null; // null=not fetched, 0=no data, number=live price per token
 
 const PROJECT_NEWS = [
   { date: '2026-05-27', tag: 'HUB', title: 'Nut Hub is live', body: 'Passport, duels, global pulse, daily bounties, radio ticker, crews, and oracle picks. All local-first.' },
@@ -3583,10 +3583,23 @@ function pmGetBalance() {
   return Math.max(0, parseInt(localStorage.getItem(KEY_PM_BAL) || '0', 10) || 0);
 }
 function pmSimUSD(bal) {
-  const usd = bal * NUT_SIM_PRICE;
+  if (!CONTRACT_ADDR) return 'TBA';
+  if (NUT_PRICE_USD === null) return '...';
+  if (!NUT_PRICE_USD) return '$0.00';
+  const usd = bal * NUT_PRICE_USD;
   if (usd === 0) return '$0.00';
   if (usd < 0.01) return '$' + usd.toFixed(6);
   return '$' + usd.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:4});
+}
+async function fetchNutPrice() {
+  if (!CONTRACT_ADDR) return;
+  try {
+    const res = await fetch(`https://api.dexscreener.com/latest/dex/tokens/${CONTRACT_ADDR}`);
+    const data = await res.json();
+    const pair = Array.isArray(data.pairs) && data.pairs[0];
+    NUT_PRICE_USD = pair && pair.priceUsd ? parseFloat(pair.priceUsd) : 0;
+    pmSetBalance(pmGetBalance()); // re-render with live price
+  } catch(e) { /* fail silently */ }
 }
 function pmSetBalance(v) {
   localStorage.setItem(KEY_PM_BAL, String(Math.max(0, Math.floor(v))));
@@ -3731,6 +3744,8 @@ renderProjectNews();
 pmResolveIfNewDay();
 pmResolveNow();
 pmRender();
+fetchNutPrice();
+setInterval(fetchNutPrice, 60000);
 if (window.NutAddons) NutAddons.init();
 setInterval(()=>{ if(!document.hidden) fetchGlobalCounts(); },60000);
 setInterval(()=>{ if(!document.hidden) fetchLeaderboard(); },120000);
