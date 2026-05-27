@@ -3685,6 +3685,11 @@ buildTicker();
 seedLogs();
 renderNickBar();
 updateUI();
+// Streak vars must be defined before initClock() → updateClock() → NutQuirks.renderQuirksStrip()
+const KEY_STREAK      = 'nut_streak_v1';
+const KEY_STREAK_LAST = 'nut_streak_last_v1';
+let currentStreak     = parseInt(localStorage.getItem(KEY_STREAK) || '0');
+let streakLastDate    = localStorage.getItem(KEY_STREAK_LAST) || '';
 initClock();
 setInterval(updateClock, 1000);
 setInterval(updateCooldown,10000);
@@ -3713,10 +3718,6 @@ renderFact('factCat2','factText2','factSrc2',factIdx2);
 // ════════════════════════════════════════
 // FEATURE 1: THE ETERNAL FLAME (Streak)
 // ════════════════════════════════════════
-const KEY_STREAK      = 'nut_streak_v1';
-const KEY_STREAK_LAST = 'nut_streak_last_v1';
-let currentStreak     = parseInt(localStorage.getItem(KEY_STREAK) || '0');
-let streakLastDate    = localStorage.getItem(KEY_STREAK_LAST) || '';
 
 function updateStreak() {
   if (streakLastDate === dateStr) return;
