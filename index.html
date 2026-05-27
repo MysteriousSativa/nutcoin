@@ -1208,6 +1208,58 @@ position:relative;overflow:hidden;
   *,*::before,*::after{animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important;}
   .drip-wrap{display:none !important;}
 }
+
+/* ── BOTTOM: NEWS + PREDICTIONS ── */
+.bottom-grid{max-width:920px;margin:0 auto;padding:0 16px 40px;display:grid;grid-template-columns:1fr 1fr;gap:14px;position:relative;z-index:1;}
+@media(max-width:860px){.bottom-grid{grid-template-columns:1fr;}}
+.bottom-card{
+  background:rgba(12,8,4,0.82);
+  border:1px solid rgba(200,169,110,0.25);
+  border-radius:20px;
+  padding:18px 16px;
+  box-shadow:0 16px 50px rgba(0,0,0,0.35), inset 0 1px 0 rgba(200,169,110,0.06);
+}
+.bottom-card-hdr{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:10px;}
+.bottom-card-title{font-family:'Cinzel',serif;font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);}
+.bottom-card-sub{font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);}
+.news-list{display:flex;flex-direction:column;gap:10px;max-height:240px;overflow:auto;padding-right:4px;scrollbar-width:thin;scrollbar-color:rgba(200,169,110,0.35) transparent;}
+.news-item{padding:10px 10px;border-radius:14px;background:rgba(8,5,2,0.55);border:1px solid rgba(200,169,110,0.14);}
+.news-meta{display:flex;gap:10px;align-items:center;margin-bottom:6px;}
+.news-date{font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);}
+.news-tag{font-family:'Cinzel',serif;font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold-bright);}
+.news-title{font-weight:800;font-size:13px;color:var(--cream);margin-bottom:4px;}
+.news-body{font-size:12px;line-height:1.45;color:rgba(237,232,223,0.9);}
+.pm-balance{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:8px 0 10px;}
+.pm-balance strong{color:var(--gold-bright);}
+.pm-mini{font-size:10px;color:var(--muted);line-height:1.35;}
+.pm-list{display:flex;flex-direction:column;gap:10px;max-height:240px;overflow:auto;padding-right:4px;scrollbar-width:thin;scrollbar-color:rgba(200,169,110,0.35) transparent;}
+.pm-market{padding:10px 10px;border-radius:14px;background:rgba(8,5,2,0.55);border:1px solid rgba(200,169,110,0.14);}
+.pm-q{font-size:12.5px;line-height:1.4;color:var(--cream);font-weight:800;margin-bottom:8px;}
+.pm-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+.pm-btn{
+  flex:1 1 120px;
+  padding:10px 12px;border-radius:12px;border:1px solid rgba(200,169,110,0.22);
+  background:rgba(12,8,4,0.75);color:var(--muted);
+  font-family:'Cinzel',serif;font-size:10px;letter-spacing:.12em;text-transform:uppercase;
+  cursor:pointer;transition:transform .12s,border-color .15s,background .15s,color .15s;
+}
+.pm-btn:hover{transform:translateY(-1px);border-color:rgba(200,169,110,0.4);color:var(--cream);}
+.pm-btn.yes.active{border-color:rgba(78,201,122,0.55);background:rgba(78,201,122,0.12);color:#8EE4A8;}
+.pm-btn.no.active{border-color:rgba(201,78,78,0.55);background:rgba(201,78,78,0.12);color:#ffb0b0;}
+.pm-stake{display:flex;align-items:center;gap:8px;margin-top:8px;}
+.pm-stake input{
+  width:92px;padding:9px 10px;border-radius:12px;
+  background:rgba(12,8,4,0.9);border:1px solid rgba(200,169,110,0.22);
+  color:var(--cream);font-family:'Space Mono',monospace;font-size:12px;
+}
+.pm-stake button{
+  padding:10px 12px;border-radius:12px;border:1px solid rgba(200,169,110,0.35);
+  background:rgba(200,100,10,0.16);color:var(--gold-bright);
+  font-family:'Cinzel',serif;font-size:10px;letter-spacing:.12em;text-transform:uppercase;
+  cursor:pointer;
+}
+.pm-pill{font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);margin-top:6px;}
+.pm-pill strong{color:var(--gold-bright);}
 </style>
 </head>
 <body>
@@ -1543,6 +1595,31 @@ position:relative;overflow:hidden;
     <div class="updates-feed" id="updatesFeed"></div>
   </div>
 </section>
+
+<!-- PROJECT NEWS + PREDICTIONS (PLAY TOKENS, NO MONEY) -->
+<div class="bottom-grid" id="bottomGrid">
+  <div class="bottom-card" id="projectNews">
+    <div class="bottom-card-hdr">
+      <div class="bottom-card-title">Project News</div>
+      <div class="bottom-card-sub" id="newsSub">updates</div>
+    </div>
+    <div class="news-list" id="newsList"></div>
+  </div>
+  <div class="bottom-card" id="predictionMarket">
+    <div class="bottom-card-hdr">
+      <div class="bottom-card-title">Predictions</div>
+      <div class="bottom-card-sub" id="pmSub">play tokens</div>
+    </div>
+    <div class="pm-balance">
+      <div class="pm-mini">Balance: <strong id="pmBal">0</strong> NUTTOKENS</div>
+      <div class="pm-mini" id="pmDay">today</div>
+    </div>
+    <div class="pm-mini" style="margin-bottom:10px;">
+      For fun only, no real money, no payouts, no cashout. Tokens are earned by logging nuts.
+    </div>
+    <div class="pm-list" id="pmList"></div>
+  </div>
+</div>
 
 <div class="wrap" style="padding-top:0">
   <div class="footer">
@@ -2240,6 +2317,8 @@ function nut() {
   typeStatsAll[method] = (typeStatsAll[method] || 0) + points;
   localStorage.setItem(KEY_TYPE_ALL, JSON.stringify(typeStatsAll));
   save();
+  // Earn play tokens for predictions (no money, no cashout)
+  if (typeof pmEarnTokens === 'function') pmEarnTokens(points);
   showNutVerdict(method);
   if (window.NutQuirks) NutQuirks.onNutLogged(method, points);
 
@@ -3267,6 +3346,183 @@ function downloadCert() {
 // ═══════════════════════════════
 // INIT
 // ═══════════════════════════════
+// ───────────────────────────────
+// Bottom: News + Predictions (play tokens)
+// ───────────────────────────────
+const KEY_PM_BAL = 'nut_pm_bal_v1';
+const KEY_PM_STATE = 'nut_pm_state_v1';
+const KEY_PM_DAY = 'nut_pm_day_v1';
+
+const PROJECT_NEWS = [
+  { date: '2026-05-27', tag: 'BUILD', title: 'Global Activity went live', body: 'Everyone’s logs now show up in Global Activity when Supabase is connected.' },
+  { date: '2026-05-27', tag: 'UX', title: 'Timezone rules + morning lock', body: 'Pick a timezone, it pins at the bottom. Morning is only valid before 12pm in that zone.' },
+  { date: '2026-05-27', tag: 'RECEIPT', title: 'Receipts upgraded', body: 'Serials, hash, and timezone verification stamp added to make sharing feel official.' },
+  { date: '2026-05-27', tag: 'QUIRKS', title: 'Method gates + bonuses', body: 'Hotel, Sneaky, Round 2, Quickie, Revenge, plus variety and surge bonuses.' },
+];
+
+function renderProjectNews() {
+  const list = document.getElementById('newsList');
+  const sub = document.getElementById('newsSub');
+  if (!list) return;
+  if (sub) sub.textContent = `${PROJECT_NEWS.length} updates`;
+  list.innerHTML = PROJECT_NEWS.map(n => `
+    <div class="news-item">
+      <div class="news-meta">
+        <span class="news-date">${n.date}</span>
+        <span class="news-tag">${n.tag}</span>
+      </div>
+      <div class="news-title">${n.title}</div>
+      <div class="news-body">${n.body}</div>
+    </div>
+  `).join('');
+}
+
+function pmGetBalance() {
+  return Math.max(0, parseInt(localStorage.getItem(KEY_PM_BAL) || '0', 10) || 0);
+}
+function pmSetBalance(v) {
+  localStorage.setItem(KEY_PM_BAL, String(Math.max(0, Math.floor(v))));
+  const el = document.getElementById('pmBal');
+  if (el) el.textContent = pmGetBalance().toLocaleString();
+}
+function pmEarnTokens(n) {
+  pmSetBalance(pmGetBalance() + Math.max(0, Math.floor(n)));
+}
+
+function pmNowDayKey() {
+  // Keep it simple: resolve by browser day (local). This is play-money only.
+  return dateStr;
+}
+
+function pmDefaultMarkets() {
+  // Original, app-specific markets, no copying external app sets.
+  return [
+    {
+      id: 'you_10',
+      q: 'Will you reach 10+ points today?',
+      resolve: () => (countToday >= 10 ? 'YES' : 'NO'),
+    },
+    {
+      id: 'variety_3',
+      q: 'Will you use 3+ different methods today?',
+      resolve: () => (uniqueMethodsToday() >= 3 ? 'YES' : 'NO'),
+    },
+    {
+      id: 'streak_safe',
+      q: 'Will you log at least once before midnight?',
+      resolve: () => (countToday >= 1 ? 'YES' : 'NO'),
+    },
+    {
+      id: 'double_hit',
+      q: 'Will you log a 2× method this hour?',
+      resolve: () => {
+        const types = getHourly2xTypes();
+        const hit = todayLog.some(e => types.includes(logType(e)) && logPts(e) > 1);
+        return hit ? 'YES' : 'NO';
+      },
+    },
+  ];
+}
+
+function pmLoadState() {
+  try { return JSON.parse(localStorage.getItem(KEY_PM_STATE) || '{}') || {}; } catch { return {}; }
+}
+function pmSaveState(st) {
+  localStorage.setItem(KEY_PM_STATE, JSON.stringify(st));
+}
+
+function pmResolveIfNewDay() {
+  const lastDay = localStorage.getItem(KEY_PM_DAY) || '';
+  const todayKey = pmNowDayKey();
+  if (!lastDay) {
+    localStorage.setItem(KEY_PM_DAY, todayKey);
+    return;
+  }
+  if (lastDay === todayKey) return;
+
+  // Resolve yesterday markets (based on stored snapshot). If missing, just reset slips.
+  const st = pmLoadState();
+  const slips = st?.slips || {};
+  const results = st?.results || {};
+  Object.entries(slips).forEach(([mid, slip]) => {
+    if (!slip || !slip.pick || !slip.stake) return;
+    const resolved = results[mid];
+    if (!resolved) return;
+    if (resolved === slip.pick) pmEarnTokens(slip.stake * 2);
+  });
+
+  localStorage.setItem(KEY_PM_DAY, todayKey);
+  pmSaveState({ slips: {}, results: {} });
+}
+
+function pmRender() {
+  const list = document.getElementById('pmList');
+  const sub = document.getElementById('pmSub');
+  const day = document.getElementById('pmDay');
+  if (!list) return;
+
+  const markets = pmDefaultMarkets();
+  if (sub) sub.textContent = `${markets.length} markets`;
+  if (day) day.textContent = pmNowDayKey();
+
+  const st = pmLoadState();
+  const slips = st.slips || {};
+
+  list.innerHTML = markets.map(m => {
+    const slip = slips[m.id] || {};
+    const pick = slip.pick || '';
+    const stake = slip.stake || 0;
+    return `
+      <div class="pm-market" data-mid="${m.id}">
+        <div class="pm-q">${m.q}</div>
+        <div class="pm-row">
+          <button class="pm-btn yes ${pick==='YES'?'active':''}" onclick="pmPick('${m.id}','YES')">Yes</button>
+          <button class="pm-btn no ${pick==='NO'?'active':''}" onclick="pmPick('${m.id}','NO')">No</button>
+        </div>
+        <div class="pm-stake">
+          <input inputmode="numeric" pattern="[0-9]*" id="pmStake_${m.id}" value="${stake || 5}" aria-label="Stake tokens"/>
+          <button onclick="pmBet('${m.id}')">Bet</button>
+          <div class="pm-pill">payout: <strong>2×</strong> · balance: <strong>${pmGetBalance()}</strong></div>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  pmSetBalance(pmGetBalance());
+}
+
+function pmPick(mid, pick) {
+  const st = pmLoadState();
+  st.slips = st.slips || {};
+  st.slips[mid] = { ...(st.slips[mid] || {}), pick };
+  pmSaveState(st);
+  pmRender();
+}
+
+function pmBet(mid) {
+  const st = pmLoadState();
+  st.slips = st.slips || {};
+  const slip = st.slips[mid] || {};
+  if (!slip.pick) { showToast('Pick YES or NO first'); return; }
+  const inp = document.getElementById(`pmStake_${mid}`);
+  const stake = Math.max(1, Math.min(500, parseInt(inp?.value || '0', 10) || 0));
+  if (stake > pmGetBalance()) { showToast('Not enough tokens'); return; }
+  pmSetBalance(pmGetBalance() - stake);
+  st.slips[mid] = { pick: slip.pick, stake };
+  pmSaveState(st);
+  showToast(`Bet placed: ${stake} on ${slip.pick}`);
+  pmRender();
+}
+
+function pmResolveNow() {
+  // Resolve current markets against current app state (play tokens, daily refresh).
+  const markets = pmDefaultMarkets();
+  const st = pmLoadState();
+  st.results = st.results || {};
+  markets.forEach(m => { st.results[m.id] = m.resolve(); });
+  pmSaveState(st);
+}
+
 setupBuyButtons();
 buildNutMethodChips();
 updateMethodAttachPreview(selectedNutType);
@@ -3286,9 +3542,14 @@ initMobile();
 fetchGlobalCounts();
 fetchLeaderboard();
 fetchGlobalActivity();
+renderProjectNews();
+pmResolveIfNewDay();
+pmResolveNow();
+pmRender();
 setInterval(()=>{ if(!document.hidden) fetchGlobalCounts(); },60000);
 setInterval(()=>{ if(!document.hidden) fetchLeaderboard(); },120000);
 setInterval(()=>{ if(!document.hidden) fetchGlobalActivity(); },30000);
+setInterval(()=>{ if(!document.hidden){ pmResolveNow(); pmRender(); } },15000);
 document.addEventListener('visibilitychange',()=>{
   if(!document.hidden){ fetchGlobalCounts(); fetchGlobalActivity(); if(currentPanel===5) fetchLeaderboard(); }
 });
