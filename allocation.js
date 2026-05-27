@@ -11,12 +11,13 @@
   const WAVE1_LOCKED = true;
   const WAVE2_END    = new Date('2026-06-10T23:59:59Z').getTime();
 
+  // Tier labels derived from research terminology (NSSHB frequency percentile bands)
   const TIERS = [
-    { id: 'genesis', label: 'GENESIS NUT', badge: '🥜✦', mult: 3, pct: -1 },
-    { id: 'diamond', label: 'DIAMOND NUT', badge: '💎', mult: 2, pct: 1 },
-    { id: 'gold',    label: 'GOLD NUT',    badge: '🌟', mult: 1.5, pct: 5 },
-    { id: 'silver',  label: 'SILVER NUT',  badge: '⚡', mult: 1, pct: 25 },
-    { id: 'paper',   label: 'PAPER NUT',   badge: '📜', mult: 0.5, pct: 100 },
+    { id: 'genesis', label: 'PRIMARY SOURCE',      badge: '🥜✦', mult: 3,   pct: -1  },
+    { id: 'diamond', label: 'STATISTICAL OUTLIER', badge: '💎',  mult: 2,   pct: 1   },
+    { id: 'gold',    label: 'HIGH FREQUENCY',      badge: '🌟',  mult: 1.5, pct: 5   },
+    { id: 'silver',  label: 'ACTIVE PARTICIPANT',  badge: '⚡',  mult: 1,   pct: 25  },
+    { id: 'paper',   label: 'BASELINE',            badge: '📜',  mult: 0.5, pct: 100 },
   ];
 
   function esc(s) {

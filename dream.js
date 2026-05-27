@@ -125,7 +125,7 @@
         <div class="dream-wallet-out">Need ~${fmtUsd(needMcap)} mcap · ~${daysToTarget} days at today pace</div>
       </div>
       <button type="button" class="dream-share" onclick="NutDream.shareBags()">SHARE MY BAGS</button>
-      <div class="dream-rank-line">You hold <strong>${pct.toFixed(5)}%</strong> of supply · equiv rank <strong>#${rank}</strong> of 10,000</div>`;
+      <div class="dream-rank-line">You hold <strong>${pct.toFixed(8)}%</strong> of the documented decade · equiv rank <strong>#${rank}</strong> if 10,000 holders</div>`;
 
     panel.querySelectorAll('.dream-tab').forEach(btn => {
       btn.addEventListener('click', () => {

@@ -35,6 +35,11 @@
     .btn.ghost{background:rgba(8,5,2,0.7);color:var(--muted);}
     .loading{text-align:center;padding:40px;color:var(--muted);}
     .err{text-align:center;padding:40px;color:#ffb0b0;}
+    .profile-dataset{background:rgba(8,5,2,0.7);border:1px solid rgba(200,169,110,0.18);border-radius:12px;padding:12px 14px;margin-bottom:14px;text-align:center;}
+    .profile-dataset-label{font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;}
+    .profile-dataset-val{font-size:18px;font-weight:900;font-family:ui-monospace,monospace;color:var(--gold-bright);letter-spacing:.02em;}
+    .profile-dataset-sub{font-size:10px;color:var(--muted);margin-top:4px;}
+    .profile-dataset-sub a{color:var(--gold);text-decoration:none;}
   </style>
 </head>
 <body>
@@ -180,6 +185,11 @@
           <div class="stat"><div class="stat-n">${typeof today === 'number' ? today.toLocaleString() : today}</div><div class="stat-l">Today</div></div>
           <div class="stat"><div class="stat-n">${deeds.toLocaleString()}</div><div class="stat-l">All time</div></div>
           <div class="stat"><div class="stat-n">${typeof streak === 'number' ? streak : streak}</div><div class="stat-l">Streak</div></div>
+        </div>
+        <div class="profile-dataset">
+          <div class="profile-dataset-label">Share of 2014-2024 historical record</div>
+          <div class="profile-dataset-val">${deeds > 0 ? (deeds / 2_528_000_000_000 * 100).toFixed(10) : '0.0000000000'}%</div>
+          <div class="profile-dataset-sub">of 2,528,000,000,000 documented instances · <a href="/whitepaper.html">methodology</a></div>
         </div>
         <div class="actions">
           <button type="button" class="btn" onclick="shareThis()">Share profile</button>

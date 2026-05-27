@@ -127,6 +127,20 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
   max-width:420px;margin:0 auto 20px;font-size:10px;letter-spacing:.1em;text-transform:uppercase;
   color:rgba(200,169,110,0.6);font-family:'Space Mono',ui-monospace,monospace;
 }
+/* ── TAM COUNTER ── */
+.tam-section{background:rgba(4,2,0,0.96);border-top:1px solid rgba(200,169,110,0.15);border-bottom:1px solid rgba(200,169,110,0.15);padding:22px 20px;}
+.tam-inner{display:flex;align-items:center;justify-content:center;gap:24px;flex-wrap:wrap;max-width:640px;margin:0 auto 10px;}
+.tam-side{text-align:center;flex:1;min-width:160px;}
+.tam-n{font-size:clamp(28px,7vw,44px);font-weight:900;font-family:'Space Mono',ui-monospace,monospace;line-height:1.05;color:var(--gold-bright);}
+.tam-n.nut{color:var(--green);}
+.tam-l{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-top:5px;line-height:1.5;}
+.tam-l span{display:block;color:rgba(255,248,238,0.3);}
+.tam-l strong{color:var(--cream);}
+.tam-vs{font-size:11px;font-weight:900;letter-spacing:.2em;color:var(--muted);padding:0 4px;}
+.tam-tagline{text-align:center;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgba(200,169,110,0.5);font-family:'Space Mono',ui-monospace,monospace;}
+.tam-tagline a{color:rgba(200,169,110,0.7);text-decoration:none;}
+.tam-tagline a:hover{color:var(--gold);}
+@media(max-width:480px){.tam-inner{gap:12px;}.tam-n{font-size:clamp(22px,8vw,32px);}}
 .ca-box{
   display:flex;align-items:center;gap:8px;max-width:480px;margin:0 auto 16px;
   background:rgba(0,0,0,0.45);border:1px solid var(--border-hi);border-radius:12px;
@@ -1702,6 +1716,22 @@ body.genesis-mode .hero-title{text-shadow:0 0 40px rgba(255,217,125,0.35);}
   </div>
 </div>
 
+<!-- TAM COUNTER — Research-derived global activity vs $NUT capture -->
+<div class="tam-section" id="tamSection">
+  <div class="tam-inner">
+    <div class="tam-side">
+      <div class="tam-n" id="tamGlobal">28.8M</div>
+      <div class="tam-l">this hour worldwide<br><span>oracle forecast · 2014-2024 data</span></div>
+    </div>
+    <div class="tam-vs">VS</div>
+    <div class="tam-side">
+      <div class="tam-n nut" id="tamNutAll">-</div>
+      <div class="tam-l">logged on $NUT all time<br><span>capture rate: <strong id="tamCapture">calculating...</strong></span></div>
+    </div>
+  </div>
+  <div class="tam-tagline">The market is enormous. You are early. &nbsp;<a href="/whitepaper.html">Methodology →</a></div>
+</div>
+
 <div class="wrap">
 
   <!-- GLOBAL LIVE COUNTER -->
@@ -2518,6 +2548,21 @@ async function fetchGlobalCounts() {
     if (ha) ha.textContent = a.toLocaleString();
     if (window.NutQuirks) NutQuirks.onGlobalCounts(t);
     if (window.NutAddons) NutAddons.onGlobalCounts(t);
+    // TAM counter
+    const tamAll = document.getElementById('tamNutAll');
+    const tamCap = document.getElementById('tamCapture');
+    if (tamAll) tamAll.textContent = a.toLocaleString();
+    if (tamCap && window.NutOracle) {
+      const hourly = NutOracle.predictHourly(new Date());
+      const daily  = NutOracle.predictDaily(new Date());
+      const tamG   = document.getElementById('tamGlobal');
+      if (tamG) tamG.textContent = (hourly / 1e6).toFixed(1) + 'M';
+      // Capture rate: $NUT all-time vs estimated decade total
+      const rate = a > 0 ? (a / NutOracle.RESEARCH_SUPPLY * 100) : 0;
+      tamCap.textContent = rate < 0.000001
+        ? '< 0.000001%'
+        : rate.toFixed(8) + '%';
+    }
   } catch(e) {
     document.getElementById('globalTodaySub').textContent = 'connection error';
   }
@@ -3796,10 +3841,13 @@ async function renderCertificate(canvas) {
   ctx.fillText(p.x, W / 2, 1210);
   ctx.font = '600 18px Inter,system-ui,sans-serif';
   ctx.fillStyle = MUTED;
-  ctx.fillText('POST AT YOUR OWN RISK · NOT FINANCIAL ADVICE', W / 2, 1245);
-  ctx.font = '500 16px "Space Mono",monospace';
-  ctx.fillStyle = 'rgba(200,169,110,0.5)';
-  ctx.fillText(p.site.replace('https://', ''), W / 2, 1285);
+  ctx.fillText('POST AT YOUR OWN RISK · NOT FINANCIAL ADVICE', W / 2, 1238);
+  ctx.font = '500 15px "Space Mono",monospace';
+  ctx.fillStyle = 'rgba(200,169,110,0.45)';
+  ctx.fillText('DEED ' + (p.allTime || 1).toLocaleString() + ' OF 2,528,000,000,000', W / 2, 1265);
+  ctx.font = '500 14px "Space Mono",monospace';
+  ctx.fillStyle = 'rgba(200,169,110,0.38)';
+  ctx.fillText(p.site.replace('https://', ''), W / 2, 1292);
 
   const loading = document.getElementById('certLoading');
   if (loading) loading.style.display = 'none';

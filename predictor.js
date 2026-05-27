@@ -297,11 +297,18 @@
       </div>`;
   }
 
+  function updateTam() {
+    const tamG = document.getElementById('tamGlobal');
+    if (tamG) tamG.textContent = (predictHourly(new Date()) / 1e6).toFixed(1) + 'M';
+  }
+
   function init() {
     recordTodayPrediction();
     settleYesterday();
     render();
+    updateTam();
     setInterval(render, 60000);
+    setInterval(updateTam, 300000); // refresh TAM hourly forecast every 5 min
   }
 
   window.NutOracle = {
