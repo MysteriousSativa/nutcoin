@@ -169,6 +169,126 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .nidx-leg.meta a:hover{color:var(--gold-bright);}
 .nidx-sep{color:rgba(200,169,110,0.2);font-size:10px;}
 
+/* ── DROP BANNER ── */
+.drop-banner{position:relative;overflow:hidden;background:rgba(4,2,0,0.98);border-bottom:1px solid rgba(255,200,80,0.25);padding:18px 16px 16px;}
+.drop-banner::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 120% at 50% 0%,rgba(200,80,0,0.14) 0%,transparent 65%);pointer-events:none;}
+.drop-banner.drop-urgent{border-color:rgba(255,80,80,0.4);}
+.drop-banner.drop-urgent::before{background:radial-gradient(ellipse 80% 120% at 50% 0%,rgba(200,20,0,0.22) 0%,transparent 65%);}
+.drop-inner{max-width:600px;margin:0 auto;text-align:center;position:relative;z-index:1;}
+.drop-kicker{display:inline-block;font-size:10px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:var(--gold-bright);background:rgba(200,169,110,0.10);border:1px solid rgba(200,169,110,0.3);border-radius:4px;padding:3px 10px;margin-bottom:8px;}
+.drop-heading{font-size:clamp(13px,3vw,16px);font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:var(--cream);margin-bottom:12px;}
+.drop-cd{display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:12px;}
+.drop-unit{display:flex;flex-direction:column;align-items:center;background:rgba(12,8,4,0.85);border:1px solid rgba(200,169,110,0.22);border-radius:8px;padding:8px 12px;min-width:52px;}
+.drop-n{font-family:'Space Mono',ui-monospace,monospace;font-size:clamp(20px,5vw,28px);font-weight:700;color:var(--gold-bright);line-height:1;}
+.drop-l{font-size:8px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-top:3px;}
+.drop-col{font-size:24px;font-weight:900;color:rgba(200,169,110,0.4);line-height:1;margin-bottom:8px;}
+.drop-details{font-size:10px;letter-spacing:.07em;color:var(--muted);margin-bottom:12px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap;}
+.drop-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;}
+.drop-notify-btn{background:transparent;border:1px solid rgba(200,169,110,0.35);border-radius:8px;padding:8px 16px;font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--gold-bright);cursor:pointer;font-family:inherit;}
+.drop-notify-btn.active{background:rgba(200,169,110,0.12);border-color:var(--gold);}
+.drop-notify-btn:hover{background:rgba(200,169,110,0.10);}
+.drop-cta-link{background:var(--btn-ember);border:1px solid rgba(255,160,40,0.5);border-radius:8px;padding:8px 16px;font-size:11px;font-weight:800;letter-spacing:.08em;color:#FFEAA0;text-decoration:none;display:inline-block;}
+.drop-cta-link:hover{filter:brightness(1.08);}
+.drop-live-badge{font-size:12px;font-weight:800;color:#4EC97A;letter-spacing:.1em;}
+
+/* ── CASINO TABS ── */
+.casino-tab-bar{display:flex;gap:0;border-bottom:1px solid rgba(200,169,110,0.18);margin-bottom:12px;}
+.casino-tab{flex:1;background:transparent;border:none;border-bottom:2px solid transparent;padding:10px 8px;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);cursor:pointer;font-family:inherit;transition:color .12s,border-color .12s;}
+.casino-tab:hover{color:var(--gold-bright);}
+.casino-tab.active{color:var(--gold-bright);border-bottom-color:var(--gold-bright);}
+.casino-panel{display:none;}
+
+/* ── ORACLE WHEEL STATUS ── */
+.wheel-oracle-status{display:block;text-align:center;font-size:10px;font-weight:700;letter-spacing:.09em;padding:5px 12px;border-radius:6px;margin-bottom:8px;}
+.oracle-hot   {background:rgba(200,100,10,0.15);color:#FFB040;border:1px solid rgba(200,100,10,0.3);}
+.oracle-warm  {background:rgba(200,169,110,0.08);color:var(--gold-bright);border:1px solid rgba(200,169,110,0.2);}
+.oracle-cold  {background:rgba(10,10,30,0.5);color:rgba(150,150,200,0.8);border:1px solid rgba(100,100,180,0.15);}
+.oracle-supp  {background:rgba(80,0,0,0.35);color:#ff6060;border:1px solid rgba(180,0,0,0.3);}
+.oracle-cosmic{background:rgba(40,0,80,0.4);color:#FFD97D;border:1px solid rgba(150,80,255,0.35);animation:cosmicPulse 1.8s ease-in-out infinite;}
+@keyframes cosmicPulse{0%,100%{box-shadow:0 0 0 0 rgba(200,169,110,0);}50%{box-shadow:0 0 14px 3px rgba(200,169,110,0.25);}}
+.wheel-recent-results{display:flex;gap:4px;justify-content:center;flex-wrap:wrap;margin-bottom:10px;min-height:20px;}
+.wr-pill{font-size:9px;font-weight:700;letter-spacing:.06em;border-radius:4px;padding:2px 6px;}
+.wr-pill.bust   {background:rgba(201,78,78,0.18);color:#ff8080;}
+.wr-pill.win    {background:rgba(78,201,122,0.18);color:#4EC97A;}
+.wr-pill.jackpot{background:rgba(200,169,110,0.20);color:#FFD97D;}
+.wr-pill.empty  {color:var(--muted);}
+
+/* ── COIN FLIP ── */
+.flip-bal{font-size:11px;color:var(--muted);text-align:center;margin-bottom:10px;}
+.flip-bal strong{color:var(--cream);}
+.flip-choose{display:flex;gap:8px;justify-content:center;margin-bottom:14px;}
+.flip-side-btn{flex:1;max-width:130px;background:rgba(8,5,2,0.7);border:1px solid rgba(200,169,110,0.25);border-radius:10px;padding:12px 8px;font-size:13px;font-weight:700;letter-spacing:.04em;color:var(--muted);cursor:pointer;font-family:inherit;transition:all .15s;}
+.flip-side-btn:hover{border-color:rgba(200,169,110,0.5);color:var(--gold-bright);}
+.flip-side-btn.active{background:rgba(200,169,110,0.12);border-color:var(--gold);color:var(--gold-bright);}
+.flip-coin-wrap{text-align:center;padding:10px 0;margin-bottom:8px;}
+.flip-coin{font-size:42px;display:inline-block;line-height:1;}
+@keyframes coinSpin{0%{transform:rotateY(0deg);}50%{transform:rotateY(540deg);}100%{transform:rotateY(1080deg);}}
+.flip-odds-note{text-align:center;font-size:10px;color:var(--muted);margin-top:8px;letter-spacing:.04em;}
+
+/* ── CRASH GAME ── */
+#crashCanvasWrap{width:100%;margin-bottom:10px;background:#050301;border-radius:8px;overflow:hidden;border:1px solid rgba(200,169,110,0.12);}
+#crashCanvas{display:block;}
+.crash-meta-row{display:flex;gap:10px;align-items:flex-start;margin-bottom:10px;}
+.crash-npc-bets{flex:1;max-height:90px;overflow:hidden;}
+.crash-history-wrap{flex-shrink:0;width:auto;}
+.crash-hist-title{font-size:8px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:4px;}
+.crash-history{display:flex;gap:3px;flex-wrap:wrap;}
+.ch-pill{font-size:9px;font-weight:700;border-radius:4px;padding:2px 5px;}
+.ch-pill.lo{background:rgba(201,78,78,0.18);color:#ff8080;}
+.ch-pill.md{background:rgba(200,169,110,0.15);color:var(--gold);}
+.ch-pill.hi{background:rgba(78,201,122,0.15);color:#4EC97A;}
+.cnb-row{display:flex;align-items:center;gap:5px;font-size:9px;padding:2px 0;}
+.cnb-name{color:var(--muted);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.cnb-bet{color:rgba(200,169,110,0.6);}
+.cnb-out{color:#4EC97A;font-weight:700;}
+.cnb-bust{color:#ff6060;font-weight:700;}
+.cnb-in{color:#4EC97A;}
+.crash-bal-line{text-align:center;font-size:11px;color:var(--muted);margin-top:6px;}
+.crash-bal-line strong{color:var(--cream);}
+.crash-cashout-btn{background:linear-gradient(135deg,rgba(0,140,60,0.9),rgba(0,100,40,0.95)) !important;border-color:rgba(78,201,122,0.55) !important;animation:cashoutPulse 0.8s ease-in-out infinite !important;}
+@keyframes cashoutPulse{0%,100%{box-shadow:0 0 0 0 rgba(78,201,122,0.3);}50%{box-shadow:0 0 14px 4px rgba(78,201,122,0.3);}}
+
+/* ── NPC COMMUNITY SECTION ── */
+.npc-section{margin-top:20px;padding-top:16px;border-top:1px solid rgba(200,169,110,0.12);}
+.npc-section-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.npc-section-title{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);display:flex;align-items:center;gap:6px;}
+.npc-live-dot{width:6px;height:6px;border-radius:50%;background:#4EC97A;animation:blink 1.4s infinite;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:0.3;}}
+.npc-ev{display:flex;align-items:flex-start;gap:9px;padding:7px 0;border-bottom:1px solid rgba(200,169,110,0.07);}
+.npc-ev:last-child{border-bottom:none;}
+.npc-av{width:28px;height:28px;border-radius:7px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#050301;}
+.npc-ev-body{flex:1;min-width:0;}
+.npc-ev-name{font-size:11px;font-weight:700;color:var(--gold-bright);}
+.npc-ev-act{font-size:11px;color:rgba(237,232,223,0.65);}
+.npc-ev-quip{font-size:10px;color:var(--muted);font-style:italic;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.npc-ev-ago{font-size:9px;color:var(--muted);white-space:nowrap;flex-shrink:0;margin-top:1px;}
+.npc-quiet{font-size:12px;color:var(--muted);text-align:center;padding:16px;}
+.npc-log .log-user{font-weight:700;}
+
+/* ── DUEL SYSTEM ── */
+.duel-section{margin:16px 0 0;}
+.duel-section-title{font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;display:flex;align-items:center;gap:6px;}
+.duel-card{background:rgba(10,7,3,0.8);border:1px solid rgba(200,169,110,0.15);border-radius:12px;padding:10px 12px;margin-bottom:8px;}
+.duel-card.done{opacity:.55;padding:8px 12px;}
+.duel-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px;}
+.duel-badge{font-size:8.5px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;border-radius:4px;padding:2px 7px;}
+.duel-badge.live{background:rgba(201,78,78,0.2);color:#ff8080;border:1px solid rgba(201,78,78,0.3);animation:livePulse 1.5s infinite;}
+@keyframes livePulse{0%,100%{opacity:1;}50%{opacity:.65;}}
+.duel-badge.done{background:rgba(78,201,122,0.12);color:#4EC97A;border:1px solid rgba(78,201,122,0.2);}
+.duel-timer{font-family:ui-monospace,monospace;font-size:11px;font-weight:700;color:var(--gold-bright);}
+.duel-taunt{font-size:10px;color:var(--muted);font-style:italic;margin-bottom:7px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.duel-match{display:flex;align-items:center;gap:6px;margin-bottom:7px;}
+.duel-side{flex:1;text-align:center;padding:6px;border-radius:8px;border:1px solid transparent;transition:border-color .2s;}
+.duel-side.lead{border-color:rgba(200,169,110,0.3);background:rgba(200,169,110,0.06);}
+.duel-pn{font-size:9px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:3px;}
+.duel-score{font-family:'Space Mono',monospace;font-size:20px;font-weight:700;color:var(--gold-bright);}
+.duel-side.lead .duel-score{color:#FFD97D;}
+.duel-vs-chip{font-size:9px;font-weight:800;letter-spacing:.08em;color:var(--muted);flex-shrink:0;}
+.duel-progress{height:4px;background:rgba(200,169,110,0.1);border-radius:2px;overflow:hidden;}
+.duel-prog-fill{height:100%;background:linear-gradient(90deg,#C8A96E,#FFD97D);border-radius:2px;transition:width .8s ease;}
+.duel-pct-labels{display:flex;justify-content:space-between;font-size:8px;color:var(--muted);margin-top:3px;}
+.duel-winner{font-size:11px;color:#4EC97A;font-weight:700;}
+
 .ca-box{
   display:flex;align-items:center;gap:8px;max-width:480px;margin:0 auto 16px;
   background:rgba(0,0,0,0.45);border:1px solid var(--border-hi);border-radius:12px;
@@ -1744,6 +1864,34 @@ body.genesis-mode .hero-title{text-shadow:0 0 40px rgba(255,217,125,0.35);}
   </div>
 </div>
 
+<!-- AIRDROP DROP BANNER -->
+<div class="drop-banner" id="dropBanner">
+  <div class="drop-inner">
+    <div class="drop-kicker">⚡ AIRDROP WAVE 2 · SNAPSHOT CLOSING</div>
+    <div class="drop-heading">SUNDAY MAY 31 · 12:00 AM</div>
+    <div class="drop-cd" id="dropCountdown">
+      <div class="drop-unit"><div class="drop-n">03</div><div class="drop-l">DAYS</div></div>
+      <div class="drop-col">:</div>
+      <div class="drop-unit"><div class="drop-n">11</div><div class="drop-l">HRS</div></div>
+      <div class="drop-col">:</div>
+      <div class="drop-unit"><div class="drop-n">42</div><div class="drop-l">MIN</div></div>
+      <div class="drop-col">:</div>
+      <div class="drop-unit"><div class="drop-n">07</div><div class="drop-l">SEC</div></div>
+    </div>
+    <div class="drop-details">
+      <span>Wave 2 snapshot locks</span>
+      <span>·</span>
+      <span>Log daily to qualify</span>
+      <span>·</span>
+      <span>Referrals earn 3× bonus pts</span>
+    </div>
+    <div class="drop-actions">
+      <button class="drop-notify-btn" id="dropNotifyBtn" onclick="if(window.NutDrop)NutDrop.toggleNotify()">🔔 REMIND ME</button>
+      <a href="#" onclick="document.getElementById('logBtn')?.click();return false" class="drop-cta-link">LOG NUTS NOW →</a>
+    </div>
+  </div>
+</div>
+
 <!-- TAM COUNTER — Research-derived global activity vs $NUT capture -->
 <div class="tam-section" id="tamSection">
   <div class="tam-inner">
@@ -1983,6 +2131,10 @@ body.genesis-mode .hero-title{text-shadow:0 0 40px rgba(255,217,125,0.35);}
       </div>
       <div id="lbEventHistory"></div>
       <div id="nutOracle"></div>
+      <div class="duel-section">
+        <div class="duel-section-title"><span class="live-dot"></span> LIVE DUELS</div>
+        <div id="npcDuels"></div>
+      </div>
       <div class="lb-join" id="lbJoin" style="display:none">
         <button class="lb-join-btn" onclick="openNickModal()">Join Leaderboard</button>
       </div>
@@ -2060,6 +2212,10 @@ body.genesis-mode .hero-title{text-shadow:0 0 40px rgba(255,217,125,0.35);}
     <div class="section-title">Global Activity</div>
     <div class="log-empty" id="logEmpty">waiting for the first nut worldwide…</div>
     <div id="logList"></div>
+    <div class="npc-section">
+      <div class="npc-section-title"><span class="live-dot"></span> COMMUNITY ACTIVITY</div>
+      <div id="npcFeed"></div>
+    </div>
   </div>
 
 </div><!-- /wrap -->
@@ -3948,6 +4104,9 @@ function downloadCert() {
 <script src="./dream.js"></script>
 <script src="./predictor.js"></script>
 <script src="./chart.js"></script>
+<script src="./drop.js"></script>
+<script src="./npcs.js"></script>
+<script src="./casino.js"></script>
 <script>
 // ═══════════════════════════════
 // INIT
@@ -4225,7 +4384,8 @@ function drawWheel(rotation) {
   const canvas = document.getElementById('wheelCanvas');
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
-  const n = WHEEL_SEGS.length;
+  const segs = (window.NutCasino ? NutCasino.getActiveSegs() : WHEEL_SEGS);
+  const n = segs.length;
   const arc = (2 * Math.PI) / n;
   const cx = 140, cy = 140, r = 128, hub = 30;
   ctx.clearRect(0, 0, 280, 280);
@@ -4236,7 +4396,7 @@ function drawWheel(rotation) {
   for (let i = 0; i < n; i++) {
     const start = rotation + i * arc - Math.PI/2;
     const end   = start + arc;
-    const seg   = WHEEL_SEGS[i];
+    const seg   = segs[i];
     ctx.beginPath(); ctx.moveTo(cx,cy); ctx.arc(cx,cy,r,start,end); ctx.closePath();
     ctx.fillStyle = seg.bg; ctx.fill();
     ctx.strokeStyle = 'rgba(200,169,110,0.2)'; ctx.lineWidth = 1; ctx.stroke();
@@ -4282,6 +4442,7 @@ function openRoulette() {
   const res = document.getElementById('spinResult');
   if (res) { res.textContent = ''; res.style.color = ''; }
   updateRouletteBal();
+  if (window.NutCasino) NutCasino.renderWheelStatus();
   requestAnimationFrame(() => drawWheel(wheelAngle));
 }
 
@@ -4319,9 +4480,10 @@ function spinWheel() {
   pmSetBalance(bal - rouletteBet);
   updateRouletteBal();
 
-  const segIdx = roulettePickSeg();
-  const seg = WHEEL_SEGS[segIdx];
-  const arc = (2 * Math.PI) / WHEEL_SEGS.length;
+  const activeSegs = (window.NutCasino ? NutCasino.getActiveSegs() : WHEEL_SEGS);
+  const segIdx = (window.NutCasino ? NutCasino.pickSeg() : roulettePickSeg());
+  const seg = activeSegs[segIdx];
+  const arc = (2 * Math.PI) / activeSegs.length;
   // Compute target angle so segIdx lands at top pointer
   const segCenter = segIdx * arc + arc / 2;
   let targetBase = ((-segCenter) % (2*Math.PI) + 2*Math.PI) % (2*Math.PI);
@@ -4344,6 +4506,7 @@ function spinWheel() {
     } else {
       wheelAngle = targetAngle % (2 * Math.PI);
       drawWheel(wheelAngle);
+      if (window.NutCasino) NutCasino.saveWheelResult(seg);
       const rmult = window.NutChaos ? NutChaos.getRouletteMultiplier() : 1;
       const won = Math.floor(rouletteBet * seg.mult * rmult);
       if (won > 0) {
@@ -4413,6 +4576,9 @@ if (window.NutChaos) NutChaos.init();
 if (window.NutDream) NutDream.init();
 if (window.NutOracle) NutOracle.init();
 if (window.NutChart) NutChart.init();
+if (window.NutDrop) NutDrop.init();
+if (window.NutNPCs) NutNPCs.init();
+if (window.NutCasino) NutCasino.init();
 setInterval(()=>{ if(!document.hidden) fetchGlobalCounts(); },60000);
 setInterval(()=>{ if(!document.hidden) fetchLeaderboard(); },120000);
 setInterval(()=>{ if(!document.hidden) fetchGlobalActivity(); },30000);
@@ -4697,25 +4863,63 @@ scrollNutBtn.addEventListener('click', () => {
   <button type="button" class="tf-buy tba" onclick="openBuy()">BUY $NUT</button>
 </div>
 
-<!-- ROULETTE MODAL -->
+<!-- CASINO MODAL -->
 <div class="roulette-overlay" id="rouletteModal" onclick="if(event.target===this)closeRoulette()">
   <div class="roulette-box">
     <button class="roulette-close" onclick="closeRoulette()">✕</button>
-    <div class="roulette-title">🎰 NUT SPIN</div>
-    <div class="roulette-sub">spin to win · house always wins</div>
-    <div class="wheel-wrap">
-      <div class="wheel-pointer">▼</div>
-      <canvas id="wheelCanvas" width="280" height="280"></canvas>
+    <div class="roulette-title">🎰 NUT CASINO</div>
+
+    <!-- Tab bar -->
+    <div class="casino-tab-bar">
+      <button class="casino-tab active" data-tab="wheel">WHEEL</button>
+      <button class="casino-tab" data-tab="flip">FLIP</button>
+      <button class="casino-tab" data-tab="crash">CRASH</button>
     </div>
-    <div class="bet-row">
-      <button class="bet-adj" onclick="rouletteBetAdj(-10)">−</button>
-      <span class="bet-display">Bet: <strong id="betDisplay">10</strong> NUTS</span>
-      <button class="bet-adj" onclick="rouletteBetAdj(10)">+</button>
-      <button class="bet-max" onclick="rouletteBetMax()">MAX</button>
+
+    <!-- ── WHEEL PANEL ── -->
+    <div class="casino-panel" id="casinoPanel_wheel" style="display:block">
+      <div class="wheel-oracle-status oracle-warm" id="wheelOracleStatus">⚡ ORACLE ACTIVE</div>
+      <div class="wheel-recent-results" id="wheelRecentResults"></div>
+      <div class="wheel-wrap">
+        <div class="wheel-pointer">▼</div>
+        <canvas id="wheelCanvas" width="280" height="280"></canvas>
+      </div>
+      <div class="bet-row">
+        <button class="bet-adj" onclick="rouletteBetAdj(-10)">−</button>
+        <span class="bet-display">Bet: <strong id="betDisplay">10</strong> NUTS</span>
+        <button class="bet-adj" onclick="rouletteBetAdj(10)">+</button>
+        <button class="bet-max" onclick="rouletteBetMax()">MAX</button>
+      </div>
+      <button class="roulette-spin-btn" id="spinBtn" onclick="spinWheel()">SPIN</button>
+      <div class="spin-result-line" id="spinResult"></div>
+      <div class="roulette-bal-line">Balance: <strong id="rouletteBal">0</strong> NUTS</div>
     </div>
-    <button class="roulette-spin-btn" id="spinBtn" onclick="spinWheel()">SPIN</button>
-    <div class="spin-result-line" id="spinResult"></div>
-    <div class="roulette-bal-line">Balance: <strong id="rouletteBal">0</strong> NUTS</div>
+
+    <!-- ── COIN FLIP PANEL ── -->
+    <div class="casino-panel" id="casinoPanel_flip" style="display:none">
+      <div id="coinFlipPanel"></div>
+    </div>
+
+    <!-- ── CRASH PANEL ── -->
+    <div class="casino-panel" id="casinoPanel_crash" style="display:none">
+      <div id="crashCanvasWrap"><canvas id="crashCanvas"></canvas></div>
+      <div class="crash-meta-row">
+        <div class="crash-npc-bets" id="crashNPCBets"></div>
+        <div class="crash-history-wrap">
+          <div class="crash-hist-title">LAST 8</div>
+          <div class="crash-history" id="crashHistory"></div>
+        </div>
+      </div>
+      <div class="bet-row">
+        <button class="bet-adj" onclick="NutCasino.adjCrashBet(-10)">−</button>
+        <span class="bet-display">Bet: <strong id="crashBetDisplay">10</strong> NUTS</span>
+        <button class="bet-adj" onclick="NutCasino.adjCrashBet(10)">+</button>
+        <button class="bet-max" onclick="NutCasino.maxCrashBet()">MAX</button>
+      </div>
+      <button class="roulette-spin-btn" id="crashBtn" onclick="NutCasino.startCrash()">▶ START</button>
+      <div class="crash-bal-line">Balance: <strong id="crashBal">0</strong> NUTS</div>
+    </div>
+
   </div>
 </div>
 
