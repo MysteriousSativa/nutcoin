@@ -2807,7 +2807,9 @@ function pickCertStirTweet() {
     );
   }
 
-  return pool[Math.floor(Math.random() * pool.length)];
+  const text = pool[Math.floor(Math.random() * pool.length)];
+  const mood = window.NutQuirks ? NutQuirks.getShareCopyByTime() : '';
+  return mood ? `${mood.toUpperCase()}\n\n${text}` : text;
 }
 
 async function shareTwitter() {
