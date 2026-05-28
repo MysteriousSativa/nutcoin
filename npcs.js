@@ -17,41 +17,36 @@
   }
   function frac(s) { return (h32(s) >>> 0) / 4294967296; }
 
-  // ── NAME GENERATION ─────────────────────────────────────────────
-  const ADJ  = ['Big','Huge','Based','Cursed','Famous','Legendary','Actual','Real',
-    'Certified','Dedicated','Veteran','Smooth','Galaxy','Night','Secret','Absolute',
-    'Midnight','Daily','Chronic','Frequent','Prolific','Committed','Serious',
-    'Turbo','Ultra','Giga','Mega','Local','Global'];
-  const NOUN = ['Nut','Chad','Degen','Lurker','Brain','Lord','King','Sigma',
-    'Wizard','Warrior','Hunter','Counter','Logger','Tracker','Enjoyer','Bro',
-    'Operator','Participant','Contributor','Researcher','Analyst','Poster',
-    'Commenter','Observer','Verifier'];
-  const THROW = ['throwaway','temp','burner','anon','notme','rando','lurker',
-    'nobody','passerby','justhere','account','realaccount','actuallyreal',
-    'notarobot','definitelynotme','totallynotburner'];
-  const FIRST = ['Mike','Jake','Tyler','Ryan','Matt','Chris','Alex','Kevin',
-    'Justin','Brandon','Kyle','Derek','Connor','Zach','Nick','Dan','Tom','Jay',
-    'Ben','Sam','Joe','Luke','Evan','Cole','Drew'];
-  const NUMS  = [69,420,1337,99,88,42,777,404,666,1234,9001,2468,47,83,156,
-    271,384,512,629,741,858,963,1024,31337,2600,4221,8888,7777,3333,
-    1111,9999,6969,23,37,51,64,78,92,107,123,138,152,167,181,196,213,
-    227,241,256,268,289,304,318,327,341,356,369,384,397,411,428,443];
+  // ── NPC CHARACTER NAMES ─────────────────────────────────────────
+  // 25 titles × 25 cores = 625 unique combos. First 300 are assigned
+  // to NPCs via a deterministic Fisher-Yates shuffle so every name is
+  // unique and always resolves to the same NPC across sessions.
+  const NPC_TITLE = [
+    'Papa','Big','King','Lord','Sir','Duke','Uncle','Captain',
+    'Professor','Doctor','Chief','Boss','Grandpa','Master','Cousin',
+    'Mayor','General','Commander','Judge','Coach','Mighty','Holy',
+    'Grand','Senior','Junior',
+  ];
+  const NPC_CORE = [
+    'Nut','Nutz','Nutty','Logger','Tracker','Counter','Baller',
+    'Stacker','Wizard','Brain','Degen','Legend','Grinder','Enjoyer',
+    'Sigma','Chad','Operator','Archivist','Keeper','Witness',
+    'Oracle','Analyst','Curator','Monk','Patriarch',
+  ];
 
-  function genName(i) {
-    const s1 = h32('n1_' + i), s2 = h32('n2_' + i), s3 = h32('n3_' + i);
-    const num = NUMS[s2 % NUMS.length];
-    const p = i % 10;
-    if (p === 0) return THROW[s1 % THROW.length] + (s2 % 90000 + 10000);
-    if (p === 1) return ADJ[s1 % ADJ.length] + NOUN[s2 % NOUN.length] + num;
-    if (p === 2) return FIRST[s1 % FIRST.length] + '_' + (s2 % 9000 + 1000);
-    if (p === 3) return ADJ[s1 % ADJ.length].toLowerCase() + '_' + NOUN[s2 % NOUN.length].toLowerCase() + '_' + (s3 % 999 + 1);
-    if (p === 4) return 'u_' + NOUN[s1 % NOUN.length].toLowerCase() + (s2 % 9999 + 1000);
-    if (p === 5) return NOUN[s1 % NOUN.length].toLowerCase() + 'dude' + (s2 % 999 + 100);
-    if (p === 6) return FIRST[s1 % FIRST.length] + ADJ[s2 % ADJ.length] + num;
-    if (p === 7) return ADJ[s1 % ADJ.length] + '_' + ADJ[s2 % ADJ.length] + '_' + NOUN[s3 % NOUN.length];
-    if (p === 8) return 'counting_nuts_' + (s1 % 9000 + 1000);
-    return THROW[s1 % THROW.length] + '_' + NOUN[s2 % NOUN.length].toLowerCase();
+  function buildNPCNames() {
+    const all = [];
+    for (const t of NPC_TITLE)
+      for (const c of NPC_CORE)
+        all.push(t + c);
+    // Deterministic Fisher-Yates — same order every runtime
+    for (let i = all.length - 1; i > 0; i--) {
+      const j = h32('shuf_' + i) % (i + 1);
+      const tmp = all[i]; all[i] = all[j]; all[j] = tmp;
+    }
+    return all; // 625 entries; NPCs index into first 300
   }
+  const NPC_NAMES = buildNPCNames();
 
   // ── TWITTER BRAINROT BIOS ────────────────────────────────────────
   const BIOS = [
@@ -129,7 +124,7 @@
       const fRol = s % 100;
       list.push({
         id:       i,
-        name:     genName(i),
+        name:     NPC_NAMES[i],
         bio:      genBio(i),
         sessionId: 'npcbot' + String(i).padStart(4, '0'),
         // 1-3 nuts/day, weighted toward 1-2 (realistic)
@@ -349,7 +344,7 @@
   // Progress tracked in localStorage so each device picks up where it left
   // off across visits. Typically done in 100 page visits (300 NPCs / 3).
 
-  const _BOOT_KEY    = 'npc_boot_n_v2';  // index of next NPC to bootstrap
+  const _BOOT_KEY    = 'npc_boot_n_v3';  // index of next NPC to bootstrap
   const _DAILY_KEY   = 'npc_daily_ts_v2'; // timestamp of last daily run
   const _DAILY_CD    = 20 * 60 * 1000;    // 20-min cooldown for daily pass
   const _MAX_HIST    = 120;               // inject at most 120 days of history

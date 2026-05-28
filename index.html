@@ -810,6 +810,24 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .nut-btn:hover{transform:translateY(-3px);box-shadow:0 8px 28px rgba(255,130,10,0.45), inset 0 1px 0 rgba(255,220,140,0.25);}
 .nut-btn:active{transform:scale(0.96);}
 .nut-btn::after{display:none;}
+.games-btn{
+  margin-top:10px;
+  background:rgba(12,8,4,0.92);
+  border:1px solid rgba(200,169,110,0.45);
+  color:var(--gold-bright);
+  border-radius:999px;
+  padding:10px 24px;
+  font-family:'Cinzel',serif;
+  font-size:11px;
+  font-weight:800;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  cursor:pointer;
+  box-shadow:0 0 12px rgba(0,0,0,0.35);
+  transition:transform .12s,box-shadow .15s,border-color .15s,color .15s;
+}
+.games-btn:hover{transform:translateY(-2px);border-color:var(--gold);color:#fff;box-shadow:0 0 22px rgba(200,140,0,0.3);}
+.games-btn:active{transform:scale(0.97);}
 .my-row{margin-top:18px;font-family:'Cinzel',serif;font-size:12px;letter-spacing:.15em;color:var(--muted);position:relative;z-index:1;}
 .my-row span{color:var(--gold);font-family:'Space Mono',monospace;}
 .card-actions{display:flex;gap:10px;justify-content:center;margin-top:18px;flex-wrap:wrap;position:relative;z-index:1;}
@@ -1905,6 +1923,7 @@ body.genesis-mode .hero-title{text-shadow:0 0 40px rgba(255,217,125,0.35);}
     <div class="reset-sub">2× methods rotate each hour · any climax counts</div>
     <div class="bonus-hour" id="bonusHour" aria-live="polite"></div>
     <button class="nut-btn" onclick="nut()">LOG NUT</button>
+    <button class="games-btn" type="button" onclick="openRoulette()">OPEN GAMES</button>
     <div class="nut-methods" id="nutMethods">
       <div class="method-picker-head">
         <span>How did you nut?</span>
@@ -2033,7 +2052,7 @@ body.genesis-mode .hero-title{text-shadow:0 0 40px rgba(255,217,125,0.35);}
     <div class="nick-bar" id="nickBar">
       <div class="nick-left">
         <span style="color:var(--muted)">Leaderboard</span>
-        <span class="nick-name" id="nickDisplay">Anonymous</span>
+        <span class="nick-name" id="nickDisplay">Loading…</span>
         <span class="nick-rank" id="nickRankDisplay"></span>
       </div>
       <button class="nick-btn" onclick="openNickModal()">Set Name</button>
@@ -2042,7 +2061,7 @@ body.genesis-mode .hero-title{text-shadow:0 0 40px rgba(255,217,125,0.35);}
       <div class="lb-empty">Connecting to the ledger...</div>
     </div>
     <div class="lb-join" id="lbJoin" style="display:none">
-      <button class="lb-join-btn" onclick="openNickModal()">Join Leaderboard</button>
+      <button class="lb-join-btn" onclick="openNickModal()">Set Your Name →</button>
     </div>
   </div>
   <div class="lb-ghost" id="lbGhost"></div>
@@ -2353,11 +2372,11 @@ body.genesis-mode .hero-title{text-shadow:0 0 40px rgba(255,217,125,0.35);}
 <div class="modal-overlay" id="nickModal">
   <div class="nick-modal-box">
     <span class="modal-emoji">🏆</span>
-    <div class="modal-title" style="color:var(--gold);font-size:18px;margin-bottom:6px;">Join the Leaderboard</div>
-    <div style="font-family:'Crimson Text',serif;font-size:16px;color:var(--muted);font-style:italic;">pick a name. everyone on the leaderboard can see how many times you nutted. choose wisely.</div>
+    <div class="modal-title" style="color:var(--gold);font-size:18px;margin-bottom:6px;">Customize Your Name</div>
+    <div style="font-family:'Crimson Text',serif;font-size:16px;color:var(--muted);font-style:italic;">you already have a name. make it yours. everyone on the leaderboard can see how many times you nutted.</div>
     <input class="nick-input" id="nickInput" type="text" maxlength="20" placeholder="Your name..."/>
     <button class="nick-submit" onclick="submitNick()">Save Name</button>
-    <span class="nick-skip" onclick="closeNickModal()">No thanks, stay anonymous</span>
+    <span class="nick-skip" onclick="closeNickModal()">Keep my auto-name</span>
   </div>
 </div>
 
@@ -2931,12 +2950,26 @@ function escHtml(s) {
 // ═══════════════════════════════
 let lbCache = [];
 
-// Generates a stable "Anon #XXXX" name from a session UUID
-function anonName(sid) {
-  const hex = String(sid).replace(/-/g,'').slice(-6);
-  const num = (parseInt(hex, 16) % 9000) + 1000;
-  return `Anon #${num}`;
+// Generates a fun stable username from a session ID (deterministic, never "Anonymous")
+const _UA = ['Lucky','Daily','Frequent','Dedicated','True','Smooth','Fast',
+  'Early','Night','Morning','Turbo','Hyper','Ultra','Secret','Based',
+  'Rare','Epic','Local','Real','Certified'];
+const _UN = ['Nutter','Logger','Counter','Tracker','Stacker','Baller',
+  'Enjoyer','Watcher','Keeper','Collector','Witness','Analyst',
+  'Operator','Researcher','Observer','Curator','Recorder','Archivist'];
+
+function genUserName(sid) {
+  let h = 2166136261 >>> 0;
+  const s = String(sid).replace(/-/g, '');
+  for (let i = 0; i < s.length; i++)
+    h = (Math.imul(h ^ s.charCodeAt(i), 16777619)) >>> 0;
+  const adj  = _UA[h % _UA.length];
+  const noun = _UN[(h >>> 8) % _UN.length];
+  const num  = ((h >>> 16) % 9000) + 1000;
+  return adj + noun + num;
 }
+// Keep anonName as alias for leaderboard rows
+function anonName(sid) { return genUserName(sid); }
 
 async function fetchLeaderboard() {
   if (!db) {
@@ -3036,14 +3069,16 @@ function escHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;')
 function renderNickBar() {
   const el = document.getElementById('nickDisplay');
   if (!el) return;
-  const name = nickname || 'Anonymous';
+  const name = nickname || genUserName(sessionId);
   if (window.NutProfiles) el.innerHTML = NutProfiles.nameHtml(sessionId, name, 'nick-name');
   else el.textContent = name;
 }
 function openNickModal() {
-  document.getElementById('nickInput').value = nickname || '';
+  const inp = document.getElementById('nickInput');
+  inp.value = nickname || '';
+  inp.placeholder = genUserName(sessionId);
   document.getElementById('nickModal').classList.add('show');
-  setTimeout(()=>document.getElementById('nickInput').focus(),100);
+  setTimeout(()=>inp.focus(),100);
 }
 function closeNickModal(){ document.getElementById('nickModal').classList.remove('show'); }
 function submitNick() {
@@ -3566,7 +3601,7 @@ async function openXWithCert(text) {
 
 function pickStirTweet() {
   const s = currentStreak || 0;
-  const name = nickname ? nickname : 'anonymous menace';
+  const name = nickname || genUserName(sessionId);
   const pool = [];
 
   if (countToday === 0) {
@@ -3633,7 +3668,7 @@ function pickStirTweet() {
 
 function pickCertStirTweet() {
   const s = currentStreak || 0;
-  const name = nickname ? `"${nickname}"` : 'anonymous';
+  const name = `"${nickname || genUserName(sessionId)}"`;
   const pool = [
     `ATTACHED: my official $NUT receipt\n\n📄 nuts today: ${countToday}\n📊 lifetime: ${countAllTime}\n${s > 0 ? `🔥 streak: ${s} days\n` : ''}signed by the nut council\n\nthis is the most honest coin in crypto and i will die on this hill\n\n${SITE_URL} #NUT #Solana`,
     `some projects drop whitepapers\n\n$NUT drops RECEIPTS\n\nmine says ${countToday} nuts today\nyours could be next\n\n${SITE_URL} #NUT #memecoin`,
@@ -3885,7 +3920,7 @@ function getReceiptPayload() {
     session: countSession,
     streak: currentStreak || 0,
     bestDay,
-    nickname: nickname || 'Anonymous',
+    nickname: nickname || genUserName(sessionId),
     lastMethod: lm.label,
     lastEmoji: lm.em,
     topMethod: top.label,
