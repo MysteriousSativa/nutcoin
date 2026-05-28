@@ -196,7 +196,7 @@
         if (typeof showToast === 'function') showToast(`🟡 ${result.toUpperCase()}! +${flipBet} NUTS`);
         // Real announcement
         const _u = (typeof nickname !== 'undefined' && nickname) || (typeof genUserName === 'function' && typeof sessionId !== 'undefined' ? genUserName(sessionId) : 'Someone');
-        if (window.NutAnnounce) NutAnnounce.emit({ type:'flip', game:'flip', user:_u, profit:flipBet, mult:2, big: flipBet >= 50,
+        if (window.NutAnnounce) NutAnnounce.emit({ type:'flip', game:'flip', user:_u, profit:flipBet, bet: flipBet, mult:2, big: flipBet >= 50,
           text:`🪙 ${_u} flipped ${result.toUpperCase()} — +${flipBet} NUTS` });
       } else {
         if (res) { res.textContent = `${result.toUpperCase()} — lost ${flipBet} NUTS`; res.style.color = '#ff6060'; }
@@ -283,7 +283,7 @@
     if (typeof showToast === 'function') showToast(`✅ Cashed out ${crashMult.toFixed(1)}× · +${profit} NUTS`);
     // Real announcement
     const _u = (typeof nickname !== 'undefined' && nickname) || (typeof genUserName === 'function' && typeof sessionId !== 'undefined' ? genUserName(sessionId) : 'Someone');
-    if (window.NutAnnounce) NutAnnounce.emit({ type:'crash', game:'crash', user:_u, profit, mult:crashMult, big: crashMult >= 5,
+    if (window.NutAnnounce) NutAnnounce.emit({ type:'crash', game:'crash', user:_u, profit, bet: crashBet, mult:crashMult, big: crashMult >= 5,
       text:`🚀 ${_u} cashed out at ${crashMult.toFixed(1)}× for +${profit} NUTS` });
     updateCrashUI();
     drawCrash();
@@ -311,9 +311,7 @@
       if (!nb.cashedOut && crashMult >= nb.targetX) {
         nb.cashedOut = true;
         nb.finalX    = parseFloat(crashMult.toFixed(1));
-        const npcProfit = Math.floor(nb.bet * nb.finalX) - nb.bet;
-        if (window.NutAnnounce) NutAnnounce.emit({ type:'crash', game:'crash', user: nb.npc.name, profit: npcProfit, mult: nb.finalX, big: nb.finalX >= 8,
-          text:`🚀 ${nb.npc.name} cashed out at ${nb.finalX}× for +${npcProfit} NUTS` });
+        // NPC cashout — update visual state only, never surfaces in the ticker
       }
     });
 
@@ -471,6 +469,7 @@
     });
     if (tab === 'flip')  { setTimeout(renderFlip, 20); }
     if (tab === 'crash') { setTimeout(initCrashCanvas, 30); }
+    if (tab === 'blackjack' && window.NutBlackjack) { setTimeout(() => NutBlackjack.render(), 20); }
     if (tab === 'wheel') {
       renderWheelStatus();
       requestAnimationFrame(() => { if (typeof drawWheel === 'function') drawWheel(typeof wheelAngle !== 'undefined' ? wheelAngle : 0); });
@@ -498,10 +497,10 @@
     }
   }
 
-  function onOpen() {
+  function onOpen(tab) {
     bindTabs();
     renderWheelStatus();
-    switchTab('wheel');
+    switchTab(tab || 'wheel');
     if (typeof updateRouletteBal === 'function') updateRouletteBal();
   }
 

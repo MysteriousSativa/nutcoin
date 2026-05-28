@@ -900,6 +900,86 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 }
 .games-btn:hover{transform:translateY(-2px);border-color:var(--gold);color:#fff;box-shadow:0 0 22px rgba(200,140,0,0.3);}
 .games-btn:active{transform:scale(0.97);}
+/* ── STAKE-STYLE CASINO LOBBY ── */
+.nut-casino-lobby{
+  max-width:920px;margin:0 auto 20px;padding:0 12px;
+}
+.lobby-shell{
+  background:linear-gradient(180deg,#13212e 0%,#0b141c 100%);
+  border:1px solid #1f3344;border-radius:16px;padding:16px 14px 14px;
+  box-shadow:0 12px 40px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.04);
+}
+.lobby-hdr{display:flex;align-items:flex-end;justify-content:space-between;gap:10px;margin-bottom:12px;flex-wrap:wrap;}
+.lobby-title{font-family:'Cinzel',serif;font-size:18px;font-weight:900;letter-spacing:.12em;color:#e8f0f6;}
+.lobby-sub{font-size:10px;color:#7f9bad;letter-spacing:.08em;text-transform:uppercase;}
+.lobby-live{display:flex;align-items:center;gap:6px;font-size:9px;font-weight:700;color:#4ec97a;letter-spacing:.1em;}
+.lobby-live-dot{width:6px;height:6px;border-radius:50%;background:#4ec97a;animation:live-pulse 1.4s ease infinite;}
+@keyframes live-pulse{0%,100%{opacity:1;}50%{opacity:.35;}}
+.lobby-steps{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;
+}
+.lobby-step{
+  background:#152532;border:1px solid #243b4d;border-radius:10px;padding:10px 8px;text-align:center;
+}
+.lobby-step-n{font-size:9px;font-weight:800;color:#4ec97a;letter-spacing:.12em;}
+.lobby-step-t{font-size:11px;font-weight:700;color:#dce8f0;margin-top:4px;line-height:1.3;}
+.lobby-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
+.lobby-panel{background:#101c26;border:1px solid #1f3344;border-radius:12px;padding:10px;}
+.lobby-panel-h{font-size:9px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#8aa4b6;margin-bottom:8px;}
+.watch-row{
+  display:grid;grid-template-columns:auto 1fr auto;gap:6px 8px;align-items:center;
+  padding:7px 8px;border-radius:8px;margin-bottom:4px;background:rgba(255,255,255,0.02);
+}
+.watch-row.watch-hot{border:1px solid rgba(255,217,125,0.25);background:rgba(255,190,60,0.06);}
+.watch-rank{font-size:10px;font-weight:800;color:#7f9bad;}
+.watch-name{font-size:12px;font-weight:700;color:#e8f0f6;}
+.watch-stat{font-size:11px;font-weight:800;color:#4ec97a;text-align:right;}
+.watch-meta{grid-column:2/4;font-size:9px;color:#6f8798;}
+.watch-empty,.win-empty{font-size:11px;color:#6f8798;font-style:italic;padding:8px 4px;}
+.lobby-wins{display:grid;gap:6px;max-height:180px;overflow-y:auto;}
+.win-card{padding:8px;border-radius:8px;background:rgba(78,201,122,0.08);border:1px solid rgba(78,201,122,0.2);}
+.win-user{display:block;font-size:11px;font-weight:800;color:#FFD97D;}
+.win-amt{display:block;font-size:12px;font-weight:900;color:#4ec97a;}
+.win-txt{display:block;font-size:9px;color:#8aa4b6;margin-top:2px;}
+.game-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.game-tile{
+  background:linear-gradient(160deg,#1a2f3f,#12202c);border:1px solid #2a4458;border-radius:12px;
+  padding:14px 8px;text-align:center;cursor:pointer;transition:transform .12s,border-color .12s,box-shadow .12s;
+}
+.game-tile:hover{transform:translateY(-2px);border-color:#4ec97a;box-shadow:0 0 20px rgba(78,201,122,0.15);}
+.game-tile.soon{opacity:.55;cursor:not-allowed;}
+.game-tile.soon:hover{transform:none;border-color:#2a4458;box-shadow:none;}
+.game-tile-ico{font-size:22px;display:block;margin-bottom:6px;}
+.game-tile-lbl{font-size:10px;font-weight:800;letter-spacing:.1em;color:#e8f0f6;}
+.game-tile-sub{font-size:8px;color:#6f8798;margin-top:4px;letter-spacing:.06em;}
+/* Stake-style casino modal */
+.roulette-box.stake-casino{
+  max-width:min(440px,96vw);background:linear-gradient(180deg,#152532,#0d1620);
+  border:1px solid #2a4458;box-shadow:0 20px 60px rgba(0,0,0,0.7);
+}
+.stake-casino .roulette-title{color:#e8f0f6;}
+.stake-casino .casino-tab-bar{background:#101c26;border-radius:10px;padding:4px;margin-bottom:12px;border:none;}
+.stake-casino .casino-tab{border-radius:8px;border-bottom:none;color:#6f8798;}
+.stake-casino .casino-tab.active{background:#1f3344;color:#4ec97a;}
+.stake-casino .roulette-spin-btn{background:linear-gradient(180deg,#00e701,#00b800);color:#041208;border-color:#00e701;}
+.stake-casino .bet-adj,.stake-casino .bet-max{background:#101c26;border-color:#2a4458;color:#c8dce8;}
+/* Blackjack */
+.bj-table{background:#0a1219;border:1px solid #243b4d;border-radius:12px;padding:12px;margin-bottom:10px;}
+.bj-label{font-size:9px;font-weight:800;letter-spacing:.12em;color:#8aa4b6;margin-bottom:6px;}
+.bj-hand{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;min-height:52px;margin-bottom:8px;}
+.bj-card{
+  width:42px;height:58px;border-radius:8px;background:#fff;border:1px solid #ccc;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  font-weight:900;box-shadow:0 2px 8px rgba(0,0,0,0.35);
+}
+.bj-card.bj-red{color:#c0392b;}
+.bj-card.bj-back{background:linear-gradient(135deg,#1a3a5c,#0d2038);color:#8aa4b6;border-color:#2a4458;}
+.bj-r{font-size:14px;line-height:1;}
+.bj-s{font-size:11px;}
+.bj-divider{height:1px;background:#243b4d;margin:8px 0;}
+.bj-actions{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:6px;margin-bottom:8px;}
+.bj-act{background:#101c26;border:1px solid #2a4458;color:#e8f0f6;border-radius:10px;padding:12px 8px;font-weight:800;font-size:11px;cursor:pointer;}
+.ann-item.t-blackjack{color:rgba(120,200,255,0.95);font-weight:700;}
 .my-row{margin-top:18px;font-family:'Cinzel',serif;font-size:12px;letter-spacing:.15em;color:var(--muted);position:relative;z-index:1;}
 .my-row span{color:var(--gold);font-family:'Space Mono',monospace;}
 .card-actions{display:flex;gap:10px;justify-content:center;margin-top:18px;flex-wrap:wrap;position:relative;z-index:1;}
@@ -1648,6 +1728,10 @@ position:relative;overflow:hidden;
 /* ── PERF MODE ── */
 @media (max-width: 900px) {
   .squirt-dot,.sweat,.splash-ring{display:none !important;}
+  .lobby-steps{grid-template-columns:1fr;}
+  .lobby-grid{grid-template-columns:1fr;}
+  .game-grid{grid-template-columns:repeat(2,1fr);}
+  .stake-casino .casino-tab{font-size:9px;padding:8px 4px;}
   .ticker{animation-duration:90s;}
   .flame-alive,.flame-icon-img{animation:none !important;}
   .prophecy-eye{animation:none !important;}
@@ -1934,7 +2018,7 @@ body.genesis-mode .hero-title{text-shadow:0 0 40px rgba(255,217,125,0.35);}
   <!-- Announcement ticker row -->
   <div class="ann-row">
     <div class="ann-inner" id="annInner">
-      <span class="ann-item t-stat">🥜 Loading community feed...</span>
+      <span class="ann-item t-stat">🥜 Live feed · Supabase</span>
     </div>
   </div>
 </div>
@@ -2029,6 +2113,42 @@ body.genesis-mode .hero-title{text-shadow:0 0 40px rgba(255,217,125,0.35);}
     </div>
   </div>
 </div>
+
+<!-- NUT CASINO LOBBY (Stake-style) -->
+<section class="nut-casino-lobby" id="nutCasinoLobby">
+  <div class="lobby-shell">
+    <div class="lobby-hdr">
+      <div>
+        <div class="lobby-title">NUT CASINO</div>
+        <div class="lobby-sub">play-money · live feed from Supabase</div>
+      </div>
+      <div class="lobby-live"><span class="lobby-live-dot"></span> LIVE</div>
+    </div>
+    <div class="lobby-steps">
+      <div class="lobby-step"><div class="lobby-step-n">STEP 1</div><div class="lobby-step-t">Log nuts → earn NUTTOKENS</div></div>
+      <div class="lobby-step"><div class="lobby-step-n">STEP 2</div><div class="lobby-step-t">Tap OPEN GAMES · pick a table</div></div>
+      <div class="lobby-step"><div class="lobby-step-n">STEP 3</div><div class="lobby-step-t">Win · hit ticker · climb watchlist</div></div>
+    </div>
+    <div class="lobby-grid">
+      <div class="lobby-panel">
+        <div class="lobby-panel-h">Players to look out for</div>
+        <div id="casinoWatchlist"><div class="watch-empty">Loading sharks…</div></div>
+      </div>
+      <div class="lobby-panel">
+        <div class="lobby-panel-h">Recent big wins</div>
+        <div class="lobby-wins" id="lobbyBigWins"><div class="win-empty">Wins broadcast live.</div></div>
+      </div>
+    </div>
+    <div class="game-grid">
+      <button type="button" class="game-tile" onclick="openRoulette('wheel')"><span class="game-tile-ico">🎡</span><span class="game-tile-lbl">WHEEL</span><span class="game-tile-sub">roulette</span></button>
+      <button type="button" class="game-tile" onclick="openRoulette('flip')"><span class="game-tile-ico">🪙</span><span class="game-tile-lbl">FLIP</span><span class="game-tile-sub">50/50</span></button>
+      <button type="button" class="game-tile" onclick="openRoulette('crash')"><span class="game-tile-ico">📈</span><span class="game-tile-lbl">CRASH</span><span class="game-tile-sub">cash out</span></button>
+      <button type="button" class="game-tile" onclick="openRoulette('blackjack')"><span class="game-tile-ico">🃏</span><span class="game-tile-lbl">21</span><span class="game-tile-sub">blackjack</span></button>
+      <button type="button" class="game-tile soon" disabled><span class="game-tile-ico">♠️</span><span class="game-tile-lbl">POKER</span><span class="game-tile-sub">soon</span></button>
+      <button type="button" class="game-tile" onclick="openRoulette()"><span class="game-tile-ico">🎰</span><span class="game-tile-lbl">ALL</span><span class="game-tile-sub">full lobby</span></button>
+    </div>
+  </div>
+</section>
 
 <!-- AIRDROP DROP BANNER -->
 <div class="drop-banner" id="dropBanner">
@@ -2557,6 +2677,12 @@ async function probeSupabaseSchema() {
   if (supabaseSchema.activity === false) {
     console.warn('$NUT: recent_activity RPC missing. Re-run supabase/schema.sql in the SQL Editor.');
   }
+  try {
+    const { error: feedErr } = await db.rpc('live_community_feed', { p_limit: 1 });
+    if (feedErr && rpcMissing(feedErr)) {
+      console.warn('$NUT: live_community_feed missing. Owner: run supabase/schema-casino.sql');
+    }
+  } catch (_) {}
 }
 
 // ═══════════════════════════════
@@ -3389,16 +3515,18 @@ setInterval(()=>{
 // ═══════════════════════════════
 // TICKER
 // ═══════════════════════════════
-function buildTicker() {
-  const items=['solo nuts count · partnered nuts count · hotel nuts count · all nuts count','you banged? log it. you solo? log it. same ledger','peanuts are legumes not nuts look it up','dopamine floods the brain at climax its literally science','95% of men report it kinsey institute said that not us',
-    'ancient sumerians were nutting circa 3000 BCE so you are in good company','squirrels smell nuts through a foot of snow you cannot even find yours in the dark',
-    'cashews grow outside their fruit which is insane and so is your nut count','pistachios called the smiling nut in persia we call it something else',
-    'masturbation documented in ancient egypt the pharaohs were built different','prolactin surge after climax is why you fall asleep immediately',
-    'regular release may boost immune antibodies science said it not us','hazelnuts fed humans for 9000 years this coin has been alive for less than a week',
-    '$NUT the most honest coin in crypto and you know exactly why','the codex grows with every nut you degenerate keep going','no financial advice just nut advice','if you know you know if you dont you will'];
-  const ticker=document.getElementById('ticker');
-  [...items,...items].forEach(s=>{
-    const e=document.createElement('span');e.className='ticker-item';e.textContent=s;ticker.appendChild(e);
+function buildTicker(feedItems) {
+  const ticker = document.getElementById('ticker');
+  if (!ticker) return;
+  const items = (feedItems && feedItems.length)
+    ? feedItems.map(e => e.text)
+    : ['🥜 log a nut · win in casino · live on Supabase · $NUT'];
+  ticker.innerHTML = '';
+  [...items, ...items].forEach(s => {
+    const e = document.createElement('span');
+    e.className = 'ticker-item';
+    e.textContent = s;
+    ticker.appendChild(e);
   });
 }
 
@@ -4617,7 +4745,7 @@ function updateRouletteBal() {
   }
 }
 
-function openRoulette() {
+function openRoulette(tab) {
   const modal = document.getElementById('rouletteModal');
   if (!modal) return;
   modal.classList.add('show');
@@ -4628,7 +4756,7 @@ function openRoulette() {
   const res = document.getElementById('spinResult');
   if (res) { res.textContent = ''; res.style.color = ''; }
   updateRouletteBal();
-  if (window.NutCasino) NutCasino.onOpen();
+  if (window.NutCasino) NutCasino.onOpen(tab || 'wheel');
   else requestAnimationFrame(() => drawWheel(wheelAngle));
 }
 
@@ -4706,7 +4834,7 @@ function spinWheel() {
         showToast(`🎰 ${seg.label}! +${profit} NUTS`);
         if (window.NutAnnounce) {
           const _uname = nickname || genUserName(sessionId);
-          NutAnnounce.emit({ type:'spin', game:'spin', user:_uname, profit, mult:seg.mult, big: seg.mult >= 10,
+          NutAnnounce.emit({ type:'spin', game:'spin', user:_uname, profit, bet: rouletteBet, mult:seg.mult, big: seg.mult >= 10,
             text:`🎰 ${_uname} hit ${seg.label} for +${profit} NUTS` });
         }
       } else {
@@ -4774,6 +4902,7 @@ if (window.NutOracle) NutOracle.init();
 if (window.NutChart) NutChart.init();
 if (window.NutDrop) NutDrop.init();
 if (window.NutNPCs) NutNPCs.init(db);
+if (window.NutCasinoLive) NutCasinoLive.init();
 
 // ══════════════════════════════════════════════════════════════
 // REAL ANNOUNCEMENT BUS
@@ -4842,35 +4971,46 @@ updateBannerSpacer();
 window.addEventListener('resize', updateBannerSpacer);
 
 // ── ANNOUNCEMENT TICKER ──────────────────────────────────────────
-function renderAnnTicker() {
+// Only real events that actually fired through NutAnnounce.emit().
+// No simulated text, no fake stats, no NPC flavor.
+function renderAnnTicker(mergedFeed) {
   const el = document.getElementById('annInner');
   if (!el) return;
 
-  // Real events (most recent first)
-  const real = window.NutAnnounce ? NutAnnounce.getRecent(10) : [];
-  // NPC simulated background noise
-  const npc  = window.NutNPCs ? NutNPCs.getAnnouncements(Date.now()) : [];
+  let events = mergedFeed;
+  if (!events || !events.length) {
+    const remote = window.NutCasinoLive ? NutCasinoLive.getFeed() : [];
+    const local = window.NutAnnounce ? NutAnnounce.getRecent(12) : [];
+    events = remote.length ? [...local, ...remote] : local;
+    const seen = new Set();
+    events = events.filter(e => {
+      const k = (e.text || '') + (e.ts || 0);
+      if (seen.has(k)) return false;
+      seen.add(k);
+      return true;
+    }).sort((a, b) => (b.ts || 0) - (a.ts || 0)).slice(0, 20);
+  }
 
-  // Real events get type 't-real', NPC events use their own type
-  const all = [
-    ...real.map(e => ({ cls: `t-${e.type}`, text: e.text })),
-    ...npc.map(e  => ({ cls: `t-${e.type}`, text: e.text })),
-  ];
-  if (!all.length) return;
+  if (!events.length) {
+    // Nothing has happened yet — show a neutral static line
+    el.innerHTML = '<span class="ann-item t-stat">🥜 Be the first to log a nut today</span>';
+    el.style.animation = 'none';
+    return;
+  }
 
-  // Duplicate for seamless looping scroll
-  const items = [...all, ...all].map(m =>
-    `<span class="ann-item ${m.cls}">${m.text}</span><span class="ann-sep">·</span>`
+  // Duplicate list for seamless looping scroll
+  const items = [...events, ...events].map(e =>
+    `<span class="ann-item t-${e.type}">${e.text}</span><span class="ann-sep">·</span>`
   ).join('');
 
   el.innerHTML = items;
-  // Restart animation so new content scrolls from beginning
   el.style.animation = 'none';
   void el.offsetWidth;
   el.style.animation = '';
 }
 renderAnnTicker();
-setInterval(renderAnnTicker, 90000); // background refresh; also fires on each real event
+// Re-render every 30 s in case the tab was backgrounded during events
+setInterval(renderAnnTicker, 30000);
 
 setInterval(()=>{ if(!document.hidden) fetchGlobalCounts(); },60000);
 setInterval(()=>{ if(!document.hidden) fetchLeaderboard(); },120000);
@@ -5158,15 +5298,18 @@ scrollNutBtn.addEventListener('click', () => {
 
 <!-- CASINO MODAL -->
 <div class="roulette-overlay" id="rouletteModal" onclick="if(event.target===this)closeRoulette()">
-  <div class="roulette-box">
+  <div class="roulette-box stake-casino">
     <button class="roulette-close" onclick="closeRoulette()">✕</button>
-    <div class="roulette-title">🎰 NUT CASINO</div>
+    <div class="roulette-title">NUT CASINO</div>
+    <div class="roulette-sub">NUTTOKENS · play only · wins go live</div>
 
     <!-- Tab bar -->
     <div class="casino-tab-bar">
       <button class="casino-tab active" data-tab="wheel">WHEEL</button>
       <button class="casino-tab" data-tab="flip">FLIP</button>
       <button class="casino-tab" data-tab="crash">CRASH</button>
+      <button class="casino-tab" data-tab="blackjack">21</button>
+      <button class="casino-tab" data-tab="poker" disabled title="Coming soon">POKER</button>
     </div>
 
     <!-- ── WHEEL PANEL ── -->
@@ -5213,6 +5356,16 @@ scrollNutBtn.addEventListener('click', () => {
       <div class="crash-bal-line">Balance: <strong id="crashBal">0</strong> NUTS</div>
     </div>
 
+    <!-- ── BLACKJACK ── -->
+    <div class="casino-panel" id="casinoPanel_blackjack" style="display:none">
+      <div id="blackjackPanel"></div>
+    </div>
+
+    <!-- ── POKER (soon) ── -->
+    <div class="casino-panel" id="casinoPanel_poker" style="display:none">
+      <p style="padding:24px 12px;color:#8aa4b6;font-size:13px;">Texas Hold&apos;em coming next. Win at 21 while you wait.</p>
+    </div>
+
   </div>
 </div>
 
@@ -5245,6 +5398,8 @@ scrollNutBtn.addEventListener('click', () => {
 </nav>
 
 <script src="./buycta.js"></script>
+<script src="./casino-live.js"></script>
+<script src="./blackjack.js"></script>
 <script>
 if (window.NutCasino) NutCasino.init();
 if (window.NutBuyCta) NutBuyCta.init();
