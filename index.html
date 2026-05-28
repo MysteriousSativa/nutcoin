@@ -95,8 +95,8 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
   width:100%;
 }
 @keyframes ann-scroll{
-  0%{transform:translateX(100vw);}
-  100%{transform:translateX(-200%);}
+  0%{transform:translateX(0);}
+  100%{transform:translateX(-50%);}
 }
 .ann-item{
   display:inline-block;
@@ -1890,7 +1890,7 @@ position:relative;overflow:hidden;
 .alloc-btn.ghost{background:rgba(8,5,2,0.7);color:var(--muted);}
 .evt-history-title{font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);margin:14px 0 8px;}
 .evt-history-row{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);padding:6px 0;border-bottom:1px solid rgba(200,169,110,0.08);}
-.chaos-banner{display:none;position:fixed;top:var(--banner-h,58px);left:0;right:0;z-index:490;padding:0 10px;}
+.chaos-banner{display:none;max-width:920px;margin:0 auto 12px;padding:0 14px;}
 .chaos-banner.show{display:block;}
 .chaos-inner{background:rgba(12,4,4,0.96);border:1px solid rgba(201,78,78,0.45);border-radius:12px;padding:8px 12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:11px;}
 .chaos-banner.evt-green .chaos-inner{border-color:rgba(78,201,122,0.5);background:rgba(4,12,6,0.96);}
@@ -1900,10 +1900,27 @@ position:relative;overflow:hidden;
 .chaos-time{font-family:'Space Mono',monospace;color:var(--muted);font-size:10px;}
 .chaos-bar{flex:1 1 100%;height:4px;background:rgba(255,255,255,0.06);border-radius:999px;overflow:hidden;}
 .chaos-bar-fill{height:100%;background:linear-gradient(90deg,#C94E4E,#FFD97D);}
-.chaos-pump-wrap{position:fixed;top:var(--banner-h,58px);left:0;right:0;z-index:489;padding:0 10px;display:flex;align-items:center;gap:8px;font-size:10px;color:var(--muted);}
-.chaos-pump-wrap:empty{display:none;}
-.pump-track{flex:1;height:6px;background:rgba(255,255,255,0.06);border-radius:999px;overflow:hidden;max-width:200px;}
-.pump-fill{height:100%;background:linear-gradient(90deg,#4EC97A,#FFD97D);}
+.community-pump-section{
+  max-width:920px;margin:18px auto 10px;padding:0 14px;
+}
+.community-pump-box{
+  display:flex;align-items:center;gap:12px;
+  padding:14px 16px;border-radius:14px;
+  background:linear-gradient(135deg,rgba(18,12,4,0.95),rgba(8,5,2,0.98));
+  border:1px solid rgba(78,201,122,0.28);
+  box-shadow:0 6px 24px rgba(0,0,0,0.35), inset 0 1px 0 rgba(78,201,122,0.08);
+}
+.community-pump-box:empty{display:none;}
+.community-pump-section:has(.community-pump-box:empty){display:none;}
+.pump-label{
+  font-size:9px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;
+  color:#8EE4A8;white-space:nowrap;
+}
+.pump-track{flex:1;height:8px;background:rgba(0,0,0,0.45);border-radius:999px;overflow:hidden;min-width:120px;}
+.pump-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,#4ec97a,#FFD97D);transition:width .4s ease;}
+.pump-count{font-size:11px;font-weight:700;color:var(--gold-bright);font-family:'Space Mono',monospace;white-space:nowrap;}
+.pump-hint{font-size:9px;color:var(--muted);letter-spacing:.04em;white-space:nowrap;display:none;}
+@media(min-width:520px){.pump-hint{display:inline;}}
 body.chaos-active.evt-red::before{opacity:0.9;background:radial-gradient(ellipse 80% 50% at 50% -10%,rgba(120,20,20,0.18) 0%,transparent 60%),radial-gradient(ellipse 60% 40% at 80% 90%,rgba(100,40,10,0.06) 0%,transparent 55%);}
 body.chaos-invert-lb .lb-list{transform:scaleY(-1);}
 body.chaos-invert-lb .lb-row{transform:scaleY(-1);}
@@ -2057,8 +2074,10 @@ body.genesis-mode .hero-title{text-shadow:0 0 40px rgba(255,217,125,0.35);}
 <!-- Spacer that auto-matches the fixed banner height so nothing hides behind it -->
 <div class="banner-spacer" id="bannerSpacer"></div>
 
-<!-- CHAOS ENGINE -->
-<div class="chaos-pump-wrap" id="chaosPumpBar"></div>
+<!-- COMMUNITY PUMP -->
+<section class="community-pump-section" aria-label="Community pump progress">
+  <div class="community-pump-box" id="chaosPumpBar"></div>
+</section>
 <div class="chaos-banner" id="chaosBanner"></div>
 
 <!-- TOP DRIPS -->
@@ -5019,12 +5038,22 @@ function mergeFeedsForTicker(remote, local) {
   }
   (local || []).forEach(push);
   (remote || []).forEach(push);
-  out.sort((a, b) => {
-    const bigDiff = (b.big ? 1 : 0) - (a.big ? 1 : 0);
-    if (bigDiff) return bigDiff;
-    return (b.ts || 0) - (a.ts || 0);
-  });
+  out.sort((a, b) => (b.ts || 0) - (a.ts || 0));
   return out.slice(0, 24);
+}
+
+let _annTickerSig = '';
+
+function annTickerHtml(events) {
+  return [...events, ...events].map(e =>
+    `<span class="ann-item t-${e.type}">${e.text}</span><span class="ann-sep">·</span>`
+  ).join('');
+}
+
+function applyAnnScroll(el) {
+  const w = el.scrollWidth || 800;
+  const sec = Math.max(35, Math.min(140, w / 35));
+  el.style.animationDuration = sec + 's';
 }
 
 function renderAnnBigPinLocal(items) {
@@ -5070,24 +5099,24 @@ function renderAnnTicker(mergedFeed) {
   if (events.length === 1) {
     el.className = 'ann-inner ann-static';
     el.innerHTML = `<span class="ann-item t-${events[0].type}">${events[0].text}</span>`;
+    _annTickerSig = events[0].text;
     updateBannerSpacer();
     return;
   }
 
+  const sig = events.map(e => e.text).join('|');
+  const html = annTickerHtml(events);
+  if (sig === _annTickerSig && el.className === 'ann-inner' && el.innerHTML) {
+    updateBannerSpacer();
+    return;
+  }
+  _annTickerSig = sig;
   el.className = 'ann-inner';
-  const items = [...events, ...events].map(e =>
-    `<span class="ann-item t-${e.type}">${e.text}</span><span class="ann-sep">·</span>`
-  ).join('');
-
-  el.innerHTML = items;
-  el.style.animation = 'none';
-  void el.offsetWidth;
-  el.style.animation = '';
+  el.innerHTML = html;
+  requestAnimationFrame(() => applyAnnScroll(el));
   updateBannerSpacer();
 }
 renderAnnTicker();
-// Re-render every 30 s in case the tab was backgrounded during events
-setInterval(renderAnnTicker, 30000);
 
 setInterval(()=>{ if(!document.hidden) fetchGlobalCounts(); },60000);
 setInterval(()=>{ if(!document.hidden) fetchLeaderboard(); },120000);

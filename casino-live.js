@@ -6,7 +6,12 @@
   let watchCache = [];
   let feedCache  = [];
   let pollTimer  = null;
+  let lastTickerSig = '';
   const shownBigKeys = new Set();
+
+  function tickerSig(items) {
+    return (items || []).map(i => i.text).join('|');
+  }
 
   function esc(s) {
     return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -124,11 +129,7 @@
     }
     (local || []).forEach(push);
     (remote || []).forEach(push);
-    out.sort((a, b) => {
-      const bigDiff = (b.big ? 1 : 0) - (a.big ? 1 : 0);
-      if (bigDiff !== 0) return bigDiff;
-      return (b.ts || 0) - (a.ts || 0);
-    });
+    out.sort((a, b) => (b.ts || 0) - (a.ts || 0));
     return out.slice(0, 28);
   }
 
@@ -207,8 +208,12 @@
     const local = window.NutAnnounce ? NutAnnounce.getRecent(16) : [];
     const npc = getNPCFeed();
     const merged = mergeFeeds(remote, local.concat(npc));
-    if (typeof renderAnnTicker === 'function') renderAnnTicker(merged);
-    if (typeof buildTicker === 'function') buildTicker(merged);
+    const sig = tickerSig(merged);
+    if (sig !== lastTickerSig) {
+      lastTickerSig = sig;
+      if (typeof renderAnnTicker === 'function') renderAnnTicker(merged);
+      if (typeof buildTicker === 'function') buildTicker(merged);
+    }
     renderAnnBigPin(merged);
     maybeShowBigFromFeed(merged);
     renderBigWins(merged);
@@ -227,7 +232,7 @@
         } else if (ev.game && (ev.profit > 0 || ev.mult >= 2)) {
           recordCasinoEvent(ev);
         }
-        setTimeout(refresh, 300);
+        setTimeout(refresh, 400);
       });
     }
     refresh();

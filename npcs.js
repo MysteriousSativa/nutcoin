@@ -305,7 +305,7 @@
       out.push({
         type: 'npc',
         user: ev.npc.name,
-        text: `🥜 ${ev.npc.name} logged on-chain`,
+        text: `🥜 ${ev.npc.name} just logged a nut`,
         ts: ev.ts,
         npc: true,
         sessionId: ev.npc.sessionId,
@@ -611,7 +611,7 @@
       emitNPC({
         type: 'nut',
         user: npc.name,
-        text: `🥜 ${npc.name} logged on-chain`,
+        text: `🥜 ${npc.name} just logged a nut`,
         sessionId: npc.sessionId,
       });
       await new Promise(r => setTimeout(r, 400));

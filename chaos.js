@@ -135,7 +135,23 @@
   function updatePumpBar(n) {
     const el = document.getElementById('chaosPumpBar');
     if (!el) return;
-    el.innerHTML = `<span class="pump-label">COMMUNITY PUMP</span><div class="pump-track"><div class="pump-fill" style="width:${Math.min(100, (n / 20) * 100)}%"></div></div><span class="pump-count">${Math.min(n, 20)}/20</span>`;
+    const capped = Math.min(Math.max(0, n), 20);
+    const pct = (capped / 20) * 100;
+    el.innerHTML = `<span class="pump-label">COMMUNITY PUMP</span>
+      <div class="pump-track"><div class="pump-fill" style="width:${pct}%"></div></div>
+      <span class="pump-count">${capped}/20</span>
+      <span class="pump-hint">logs in 5 min fill the bar · triggers NUT PUMP</span>`;
+  }
+
+  function initPumpBar() {
+    try {
+      const win = JSON.parse(localStorage.getItem(KEY_PUMP_WIN) || '[]');
+      const now = Date.now();
+      const recent = win.filter(t => now - t < 5 * 60000);
+      updatePumpBar(recent.length + communityIds.size);
+    } catch (_) {
+      updatePumpBar(communityIds.size);
+    }
   }
 
   function getEarnMultiplier() {
@@ -258,7 +274,7 @@
   function init() {
     renderBanner();
     renderHistory();
-    updatePumpBar(0);
+    initPumpBar();
     askPush();
     tickEvent();
     setInterval(tickEvent, 5000);
