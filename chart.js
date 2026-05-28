@@ -2,14 +2,15 @@
  * $NUT Index Chart — 12-Year Global Orgasm Activity Index
  * All activities · Solo + Partnered blended · 2014-2026 · 149 monthly data points
  *
- * YEAR_TREND tells a crypto-native growth story driven by real behavioral data:
+ * YEAR_TREND narrative:
  *   2014-2016 : Slow organic adoption — smartphone self-report methodology emerges
- *   2017      : First major run-up — mainstream awareness spike
- *   2018      : Correction and reset
+ *   2017      : First pump — mainstream awareness
+ *   2018      : Correction
  *   2019      : Recovery and re-accumulation
- *   2020      : COVID mega-pump — documented +75% blended (NSSHB + Durex lockdown data)
- *   2021-2022 : Post-COVID normalization, bear market
- *   2023-2026 : Steady rebuild, pre-launch accumulation
+ *   2020      : COVID spike — +87% vs 2019 (lockdowns, all activities)
+ *   2021-2022 : Post-COVID bear — deep correction to cycle lows
+ *   2023-2026 : Global adoption expansion (population growth + developing-market smartphones)
+ *               breaks the 2020 ATH — Genesis Snapshot launches AT all-time highs
  *
  * Per-point ±22% seeded noise makes the line realistically jagged.
  */
@@ -22,12 +23,13 @@
     1.07, 1.13, 1.04, 1.01, 0.98, 0.97,
     0.95, 0.93, 0.98, 1.03, 0.61, 1.15,
   ];
-  // Crypto-arc YEAR_TREND: starts at 80, pumps to ~430 at COVID ATH, sits ~250 at launch
+  // 2026 ATH: the coin launches as underlying breaks all-time highs
+  // COVID was a spike; the real structural peak is RIGHT NOW
   const YEAR_TREND = {
-    2014:1.00, 2015:1.30, 2016:1.68, 2017:2.45,
-    2018:1.65, 2019:2.18, 2020:4.80,
-    2021:2.90, 2022:2.02, 2023:2.45, 2024:2.82,
-    2025:3.20, 2026:3.22,
+    2014:1.00, 2015:1.35, 2016:1.75, 2017:2.55,
+    2018:1.68, 2019:2.25, 2020:4.20,
+    2021:2.82, 2022:1.95, 2023:2.72, 2024:3.88,
+    2025:5.05, 2026:5.55,
   };
   const BASE     = 80;
   const MON_ABBR = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
@@ -92,7 +94,7 @@
   const ANNS = [
     {
       aidx: ALL_DATA.findIndex(p => p.y === 2020 && p.m === 0),
-      label: ['COVID', 'LOCKDOWNS'],
+      label: ['COVID', 'SPIKE'],
       side: 'top', type: 'bull',
     },
     {
@@ -101,13 +103,18 @@
       side: 'bot', type: 'bear',
     },
     {
-      aidx: ATH_IDX, // dynamic — points to actual computed ATH with noise
+      aidx: ALL_DATA.findIndex(p => p.y === 2022 && p.m === 6),
+      label: ['CYCLE', 'LOW'],
+      side: 'bot', type: 'bear',
+    },
+    {
+      aidx: ATH_IDX, // dynamic — the ATH is now at Genesis (2025/2026)
       label: ['ALL TIME', 'HIGH'],
       side: 'top', type: 'ath',
     },
     {
       aidx: ALL_DATA.length - 1,
-      label: ['GENESIS', 'SNAPSHOT'],
+      label: ['YOU', 'ARE HERE'],
       side: 'top', type: 'genesis',
     },
   ];
@@ -341,18 +348,17 @@
       ctx.fillText(p.v.toFixed(1), PAD.l + CW + 28, y + 3.5);
 
       // Tooltip
-      const pctBase = ((p.v - BASE) / BASE * 100);
       const pctATH  = ((p.v - ATH_VAL) / ATH_VAL * 100);
       const tag = p.isNNN     ? '▼ NNN SUPPRESSION'
                 : p.isDec     ? '▲ DECEMBER REBOUND'
-                : p.isCovid   ? '▲ COVID ERA ELEVATED'
-                : p.isGenesis ? '● GENESIS SNAPSHOT'
+                : p.isCovid   ? '▲ COVID SPIKE'
+                : p.isGenesis ? '▲ GENESIS · ATH TERRITORY'
+                : (p.y >= 2025 && pctATH >= -5) ? '▲ ALL TIME HIGH ZONE'
                 : '';
       const tipLines = [
         p.lbl,
         'NUTIDX  ' + p.v.toFixed(1),
-        (pctBase >= 0 ? '+' : '') + pctBase.toFixed(1) + '% vs baseline',
-        pctATH.toFixed(1)  + '% vs ATH',
+        (pctATH >= 0 ? '+' : '') + pctATH.toFixed(1) + '% vs ATH',
         ...(tag ? [tag] : []),
       ];
 
@@ -515,7 +521,12 @@
       pts: document.getElementById('nidxPts'),
     };
     if (el.val) el.val.textContent = LATEST.toFixed(1);
-    if (el.chg) { el.chg.textContent = pctATH + '% FROM ATH'; }
+    if (el.chg) {
+      el.chg.textContent = parseFloat(pctATH) >= -5
+        ? '▲ ATH TERRITORY'
+        : pctATH + '% FROM ATH';
+      el.chg.style.color = parseFloat(pctATH) >= -5 ? '#4EC97A' : '';
+    }
     if (el.ath) {
       el.ath.textContent = 'ATH ' + ATH_VAL.toFixed(1) + '  ·  ' + ALL_DATA[ATH_IDX].lbl.toUpperCase();
     }
