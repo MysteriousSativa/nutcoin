@@ -88,9 +88,12 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
   font-size:9px;font-weight:500;letter-spacing:.07em;
   color:var(--muted);padding:0 18px;
 }
-.ann-item.t-duel{color:rgba(200,169,110,0.8);}
-.ann-item.t-activity{color:rgba(237,232,223,0.5);}
+.ann-item.t-duel{color:rgba(200,169,110,0.7);}
+.ann-item.t-activity{color:rgba(237,232,223,0.45);}
 .ann-item.t-stat{color:rgba(78,201,122,0.6);}
+/* Real user events — brighter so they stand out vs NPC simulation */
+.ann-item.t-nut{color:rgba(255,220,100,0.9);font-weight:600;}
+.ann-item.t-spin,.ann-item.t-flip,.ann-item.t-crash{color:rgba(78,201,122,0.9);font-weight:700;}
 .ann-sep{color:rgba(200,169,110,0.2);padding:0 4px;}
 /* buy nudge — appears below banner so it never overlaps LOG NUT */
 .buy-nudge{
@@ -106,6 +109,27 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .buy-nudge-msg{flex:1;font-size:12px;line-height:1.35;color:var(--cream);}
 .buy-nudge-btn{padding:8px 12px;border-radius:10px;border:1px solid rgba(255,160,40,0.5);background:var(--btn-ember);color:#1a0a00;font-weight:800;font-size:10px;letter-spacing:.06em;cursor:pointer;white-space:nowrap;}
 .buy-nudge-x{background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px;padding:4px;}
+/* ── BIG WIN BANNER ── */
+.big-win-banner{
+  position:fixed;
+  left:50%;top:calc(var(--banner-h,60px) + 6px);
+  transform:translateX(-50%) translateY(-180%);
+  z-index:820;max-width:min(460px,calc(100vw - 20px));
+  text-align:center;pointer-events:none;
+  transition:transform .45s cubic-bezier(.34,1.56,.64,1),opacity .35s;
+  opacity:0;
+}
+.big-win-banner.show{transform:translateX(-50%) translateY(0);opacity:1;}
+.bwb-inner{
+  background:linear-gradient(135deg,rgba(36,18,0,.98) 0%,rgba(10,5,0,.99) 100%);
+  border:2px solid var(--gold-bright);
+  border-radius:20px;padding:16px 28px 12px;
+  box-shadow:0 0 60px rgba(255,180,40,.5),0 0 20px rgba(255,180,40,.2) inset,0 20px 60px rgba(0,0,0,.7);
+}
+.bwb-kicker{font-size:9.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);font-weight:700;margin-bottom:4px;font-family:'Space Mono',monospace;}
+.bwb-amount{font-family:'Space Mono',monospace;font-size:clamp(26px,7vw,42px);font-weight:700;color:var(--gold-bright);text-shadow:0 0 24px rgba(255,200,80,.9),0 0 6px rgba(255,200,80,.5);line-height:1;letter-spacing:.04em;}
+.bwb-user{font-size:11px;color:rgba(237,232,223,.75);margin-top:5px;letter-spacing:.07em;}
+.bwb-confetti{font-size:22px;letter-spacing:6px;margin-bottom:2px;}
 .buy-btn-sm{
   background:
     linear-gradient(135deg, rgba(200,100,10,0.9) 0%, rgba(160,70,0,0.95) 50%, rgba(180,90,5,0.9) 100%);
@@ -2429,8 +2453,8 @@ body.genesis-mode .hero-title{text-shadow:0 0 40px rgba(255,217,125,0.35);}
   <div class="nick-modal-box">
     <span class="modal-emoji">🏆</span>
     <div class="modal-title" style="color:var(--gold);font-size:18px;margin-bottom:6px;">Customize Your Name</div>
-    <div style="font-family:'Crimson Text',serif;font-size:16px;color:var(--muted);font-style:italic;">you already have a name. make it yours. everyone on the leaderboard can see how many times you nutted.</div>
-    <input class="nick-input" id="nickInput" type="text" maxlength="20" placeholder="Your name..."/>
+    <div style="font-family:'Crimson Text',serif;font-size:16px;color:var(--muted);font-style:italic;">you already have a name. make it yours. must be unique, no spaces.</div>
+    <input class="nick-input" id="nickInput" type="text" maxlength="20" placeholder="Your name..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
     <button class="nick-submit" onclick="submitNick()">Save Name</button>
     <span class="nick-skip" onclick="closeNickModal()">Keep my auto-name</span>
   </div>
@@ -2484,6 +2508,8 @@ body.genesis-mode .hero-title{text-shadow:0 0 40px rgba(255,217,125,0.35);}
 
 <div class="confetti-wrap" id="confettiWrap"></div>
 <div class="toast" id="toast"></div>
+<!-- Big Win Banner (fires for game wins and milestones) -->
+<div class="big-win-banner" id="bigWinBanner"></div>
 
 <script>
 // ═══════════════════════════════════════════════════════
@@ -3138,14 +3164,35 @@ function openNickModal() {
 }
 function closeNickModal(){ document.getElementById('nickModal').classList.remove('show'); }
 function submitNick() {
-  const val = document.getElementById('nickInput').value.trim().slice(0,20);
-  if (!val) return;
+  let raw = document.getElementById('nickInput').value.trim();
+  if (!raw) return;
+
+  // No spaces — reject and explain
+  if (/\s/.test(raw)) {
+    showToast('No spaces allowed — use _ or CamelCase');
+    return;
+  }
+
+  const val = raw.slice(0, 20);
+
+  // Must not clash with an NPC name
+  if (window.NutNPCs && NutNPCs.getNPC(val)) {
+    showToast('That name is reserved. Pick something unique.');
+    return;
+  }
+
+  // Must not clash with another real user already on the leaderboard
+  if (Array.isArray(lbCache) && lbCache.some(r => !r.isYou && r.nickname.toLowerCase() === val.toLowerCase())) {
+    showToast('Username taken. Choose a different one.');
+    return;
+  }
+
   nickname = val;
   localStorage.setItem(KEY_NICK, nickname);
   closeNickModal();
   renderNickBar();
   fetchLeaderboard();
-  showToast('Nickname set: '+nickname+' ✦');
+  showToast('Name set: ' + nickname + ' ✦');
 }
 document.getElementById('nickInput').addEventListener('keydown',e=>{ if(e.key==='Enter') submitNick(); });
 
@@ -3201,6 +3248,21 @@ function nut() {
     setTimeout(() => showToast('Milestone hit — Post Receipt to X'), 2500);
   }
   logToSupabase();
+  // Real announcement: fire for every nut + extra for milestones
+  if (window.NutAnnounce) {
+    const _uname = nickname || genUserName(sessionId);
+    const isMilestone = countAllTime > 0 && countAllTime % 50 === 0;
+    NutAnnounce.emit({
+      type: 'nut',
+      user: _uname,
+      text: isMilestone
+        ? `🥜 ${_uname} hit ${countAllTime} total nuts`
+        : `🥜 ${_uname} just logged a nut`,
+      big: isMilestone && countAllTime % 100 === 0,
+      milestone: isMilestone ? countAllTime : null,
+      profit: isMilestone ? countAllTime : null,
+    });
+  }
   // New features
   updateStreak();
   renderFlame();
@@ -4642,6 +4704,11 @@ function spinWheel() {
         const profit = payout - rouletteBet;
         if (res) { res.textContent = `${seg.label} — +${profit} NUTS profit`; res.style.color = '#44ff88'; }
         showToast(`🎰 ${seg.label}! +${profit} NUTS`);
+        if (window.NutAnnounce) {
+          const _uname = nickname || genUserName(sessionId);
+          NutAnnounce.emit({ type:'spin', game:'spin', user:_uname, profit, mult:seg.mult, big: seg.mult >= 10,
+            text:`🎰 ${_uname} hit ${seg.label} for +${profit} NUTS` });
+        }
       } else {
         pmSetBalance(balAtSpin - rouletteBet);
         if (res) { res.textContent = `BUST — lost ${rouletteBet} NUTS`; res.style.color = '#ff6060'; }
@@ -4708,6 +4775,60 @@ if (window.NutChart) NutChart.init();
 if (window.NutDrop) NutDrop.init();
 if (window.NutNPCs) NutNPCs.init(db);
 
+// ══════════════════════════════════════════════════════════════
+// REAL ANNOUNCEMENT BUS
+// Collects genuine events: nut logs, game wins, NPC duel results.
+// Anything that fires NutAnnounce.emit() appears in the ticker
+// immediately. Big wins (big:true) get the gold popup.
+// ══════════════════════════════════════════════════════════════
+window.NutAnnounce = (function() {
+  const queue = [];
+  const subs  = [];
+
+  function emit(ev) {
+    const item = Object.assign({ ts: Date.now() }, ev);
+    queue.unshift(item);
+    if (queue.length > 40) queue.pop();
+    subs.forEach(fn => { try { fn(item); } catch(_) {} });
+    if (item.big) showBigWin(item);
+    // Always refresh ticker on new event
+    setTimeout(renderAnnTicker, 0);
+  }
+
+  function subscribe(fn) {
+    subs.push(fn);
+    return () => { const i = subs.indexOf(fn); if (i >= 0) subs.splice(i,1); };
+  }
+
+  function getRecent(n) { return queue.slice(0, n || 20); }
+  return { emit, subscribe, getRecent };
+})();
+
+// ── BIG WIN GOLD POPUP ───────────────────────────────────────
+function showBigWin(ev) {
+  const el = document.getElementById('bigWinBanner');
+  if (!el) return;
+  const CONFETTI = '🎉 🥜 💎 🔥 👑';
+  const kicker = ev.game === 'crash' ? '🚀 CRASH CASHOUT'
+               : ev.game === 'spin'  ? '🎰 SPIN JACKPOT'
+               : ev.game === 'flip'  ? '🪙 FLIP WIN'
+               : ev.milestone        ? '🥜 MILESTONE'
+               : '🏆 BIG WIN';
+  const amount = ev.game === 'crash' ? `${ev.mult.toFixed ? ev.mult.toFixed(1) : ev.mult}×  ·  +${ev.profit} NUTS`
+               : ev.profit           ? `+${ev.profit} NUTS`
+               : ev.milestone        ? `${ev.milestone} NUTS`
+               : '';
+  el.innerHTML = `<div class="bwb-inner">
+    <div class="bwb-confetti">${CONFETTI}</div>
+    <div class="bwb-kicker">${kicker}</div>
+    <div class="bwb-amount">${amount}</div>
+    <div class="bwb-user">${escHtml(ev.user || 'Anonymous')}</div>
+  </div>`;
+  el.classList.add('show');
+  clearTimeout(el._t);
+  el._t = setTimeout(() => el.classList.remove('show'), 4500);
+}
+
 // ── BANNER SPACER: keeps content below the fixed buy-banner ──────
 function updateBannerSpacer() {
   const banner = document.getElementById('buyBanner');
@@ -4724,16 +4845,32 @@ window.addEventListener('resize', updateBannerSpacer);
 function renderAnnTicker() {
   const el = document.getElementById('annInner');
   if (!el) return;
-  const msgs = window.NutNPCs ? NutNPCs.getAnnouncements(Date.now()) : [];
-  if (!msgs.length) return;
-  // Duplicate the list so the scroll loops seamlessly
-  const items = [...msgs, ...msgs].map(m =>
-    `<span class="ann-item t-${m.type}">${m.text}</span><span class="ann-sep">·</span>`
+
+  // Real events (most recent first)
+  const real = window.NutAnnounce ? NutAnnounce.getRecent(10) : [];
+  // NPC simulated background noise
+  const npc  = window.NutNPCs ? NutNPCs.getAnnouncements(Date.now()) : [];
+
+  // Real events get type 't-real', NPC events use their own type
+  const all = [
+    ...real.map(e => ({ cls: `t-${e.type}`, text: e.text })),
+    ...npc.map(e  => ({ cls: `t-${e.type}`, text: e.text })),
+  ];
+  if (!all.length) return;
+
+  // Duplicate for seamless looping scroll
+  const items = [...all, ...all].map(m =>
+    `<span class="ann-item ${m.cls}">${m.text}</span><span class="ann-sep">·</span>`
   ).join('');
+
   el.innerHTML = items;
+  // Restart animation so new content scrolls from beginning
+  el.style.animation = 'none';
+  void el.offsetWidth;
+  el.style.animation = '';
 }
 renderAnnTicker();
-setInterval(renderAnnTicker, 120000); // refresh every 2 min
+setInterval(renderAnnTicker, 90000); // background refresh; also fires on each real event
 
 setInterval(()=>{ if(!document.hidden) fetchGlobalCounts(); },60000);
 setInterval(()=>{ if(!document.hidden) fetchLeaderboard(); },120000);

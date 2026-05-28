@@ -433,6 +433,10 @@
     }).join('');
   }
 
+  // ── DUEL ANNOUNCEMENT TRACKER ──────────────────────────────────
+  // Fires into NutAnnounce when a duel completes. Set so each duel only announces once.
+  const _announcedDuels = new Set();
+
   // ── RENDER: DUELS + SPEED ROUNDS ───────────────────────────────
   function renderDuels() {
     const el = document.getElementById('npcDuels');
@@ -441,6 +445,20 @@
     const duels  = getActiveDuels(now);
     const speeds = getSpeedRounds(now);
     const all    = [...speeds, ...duels];
+
+    // Fire real events for freshly-completed duels
+    all.forEach(d => {
+      if (d.done && !_announcedDuels.has(d.id)) {
+        _announcedDuels.add(d.id);
+        if (_announcedDuels.size > 80) _announcedDuels.delete(_announcedDuels.values().next().value);
+        const w = d.c1 >= d.c2 ? d.npc1 : d.npc2;
+        const l = d.c1 >= d.c2 ? d.npc2 : d.npc1;
+        if (window.NutAnnounce) NutAnnounce.emit({
+          type: 'duel', npc: true,
+          text: `⚔ ${w.name} destroyed ${l.name} ${d.c1}-${d.c2}`,
+        });
+      }
+    });
 
     el.innerHTML = all.map(d => {
       const isSpeed = d.type === 'speed';
