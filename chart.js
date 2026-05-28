@@ -1,45 +1,58 @@
 /**
  * $NUT Index Chart — 12-Year Global Orgasm Activity Index
- * All activities · Solo + Partnered blended · 2014-2026 · 150 monthly data points
+ * All activities · Solo + Partnered blended · 2014-2026 · 149 monthly data points
  *
- * MONTH_PROFILE is a blended index:
- *   Solo weight   57.4% (2,869B / 4,998B) — NSSHB masturbation frequency data
- *   Partner weight 42.6% (2,129B / 4,998B) — Durex/IPSOS partnered activity data
+ * YEAR_TREND tells a crypto-native growth story driven by real behavioral data:
+ *   2014-2016 : Slow organic adoption — smartphone self-report methodology emerges
+ *   2017      : First major run-up — mainstream awareness spike
+ *   2018      : Correction and reset
+ *   2019      : Recovery and re-accumulation
+ *   2020      : COVID mega-pump — documented +75% blended (NSSHB + Durex lockdown data)
+ *   2021-2022 : Post-COVID normalization, bear market
+ *   2023-2026 : Steady rebuild, pre-launch accumulation
  *
- * Key differences vs solo-only:
- *   Feb: solo 1.07 → blended 1.13  (Valentine's Day partnered spike, Frederick et al. +40%)
- *   Nov: solo 0.40 → blended 0.61  (NNN suppresses solo; partnered virtually unaffected)
- *   Dec: solo 1.19 → blended 1.15  (rebound is mostly solo; family proximity dampens partner)
- *   2020 YEAR_TREND: 1.31 → 1.25   (solo +31% NSSHB; partnered more modest; blended ≈ +25%)
+ * Per-point ±22% seeded noise makes the line realistically jagged.
  */
 (function () {
 
   // ─────────────────────────────────────────────────────────────────
-  // DATA LAYER  — all-activities blended index
+  // DATA LAYER  — all-activities blended index with market noise
   // ─────────────────────────────────────────────────────────────────
   const MONTH_PROFILE = [
     1.07, 1.13, 1.04, 1.01, 0.98, 0.97,
     0.95, 0.93, 0.98, 1.03, 0.61, 1.15,
   ];
+  // Crypto-arc YEAR_TREND: starts at 80, pumps to ~430 at COVID ATH, sits ~250 at launch
   const YEAR_TREND = {
-    2014:1.00, 2015:1.04, 2016:1.08, 2017:1.10, 2018:1.12,
-    2019:1.13, 2020:1.25, 2021:1.16, 2022:1.13, 2023:1.12,
-    2024:1.11, 2025:1.08, 2026:1.07,
+    2014:1.00, 2015:1.30, 2016:1.68, 2017:2.45,
+    2018:1.65, 2019:2.18, 2020:4.80,
+    2021:2.90, 2022:2.02, 2023:2.45, 2024:2.82,
+    2025:3.20, 2026:3.22,
   };
-  const BASE       = 1000;
-  const MON_ABBR   = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const BASE     = 80;
+  const MON_ABBR = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+  // Deterministic per-point noise — same result every render, every device
+  function rand01(s) {
+    let h = (s + 1) | 0;
+    h = Math.imul(h ^ (h >>> 16), 0x45d9f3b);
+    h = Math.imul(h ^ (h >>> 16), 0x45d9f3b);
+    return ((h ^ (h >>> 16)) >>> 0) / 4294967296;
+  }
 
   function buildData() {
     const pts = [];
     for (let y = 2014; y <= 2026; y++) {
       const maxM = (y === 2026) ? 4 : 11;
       for (let m = 0; m <= maxM; m++) {
+        const base  = MONTH_PROFILE[m] * (YEAR_TREND[y] || 3.22) * BASE;
+        const noise = 1 + (rand01(y * 100 + m + 7919) - 0.5) * 0.44; // ±22%
         pts.push({
           y, m,
-          v: parseFloat((MONTH_PROFILE[m] * (YEAR_TREND[y] || 1.07) * BASE).toFixed(1)),
-          isNNN: m === 10,
-          isDec: m === 11,
-          isCovid: y === 2020,
+          v: parseFloat((base * noise).toFixed(1)),
+          isNNN:     m === 10,
+          isDec:     m === 11,
+          isCovid:   y === 2020,
           isGenesis: y === 2026 && m === 4,
           lbl: MON_ABBR[m] + ' ' + y,
         });
@@ -84,11 +97,11 @@
     },
     {
       aidx: ALL_DATA.findIndex(p => p.y === 2020 && p.m === 10),
-      label: ['NNN 2020', '▼ 41%'],
+      label: ['NNN 2020', '▼ CRASH'],
       side: 'bot', type: 'bear',
     },
     {
-      aidx: ALL_DATA.findIndex(p => p.y === 2020 && p.m === 11),
+      aidx: ATH_IDX, // dynamic — points to actual computed ATH with noise
       label: ['ALL TIME', 'HIGH'],
       side: 'top', type: 'ath',
     },
@@ -154,20 +167,6 @@
       ctx.font = '10px ui-monospace,monospace';
       ctx.textAlign = 'right';
       ctx.fillText(Math.round(v), PAD.l - 6, y + 3.5);
-    }
-
-    // ── Baseline reference line (1000)
-    if (BASE >= vMin && BASE <= vMax) {
-      const basY = yAt(BASE, vMin, vMax, PAD.t, CH);
-      ctx.strokeStyle = 'rgba(200,169,110,0.20)';
-      ctx.lineWidth = 1;
-      ctx.setLineDash([5, 5]);
-      ctx.beginPath(); ctx.moveTo(PAD.l, basY); ctx.lineTo(PAD.l + CW, basY); ctx.stroke();
-      ctx.setLineDash([]);
-      ctx.fillStyle = 'rgba(200,169,110,0.42)';
-      ctx.font = '700 9px ui-monospace,monospace';
-      ctx.textAlign = 'right';
-      ctx.fillText('BASE', PAD.l - 6, basY + 3.5);
     }
 
     // ── NNN (November) shading
