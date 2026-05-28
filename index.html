@@ -708,6 +708,8 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .divider-img{display:none !important;}
 
 /* ── COUNTER CARD ── */
+.wrap-log-top{padding-top:8px;padding-bottom:4px;}
+.wrap-log-top .section-kicker{margin-bottom:10px;}
 .counter-card{
   background:
     radial-gradient(ellipse 90% 60% at 50% 0%, rgba(200,80,10,0.18) 0%, transparent 65%),
@@ -718,6 +720,8 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
   position:relative;overflow:hidden;margin-bottom:18px;
   box-shadow:0 8px 32px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,230,140,0.12);
 }
+.counter-card .nut-btn{margin-bottom:20px;}
+.counter-card .nut-methods{margin-top:0;}
 .counter-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;
   background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:.5;}
 .counter-card::after{content:'';position:absolute;inset:0;
@@ -773,7 +777,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .bonus-hour-sub{font-size:10px;color:var(--muted);margin-top:6px;}
 .nut-verdict{
   min-height:1.2em;font-size:12px;font-weight:600;color:var(--gold-bright);
-  margin:-8px 0 14px;font-style:italic;position:relative;z-index:1;padding:0 12px;
+  margin:12px 0 14px;font-style:italic;position:relative;z-index:1;padding:0 12px;
 }
 .method-ledger{display:grid;gap:8px;}
 .method-row{
@@ -1892,6 +1896,41 @@ body.genesis-mode .hero-title{text-shadow:0 0 40px rgba(255,217,125,0.35);}
   </div>
 </div>
 
+<!-- LOG NUT — primary action at top -->
+<div class="wrap wrap-log-top">
+  <p class="section-kicker">solo · partnered · unhinged, all nuts count</p>
+  <div class="counter-card" id="nutCard">
+    <div class="counter-label">Your Nut Points, Today</div>
+    <div class="big-count" id="bigCount">0</div>
+    <div class="reset-sub">2× methods rotate each hour · any climax counts</div>
+    <div class="bonus-hour" id="bonusHour" aria-live="polite"></div>
+    <button class="nut-btn" onclick="nut()">LOG NUT</button>
+    <div class="nut-methods" id="nutMethods">
+      <div class="method-picker-head">
+        <span>How did you nut?</span>
+        <span class="method-scroll-hint">scroll →</span>
+      </div>
+      <div class="method-scroll-outer">
+        <button type="button" class="scroll-arrow scroll-arrow-left" onclick="scrollMethods(-1)" aria-label="Scroll categories left">‹</button>
+        <div class="method-scroll-viewport" id="methodScrollViewport">
+          <div class="nut-method-track" id="nutMethodGrid"></div>
+        </div>
+        <button type="button" class="scroll-arrow scroll-arrow-right" onclick="scrollMethods(1)" aria-label="Scroll categories right">›</button>
+      </div>
+      <div class="method-attach-preview" id="methodAttachPreview">Solo · 1 pt</div>
+    </div>
+    <div class="nut-verdict" id="nutVerdict" aria-live="polite"></div>
+    <div class="my-row">
+      All-time: <span id="myAllTime">0</span> &nbsp;·&nbsp; Session: <span id="mySession">0</span>
+      &nbsp;·&nbsp; Partnered today: <span id="partnerToday">0</span>
+    </div>
+    <div class="card-actions">
+      <button class="cert-btn" onclick="openCertificate()">Get Receipt</button>
+      <button class="share-btn" onclick="shareTwitter()">Post Receipt to X</button>
+    </div>
+  </div>
+</div>
+
 <!-- AIRDROP DROP BANNER -->
 <div class="drop-banner" id="dropBanner">
   <div class="drop-inner">
@@ -2030,40 +2069,6 @@ body.genesis-mode .hero-title{text-shadow:0 0 40px rgba(255,217,125,0.35);}
       <span class="clock-pinned-period" id="clockPinnedPeriod"></span>
     </div>
   </div>
-  <p class="section-kicker">solo · partnered · unhinged, all nuts count</p>
-
-  <!-- COUNTER CARD -->
-  <div class="counter-card" id="nutCard">
-    <div class="counter-label">Your Nut Points, Today</div>
-    <div class="big-count" id="bigCount">0</div>
-    <div class="reset-sub">2× methods rotate each hour · any climax counts</div>
-    <div class="bonus-hour" id="bonusHour" aria-live="polite"></div>
-    <div class="nut-methods" id="nutMethods">
-      <div class="method-picker-head">
-        <span>How did you nut?</span>
-        <span class="method-scroll-hint">scroll →</span>
-      </div>
-      <div class="method-scroll-outer">
-        <button type="button" class="scroll-arrow scroll-arrow-left" onclick="scrollMethods(-1)" aria-label="Scroll categories left">‹</button>
-        <div class="method-scroll-viewport" id="methodScrollViewport">
-          <div class="nut-method-track" id="nutMethodGrid"></div>
-        </div>
-        <button type="button" class="scroll-arrow scroll-arrow-right" onclick="scrollMethods(1)" aria-label="Scroll categories right">›</button>
-      </div>
-      <div class="method-attach-preview" id="methodAttachPreview">Solo · 1 pt</div>
-    </div>
-    <div class="nut-verdict" id="nutVerdict" aria-live="polite"></div>
-    <button class="nut-btn" onclick="nut()">LOG NUT</button>
-    <div class="my-row">
-      All-time: <span id="myAllTime">0</span> &nbsp;·&nbsp; Session: <span id="mySession">0</span>
-      &nbsp;·&nbsp; Partnered today: <span id="partnerToday">0</span>
-    </div>
-    <div class="card-actions">
-      <button class="cert-btn" onclick="openCertificate()">Get Receipt</button>
-      <button class="share-btn" onclick="shareTwitter()">Post Receipt to X</button>
-    </div>
-  </div>
-
   <!-- NUT HUB: Passport, Duels, Pulse, Bounties, Crew, Oracle -->
   <section class="nut-hub" id="nutHub">
     <div class="hub-card">
