@@ -52,7 +52,8 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
   background:rgba(4,2,0,0.97);
   border-bottom:1px solid rgba(200,169,110,0.35);
   display:flex;align-items:center;justify-content:center;
-  gap:20px;padding:8px 16px;
+  flex-wrap:wrap;
+  gap:12px 20px;padding:7px 16px 0;
   font-family:inherit;font-size:11px;letter-spacing:.14em;font-weight:600;
   color:var(--muted);
   box-shadow:0 2px 30px rgba(0,0,0,0.5), 0 1px 0 rgba(200,169,110,0.2);
@@ -62,7 +63,44 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .buy-price-ticker{margin-left:auto;font-size:10px;color:var(--muted);display:flex;align-items:center;gap:8px;}
 .buy-price-ticker strong{color:var(--gold-bright);}
 .bpt-buy{padding:4px 10px;border-radius:8px;border:1px solid rgba(255,160,40,0.45);background:rgba(200,100,10,0.2);color:var(--gold-bright);font-size:9px;font-weight:800;cursor:pointer;font-family:inherit;}
-.buy-nudge{position:fixed;left:50%;transform:translateX(-50%) translateY(120%);bottom:calc(100px + env(safe-area-inset-bottom,0px));z-index:650;max-width:min(420px,calc(100vw - 24px));opacity:0;pointer-events:none;transition:transform .35s ease,opacity .35s ease;}
+/* spacer div matches fixed banner height so content is never hidden behind it */
+.banner-spacer{display:block;width:100%;}
+/* ── ANNOUNCEMENT TICKER (second row inside banner) ── */
+.ann-row{
+  width:100%;flex-basis:100%;
+  border-top:1px solid rgba(200,169,110,0.10);
+  overflow:hidden;height:22px;
+  display:flex;align-items:center;
+  margin-top:5px;
+}
+.ann-inner{
+  white-space:nowrap;
+  display:inline-flex;align-items:center;
+  animation:ann-scroll 90s linear infinite;
+  will-change:transform;
+}
+@keyframes ann-scroll{
+  0%{transform:translateX(100vw);}
+  100%{transform:translateX(-200%);}
+}
+.ann-item{
+  display:inline-block;
+  font-size:9px;font-weight:500;letter-spacing:.07em;
+  color:var(--muted);padding:0 18px;
+}
+.ann-item.t-duel{color:rgba(200,169,110,0.8);}
+.ann-item.t-activity{color:rgba(237,232,223,0.5);}
+.ann-item.t-stat{color:rgba(78,201,122,0.6);}
+.ann-sep{color:rgba(200,169,110,0.2);padding:0 4px;}
+/* buy nudge — appears below banner so it never overlaps LOG NUT */
+.buy-nudge{
+  position:fixed;left:50%;
+  top:calc(var(--banner-h,56px) + 6px);
+  transform:translateX(-50%) translateY(-130%);
+  z-index:650;max-width:min(420px,calc(100vw - 24px));
+  opacity:0;pointer-events:none;
+  transition:transform .35s ease,opacity .35s ease;
+}
 .buy-nudge.show{transform:translateX(-50%) translateY(0);opacity:1;pointer-events:auto;}
 .buy-nudge-inner{display:flex;align-items:center;gap:10px;padding:12px 14px;background:rgba(8,5,2,0.97);border:1px solid rgba(200,169,110,0.4);border-radius:14px;box-shadow:0 8px 32px rgba(0,0,0,0.55);}
 .buy-nudge-msg{flex:1;font-size:12px;line-height:1.35;color:var(--cream);}
@@ -112,7 +150,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 
 /* ── HERO (memecoin landing) ── */
 .hero{
-  text-align:center;padding:72px 16px 28px;position:relative;z-index:1;
+  text-align:center;padding:26px 16px 28px;position:relative;z-index:1;
   background:var(--hero-grad), linear-gradient(180deg,#140a04 0%,#050301 72%);
   border-bottom:1px solid rgba(200,169,110,0.12);
 }
@@ -265,7 +303,14 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 @keyframes blink{0%,100%{opacity:1;}50%{opacity:0.3;}}
 .npc-ev{display:flex;align-items:flex-start;gap:9px;padding:7px 0;border-bottom:1px solid rgba(200,169,110,0.07);}
 .npc-ev:last-child{border-bottom:none;}
-.npc-av{width:28px;height:28px;border-radius:7px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#050301;}
+/* NPC avatar — emoji inside colored box */
+.npc-av{width:32px;height:32px;border-radius:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:16px;border:1px solid transparent;}
+.npc-av.av-gold{border-color:rgba(255,215,0,0.55);box-shadow:0 0 8px rgba(255,180,0,0.3);}
+.npc-av.av-king{border-color:rgba(255,215,0,0.85);box-shadow:0 0 14px rgba(255,180,0,0.5);animation:king-glow 2.4s ease-in-out infinite alternate;}
+@keyframes king-glow{from{box-shadow:0 0 8px rgba(255,180,0,0.4);}to{box-shadow:0 0 20px rgba(255,200,60,0.7);}}
+/* NPC badges */
+.npc-badge{font-size:11px;line-height:1;}
+.duel-badges{display:flex;gap:2px;justify-content:center;margin-top:2px;min-height:14px;}
 .npc-ev-body{flex:1;min-width:0;}
 .npc-ev-name{font-size:11px;font-weight:700;color:var(--gold-bright);}
 .npc-ev-act{font-size:11px;color:rgba(237,232,223,0.65);}
@@ -287,9 +332,12 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .duel-timer{font-family:ui-monospace,monospace;font-size:11px;font-weight:700;color:var(--gold-bright);}
 .duel-taunt{font-size:10px;color:var(--muted);font-style:italic;margin-bottom:7px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .duel-match{display:flex;align-items:center;gap:6px;margin-bottom:7px;}
-.duel-side{flex:1;text-align:center;padding:6px;border-radius:8px;border:1px solid transparent;transition:border-color .2s;}
-.duel-side.lead{border-color:rgba(200,169,110,0.3);background:rgba(200,169,110,0.06);}
-.duel-pn{font-size:9px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:3px;}
+.duel-side{flex:1;display:flex;align-items:center;gap:6px;padding:7px 8px;border-radius:10px;border:1px solid transparent;transition:border-color .2s,background .2s;}
+.duel-side.lead{border-color:rgba(200,169,110,0.3);background:rgba(200,169,110,0.07);}
+.duel-pn{font-size:10px;font-weight:600;color:var(--cream);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+/* speed rounds get a distinct teal accent */
+.speed-card{border-color:rgba(78,201,181,0.35) !important;}
+.duel-badge.speed{background:rgba(78,201,181,0.15);border-color:rgba(78,201,181,0.5);color:#4EC9B5;}
 .duel-score{font-family:'Space Mono',monospace;font-size:20px;font-weight:700;color:var(--gold-bright);}
 .duel-side.lead .duel-score{color:#FFD97D;}
 .duel-vs-chip{font-size:9px;font-weight:800;letter-spacing:.08em;color:var(--muted);flex-shrink:0;}
@@ -1324,8 +1372,9 @@ position:relative;overflow:hidden;
   .sticky-trade{display:flex;}
   .scroll-nut-btn{display:none !important;}
   .buy-banner .contract{display:none;}
+  .buy-banner{gap:8px 14px;padding:5px 10px 0;}
   .hero{
-    padding:58px 14px 22px;
+    padding:20px 14px 22px;
     background:
       radial-gradient(ellipse 100% 80% at 50% -20%,rgba(220,100,20,0.22) 0%,transparent 55%),
       var(--hero-grad), linear-gradient(180deg,#140a04 0%,#050301 72%);
@@ -1375,9 +1424,7 @@ position:relative;overflow:hidden;
   .mnav-lbl{font-family:inherit;font-size:7.5px;font-weight:600;letter-spacing:.07em;color:var(--muted);text-transform:uppercase;transition:color .2s;}
   .mnav-btn.active .mnav-lbl{color:var(--gold-bright);text-shadow:0 0 8px rgba(200,169,110,0.8);}
 
-  /* Buy banner */
-  .buy-banner{flex-wrap:wrap;gap:6px;padding:5px 10px;font-size:9.5px;}
-  .buy-banner .contract{display:none;}
+  /* Buy button */
   .buy-btn-sm{padding:5px 14px;font-size:10px;}
 
   /* Wrap */
@@ -1854,12 +1901,21 @@ body.genesis-mode .hero-title{text-shadow:0 0 40px rgba(255,217,125,0.35);}
   </defs>
 </svg>
 
-<!-- BUY BANNER -->
+<!-- BUY BANNER + ANNOUNCEMENT TICKER -->
 <div class="buy-banner" id="buyBanner">
   <span style="color:var(--gold);font-weight:700;">🚀 $NUT</span>
   <span class="contract">CA: <span id="bannerCA">TBA, deploy on pump.fun to activate</span></span>
+  <div class="buy-price-ticker" id="buyPriceTicker" style="display:none"></div>
   <button class="buy-btn-sm tba" id="bannerBuyBtn" onclick="openBuy()">BUY $NUT</button>
+  <!-- Announcement ticker row -->
+  <div class="ann-row">
+    <div class="ann-inner" id="annInner">
+      <span class="ann-item t-stat">🥜 Loading community feed...</span>
+    </div>
+  </div>
 </div>
+<!-- Spacer that auto-matches the fixed banner height so nothing hides behind it -->
+<div class="banner-spacer" id="bannerSpacer"></div>
 
 <!-- CHAOS ENGINE -->
 <div class="chaos-pump-wrap" id="chaosPumpBar"></div>
@@ -4651,6 +4707,34 @@ if (window.NutOracle) NutOracle.init();
 if (window.NutChart) NutChart.init();
 if (window.NutDrop) NutDrop.init();
 if (window.NutNPCs) NutNPCs.init(db);
+
+// ── BANNER SPACER: keeps content below the fixed buy-banner ──────
+function updateBannerSpacer() {
+  const banner = document.getElementById('buyBanner');
+  const spacer = document.getElementById('bannerSpacer');
+  if (!banner || !spacer) return;
+  const h = banner.offsetHeight;
+  spacer.style.height = h + 'px';
+  document.documentElement.style.setProperty('--banner-h', h + 'px');
+}
+updateBannerSpacer();
+window.addEventListener('resize', updateBannerSpacer);
+
+// ── ANNOUNCEMENT TICKER ──────────────────────────────────────────
+function renderAnnTicker() {
+  const el = document.getElementById('annInner');
+  if (!el) return;
+  const msgs = window.NutNPCs ? NutNPCs.getAnnouncements(Date.now()) : [];
+  if (!msgs.length) return;
+  // Duplicate the list so the scroll loops seamlessly
+  const items = [...msgs, ...msgs].map(m =>
+    `<span class="ann-item t-${m.type}">${m.text}</span><span class="ann-sep">·</span>`
+  ).join('');
+  el.innerHTML = items;
+}
+renderAnnTicker();
+setInterval(renderAnnTicker, 120000); // refresh every 2 min
+
 setInterval(()=>{ if(!document.hidden) fetchGlobalCounts(); },60000);
 setInterval(()=>{ if(!document.hidden) fetchLeaderboard(); },120000);
 setInterval(()=>{ if(!document.hidden) fetchGlobalActivity(); },30000);
