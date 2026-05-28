@@ -419,10 +419,12 @@
   }
 
   // ── TAB SWITCHER ────────────────────────────────────────────────
+  let tabsBound = false;
+
   function switchTab(tab) {
     document.querySelectorAll('.casino-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
     document.querySelectorAll('.casino-panel').forEach(p => {
-      p.style.display = p.id === 'casinoPanel_' + tab ? '' : 'none';
+      p.style.display = p.id === 'casinoPanel_' + tab ? 'block' : 'none';
     });
     if (tab === 'flip')  { setTimeout(renderFlip, 20); }
     if (tab === 'crash') { setTimeout(initCrashCanvas, 30); }
@@ -432,17 +434,36 @@
     }
   }
 
-  // ── INIT ────────────────────────────────────────────────────────
-  function init() {
-    document.querySelectorAll('.casino-tab').forEach(btn => {
+  function bindTabs() {
+    if (tabsBound) return;
+    const tabs = document.querySelectorAll('.casino-tab');
+    if (!tabs.length) return;
+    tabs.forEach(btn => {
       btn.addEventListener('click', () => switchTab(btn.dataset.tab));
     });
+    tabsBound = true;
+    renderFlip();
+    initCrashCanvas();
+  }
+
+  // ── INIT ────────────────────────────────────────────────────────
+  function init() {
+    bindTabs();
     renderWheelStatus();
-    setInterval(renderWheelStatus, 60000);
+    if (!window._nutCasinoOracleTick) {
+      window._nutCasinoOracleTick = setInterval(renderWheelStatus, 60000);
+    }
+  }
+
+  function onOpen() {
+    bindTabs();
+    renderWheelStatus();
+    switchTab('wheel');
+    if (typeof updateRouletteBal === 'function') updateRouletteBal();
   }
 
   window.NutCasino = {
-    init, switchTab,
+    init, onOpen, switchTab, bindTabs,
     // wheel
     pickSeg, getActiveSegs, saveWheelResult, renderWheelStatus,
     // flip

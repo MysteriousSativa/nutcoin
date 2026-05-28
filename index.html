@@ -59,6 +59,15 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 }
 .buy-banner .contract{color:var(--muted);font-family:'Space Mono',monospace;font-size:10px;}
 .buy-banner .contract span{color:var(--gold);}
+.buy-price-ticker{margin-left:auto;font-size:10px;color:var(--muted);display:flex;align-items:center;gap:8px;}
+.buy-price-ticker strong{color:var(--gold-bright);}
+.bpt-buy{padding:4px 10px;border-radius:8px;border:1px solid rgba(255,160,40,0.45);background:rgba(200,100,10,0.2);color:var(--gold-bright);font-size:9px;font-weight:800;cursor:pointer;font-family:inherit;}
+.buy-nudge{position:fixed;left:50%;transform:translateX(-50%) translateY(120%);bottom:calc(100px + env(safe-area-inset-bottom,0px));z-index:650;max-width:min(420px,calc(100vw - 24px));opacity:0;pointer-events:none;transition:transform .35s ease,opacity .35s ease;}
+.buy-nudge.show{transform:translateX(-50%) translateY(0);opacity:1;pointer-events:auto;}
+.buy-nudge-inner{display:flex;align-items:center;gap:10px;padding:12px 14px;background:rgba(8,5,2,0.97);border:1px solid rgba(200,169,110,0.4);border-radius:14px;box-shadow:0 8px 32px rgba(0,0,0,0.55);}
+.buy-nudge-msg{flex:1;font-size:12px;line-height:1.35;color:var(--cream);}
+.buy-nudge-btn{padding:8px 12px;border-radius:10px;border:1px solid rgba(255,160,40,0.5);background:var(--btn-ember);color:#1a0a00;font-weight:800;font-size:10px;letter-spacing:.06em;cursor:pointer;white-space:nowrap;}
+.buy-nudge-x{background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px;padding:4px;}
 .buy-btn-sm{
   background:
     linear-gradient(135deg, rgba(200,100,10,0.9) 0%, rgba(160,70,0,0.95) 50%, rgba(180,90,5,0.9) 100%);
@@ -3076,6 +3085,7 @@ function nut() {
   if (window.NutAddons) NutAddons.onNutLogged(method, points);
   if (window.NutAllocation) NutAllocation.onNutLogged();
   if (window.NutChaos) NutChaos.onNutLogged();
+  if (window.NutBuyCta) NutBuyCta.onNutLogged(points);
 
   document.getElementById('bigCount').classList.add('bump');
   setTimeout(()=>document.getElementById('bigCount').classList.remove('bump'),100);
@@ -4459,8 +4469,8 @@ function openRoulette() {
   const res = document.getElementById('spinResult');
   if (res) { res.textContent = ''; res.style.color = ''; }
   updateRouletteBal();
-  if (window.NutCasino) NutCasino.renderWheelStatus();
-  requestAnimationFrame(() => drawWheel(wheelAngle));
+  if (window.NutCasino) NutCasino.onOpen();
+  else requestAnimationFrame(() => drawWheel(wheelAngle));
 }
 
 function closeRoulette() {
@@ -4595,7 +4605,6 @@ if (window.NutOracle) NutOracle.init();
 if (window.NutChart) NutChart.init();
 if (window.NutDrop) NutDrop.init();
 if (window.NutNPCs) NutNPCs.init(db);
-if (window.NutCasino) NutCasino.init();
 setInterval(()=>{ if(!document.hidden) fetchGlobalCounts(); },60000);
 setInterval(()=>{ if(!document.hidden) fetchLeaderboard(); },120000);
 setInterval(()=>{ if(!document.hidden) fetchGlobalActivity(); },30000);
@@ -4967,5 +4976,11 @@ scrollNutBtn.addEventListener('click', () => {
     <span class="mnav-icon">🔮</span><span class="mnav-lbl">Oracle</span>
   </button>
 </nav>
+
+<script src="./buycta.js"></script>
+<script>
+if (window.NutCasino) NutCasino.init();
+if (window.NutBuyCta) NutBuyCta.init();
+</script>
 </body>
 </html>
