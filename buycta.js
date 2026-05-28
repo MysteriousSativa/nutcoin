@@ -109,7 +109,8 @@
   function injectUI() {
     if (document.getElementById('buyPriceTicker')) return;
 
-    const banner = document.getElementById('buyBanner');
+    const top = document.querySelector('.buy-banner-top');
+    const banner = top || document.getElementById('buyBanner');
     if (banner) {
       const ticker = document.createElement('div');
       ticker.id = 'buyPriceTicker';
