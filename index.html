@@ -4505,16 +4505,16 @@ function spinWheel() {
   if (btn) btn.disabled = true;
   if (res) { res.textContent = ''; res.style.color = ''; }
 
-  pmSetBalance(bal - rouletteBet);
+  const balAtSpin = bal;
+  pmSetBalance(balAtSpin - rouletteBet);
   updateRouletteBal();
 
   const activeSegs = (window.NutCasino ? NutCasino.getActiveSegs() : WHEEL_SEGS);
+  const n = activeSegs.length;
   const segIdx = (window.NutCasino ? NutCasino.pickSeg() : roulettePickSeg());
-  const seg = activeSegs[segIdx];
-  const arc = (2 * Math.PI) / activeSegs.length;
-  // Compute target angle so segIdx lands at top pointer
-  const segCenter = segIdx * arc + arc / 2;
-  let targetBase = ((-segCenter) % (2*Math.PI) + 2*Math.PI) % (2*Math.PI);
+  const targetBase = window.NutCasino
+    ? NutCasino.wheelTargetAngle(segIdx, n)
+    : (((-(segIdx * (2 * Math.PI) / n + (2 * Math.PI) / n / 2)) % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
   const curMod   = ((wheelAngle % (2*Math.PI)) + 2*Math.PI) % (2*Math.PI);
   let diff = targetBase - curMod;
   if (diff < 0.01) diff += 2 * Math.PI;
@@ -4532,17 +4532,22 @@ function spinWheel() {
     if (t < 1) {
       wheelAnimId = requestAnimationFrame(animate);
     } else {
-      wheelAngle = targetAngle % (2 * Math.PI);
+      wheelAngle = targetBase;
       drawWheel(wheelAngle);
+      const resolvedIdx = window.NutCasino
+        ? NutCasino.resolveWheelSegIdx(wheelAngle, n)
+        : segIdx;
+      const seg = activeSegs[resolvedIdx];
       if (window.NutCasino) NutCasino.saveWheelResult(seg);
       const rmult = window.NutChaos ? NutChaos.getRouletteMultiplier() : 1;
-      const won = Math.floor(rouletteBet * seg.mult * rmult);
-      if (won > 0) {
-        pmSetBalance(pmGetBalance() + won);
-        const profit = won - rouletteBet;
+      const payout = seg.mult > 0 ? Math.floor(rouletteBet * seg.mult * rmult) : 0;
+      if (payout > 0) {
+        pmSetBalance(balAtSpin - rouletteBet + payout);
+        const profit = payout - rouletteBet;
         if (res) { res.textContent = `${seg.label} — +${profit} NUTS profit`; res.style.color = '#44ff88'; }
         showToast(`🎰 ${seg.label}! +${profit} NUTS`);
       } else {
+        pmSetBalance(balAtSpin - rouletteBet);
         if (res) { res.textContent = `BUST — lost ${rouletteBet} NUTS`; res.style.color = '#ff6060'; }
         showToast(`💸 BUST. −${rouletteBet} NUTS`);
       }

@@ -84,6 +84,19 @@
     return w.length - 1;
   }
 
+  function wheelTargetAngle(segIdx, n) {
+    const arc = (2 * Math.PI) / n;
+    const segCenter = segIdx * arc + arc / 2;
+    return ((2 * Math.PI - segCenter) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI);
+  }
+
+  function resolveWheelSegIdx(rotation, n) {
+    const arc = (2 * Math.PI) / n;
+    const rot = ((rotation % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
+    const rel = (2 * Math.PI - rot) % (2 * Math.PI);
+    return Math.min(n - 1, Math.floor(rel / arc + 1e-9));
+  }
+
   // ── RECENT WHEEL RESULTS ───────────────────────────────────────
   const KEY_WR = 'nut_wheel_results_v1';
 
@@ -192,18 +205,32 @@
 
   // ── CRASH GAME ──────────────────────────────────────────────────
   let crashState = 'idle', crashMult = 1.00, crashTarget = 2.00;
-  let crashBet   = 10, crashId = null, crashT0 = 0;
+  let crashBet   = 10, crashId = null, crashT0 = 0, crashLastStep = 0;
+  let crashBalAtStart = 0;
   let crashHist  = [], crashNPCs = [];
   let crashCanvas, crashCtx;
 
   function genCrash() {
     const r = Math.random();
-    if (r < 0.40) return 1.00 + Math.random() * 0.48;
-    if (r < 0.68) return 1.50 + Math.random() * 1.50;
-    if (r < 0.82) return 3.00 + Math.random() * 3.00;
-    if (r < 0.91) return 6.00 + Math.random() * 9.00;
+    if (r < 0.40) return 1.0 + Math.random() * 0.48;
+    if (r < 0.68) return 1.5 + Math.random() * 1.50;
+    if (r < 0.82) return 3.0 + Math.random() * 3.00;
+    if (r < 0.91) return 6.0 + Math.random() * 9.00;
     if (r < 0.96) return 15.0 + Math.random() * 25.0;
     return 40 + Math.random() * 60;
+  }
+
+  function crashStepMs() {
+    if (crashMult < 2) return 110;
+    if (crashMult < 5) return 95;
+    if (crashMult < 15) return 72;
+    return 48;
+  }
+
+  function tickCrashMult() {
+    const next = parseFloat((crashMult + 0.1).toFixed(1));
+    if (next >= crashTarget) return crashTarget;
+    return next;
   }
 
   function startCrash() {
@@ -211,11 +238,13 @@
     const bal = typeof pmGetBalance === 'function' ? pmGetBalance() : 0;
     if (bal < crashBet || crashBet < 1) { if (typeof showToast === 'function') showToast('Not enough NUTS'); return; }
 
+    crashBalAtStart = bal;
     if (typeof pmSetBalance === 'function') pmSetBalance(bal - crashBet);
-    crashTarget = parseFloat(genCrash().toFixed(2));
-    crashMult   = 1.00;
+    crashTarget = parseFloat(genCrash().toFixed(1));
+    crashMult   = 1.0;
     crashState  = 'running';
     crashT0     = performance.now();
+    crashLastStep = crashT0;
 
     // NPC co-players
     const pool = window.NutNPCs ? NutNPCs.NPCS : [];
@@ -242,10 +271,12 @@
     if (crashState !== 'running') return;
     crashState = 'cashout';
     cancelAnimationFrame(crashId);
-    const won    = Math.floor(crashBet * crashMult);
-    const profit = won - crashBet;
-    if (typeof pmSetBalance === 'function') pmSetBalance(pmGetBalance() + won);
-    if (typeof showToast === 'function') showToast(`✅ Cashed out ${crashMult.toFixed(2)}× · +${profit} NUTS`);
+    const payout = Math.floor(crashBet * crashMult);
+    const profit = payout - crashBet;
+    if (typeof pmSetBalance === 'function') {
+      pmSetBalance(crashBalAtStart - crashBet + payout);
+    }
+    if (typeof showToast === 'function') showToast(`✅ Cashed out ${crashMult.toFixed(1)}× · +${profit} NUTS`);
     updateCrashUI();
     drawCrash();
     setTimeout(crashReset, 2800);
@@ -260,15 +291,18 @@
     drawCrash();
   }
 
-  function animCrash() {
+  function animCrash(now) {
     if (crashState !== 'running') return;
-    const elap = (performance.now() - crashT0) / 1000;
-    crashMult = parseFloat(Math.pow(1.07, elap * 3.5).toFixed(2));
+    const t = now || performance.now();
+    if (t - crashLastStep >= crashStepMs()) {
+      crashLastStep = t;
+      crashMult = tickCrashMult();
+    }
 
     crashNPCs.forEach(nb => {
       if (!nb.cashedOut && crashMult >= nb.targetX) {
         nb.cashedOut = true;
-        nb.finalX    = parseFloat(crashMult.toFixed(2));
+        nb.finalX    = parseFloat(crashMult.toFixed(1));
       }
     });
 
@@ -276,7 +310,7 @@
       crashMult  = crashTarget;
       crashState = 'crashed';
       cancelAnimationFrame(crashId);
-      if (typeof showToast === 'function') showToast('💥 CRASHED at ' + crashMult.toFixed(2) + '×');
+      if (typeof showToast === 'function') showToast('💥 CRASHED at ' + crashMult.toFixed(1) + '×');
       updateCrashUI();
       drawCrash();
       setTimeout(crashReset, 3000);
@@ -310,16 +344,14 @@
 
     // Curve
     if (crashState === 'running') {
-      const elap = (performance.now() - crashT0) / 1000;
       const PAD  = 14;
-      const pts  = Math.min(120, Math.floor(elap * 25));
+      const steps = Math.max(2, Math.round((crashMult - 1) * 10));
       ctx.strokeStyle = color;
       ctx.lineWidth   = 2.5;
       ctx.beginPath();
-      for (let p = 0; p <= pts; p++) {
-        const t = (p / pts) * elap;
-        const m = Math.pow(1.07, t * 3.5);
-        const x = PAD + (p / pts) * (W - PAD * 2);
+      for (let p = 0; p <= steps; p++) {
+        const m = 1 + p * 0.1;
+        const x = PAD + (p / steps) * (W - PAD * 2);
         const y = H - PAD - Math.min((m - 1) / Math.max(crashTarget * 1.1 - 1, 1), 1) * (H - PAD * 2 - 10);
         p === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
       }
@@ -335,7 +367,7 @@
     ctx.fillStyle   = color;
     ctx.font        = '900 36px Space\ Mono,ui-monospace,monospace';
     ctx.textAlign   = 'center';
-    ctx.fillText(crashMult.toFixed(2) + '×', W / 2, H / 2 + 10);
+    ctx.fillText(crashMult.toFixed(1) + '×', W / 2, H / 2 + 10);
 
     if (crashState === 'crashed') {
       ctx.fillStyle = '#ff6060';
@@ -363,7 +395,7 @@
         btn.disabled    = false;
         btn.onclick     = startCrash;
       } else if (crashState === 'running') {
-        btn.textContent = '💰 CASH OUT ' + crashMult.toFixed(2) + '×';
+        btn.textContent = '💰 CASH OUT ' + crashMult.toFixed(1) + '×';
         btn.className   = 'roulette-spin-btn crash-cashout-btn';
         btn.disabled    = false;
         btn.onclick     = cashOut;
@@ -377,7 +409,7 @@
     if (nb) {
       nb.innerHTML = crashNPCs.map(c => {
         const tag = c.cashedOut
-          ? `<span class="cnb-out">✓ ${c.finalX?.toFixed(2)}×</span>`
+          ? `<span class="cnb-out">✓ ${c.finalX?.toFixed(1)}×</span>`
           : (crashState === 'crashed' ? '<span class="cnb-bust">BUST</span>' : '<span class="cnb-in">🟢</span>');
         return `<div class="cnb-row"><span class="cnb-name">u/${c.npc.name.slice(0,12)}</span><span class="cnb-bet">${c.bet}🥜</span>${tag}</div>`;
       }).join('') || '';
@@ -385,7 +417,7 @@
 
     if (hist) {
       hist.innerHTML = crashHist.length
-        ? crashHist.map(v => `<span class="ch-pill ${v < 1.5 ? 'lo' : v < 4 ? 'md' : 'hi'}">${v.toFixed(2)}×</span>`).join('')
+        ? crashHist.map(v => `<span class="ch-pill ${v < 1.5 ? 'lo' : v < 4 ? 'md' : 'hi'}">${v.toFixed(1)}×</span>`).join('')
         : '<span class="ch-pill lo">–</span>';
     }
   }
@@ -465,7 +497,7 @@
   window.NutCasino = {
     init, onOpen, switchTab, bindTabs,
     // wheel
-    pickSeg, getActiveSegs, saveWheelResult, renderWheelStatus,
+    pickSeg, getActiveSegs, saveWheelResult, renderWheelStatus, wheelTargetAngle, resolveWheelSegIdx,
     // flip
     chooseSide, doFlip, adjFlipBet, maxFlipBet,
     // crash
