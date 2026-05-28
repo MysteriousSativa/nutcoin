@@ -4195,6 +4195,7 @@ async function fetchNutPrice() {
     const pair = Array.isArray(data.pairs) && data.pairs[0];
     NUT_PRICE_USD = pair && pair.priceUsd ? parseFloat(pair.priceUsd) : 0;
     pmSetBalance(pmGetBalance()); // re-render with live price
+    if (window.NutBuyCta) NutBuyCta.renderTicker();
   } catch(e) { /* fail silently */ }
 }
 function pmSetBalance(v) {
