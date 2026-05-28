@@ -434,7 +434,6 @@
 
   // ── INIT ────────────────────────────────────────────────────────
   function init(db) {
-    renderFeed();
     renderDuels();
 
     // Non-blocking Supabase injection
@@ -444,8 +443,8 @@
       setInterval(() => injectToSupabase(db).catch(() => {}), _DAILY_CD + 2 * 60 * 1000);
     }
 
-    // Refresh display every 15 seconds
-    setInterval(() => { renderFeed(); renderDuels(); }, 15000);
+    // Refresh duels every 15 seconds
+    setInterval(() => { renderDuels(); }, 15000);
   }
 
   // ── PUBLIC API ──────────────────────────────────────────────────
