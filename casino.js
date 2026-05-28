@@ -196,7 +196,7 @@
         if (typeof showToast === 'function') showToast(`🟡 ${result.toUpperCase()}! +${flipBet} NUTS`);
         // Real announcement
         const _u = (typeof nickname !== 'undefined' && nickname) || (typeof genUserName === 'function' && typeof sessionId !== 'undefined' ? genUserName(sessionId) : 'Someone');
-        if (window.NutAnnounce) NutAnnounce.emit({ type:'flip', game:'flip', user:_u, profit:flipBet, bet: flipBet, mult:2, big: flipBet >= 50,
+        if (window.NutAnnounce) NutAnnounce.emit({ type:'flip', game:'flip', user:_u, profit:flipBet, bet: flipBet, mult:2, big: flipBet >= 25,
           text:`🪙 ${_u} flipped ${result.toUpperCase()} — +${flipBet} NUTS` });
       } else {
         if (res) { res.textContent = `${result.toUpperCase()} — lost ${flipBet} NUTS`; res.style.color = '#ff6060'; }
@@ -283,7 +283,7 @@
     if (typeof showToast === 'function') showToast(`✅ Cashed out ${crashMult.toFixed(1)}× · +${profit} NUTS`);
     // Real announcement
     const _u = (typeof nickname !== 'undefined' && nickname) || (typeof genUserName === 'function' && typeof sessionId !== 'undefined' ? genUserName(sessionId) : 'Someone');
-    if (window.NutAnnounce) NutAnnounce.emit({ type:'crash', game:'crash', user:_u, profit, bet: crashBet, mult:crashMult, big: crashMult >= 5,
+    if (window.NutAnnounce) NutAnnounce.emit({ type:'crash', game:'crash', user:_u, profit, bet: crashBet, mult:crashMult, big: crashMult >= 3 || profit >= 25,
       text:`🚀 ${_u} cashed out at ${crashMult.toFixed(1)}× for +${profit} NUTS` });
     updateCrashUI();
     drawCrash();
@@ -311,7 +311,27 @@
       if (!nb.cashedOut && crashMult >= nb.targetX) {
         nb.cashedOut = true;
         nb.finalX    = parseFloat(crashMult.toFixed(1));
-        // NPC cashout — update visual state only, never surfaces in the ticker
+        const profit = Math.max(0, Math.floor(nb.bet * nb.finalX) - nb.bet);
+        const big    = nb.finalX >= 3 || profit >= 20;
+        if (window.NutAnnounce && profit > 0) {
+          NutAnnounce.emit({
+            type: 'crash',
+            game: 'crash',
+            user: nb.npc.name,
+            text: `🚀 ${nb.npc.name} cashed crash at ${nb.finalX}× for +${profit} NUTS`,
+            profit,
+            bet: nb.bet,
+            mult: nb.finalX,
+            big,
+            npc: true,
+            sessionId: nb.npc.sessionId,
+          });
+        }
+        if (window.NutCasinoLive && profit > 0) {
+          NutCasinoLive.recordNPCCasinoEvent(nb.npc, {
+            game: 'crash', profit, bet: nb.bet, mult: nb.finalX,
+          });
+        }
       }
     });
 

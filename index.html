@@ -109,7 +109,19 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 /* Real user events — brighter so they stand out vs NPC simulation */
 .ann-item.t-nut{color:rgba(255,220,100,0.9);font-weight:600;}
 .ann-item.t-spin,.ann-item.t-flip,.ann-item.t-crash{color:rgba(78,201,122,0.9);font-weight:700;}
+.ann-item.t-npc{color:rgba(180,220,255,0.85);font-weight:600;}
+.ann-item.t-duel{color:rgba(255,200,120,0.9);font-weight:700;}
 .ann-sep{color:rgba(200,169,110,0.2);padding:0 4px;}
+.ann-big-pin{
+  width:100%;display:none;text-align:center;
+  padding:5px 8px 2px;margin-top:4px;
+  border-top:1px solid rgba(255,217,125,0.2);
+  background:linear-gradient(90deg,transparent,rgba(255,190,60,0.08),transparent);
+  font-size:9px;letter-spacing:.06em;line-height:1.35;
+}
+.abp-kicker{color:var(--gold);font-weight:800;margin-right:6px;}
+.abp-user{color:#e8f0f6;font-weight:700;margin-right:6px;}
+.abp-amt{color:#4ec97a;font-weight:800;}
 /* buy nudge — appears below banner so it never overlaps LOG NUT */
 .buy-nudge{
   position:fixed;left:50%;
@@ -2035,6 +2047,7 @@ body.genesis-mode .hero-title{text-shadow:0 0 40px rgba(255,217,125,0.35);}
     <div class="buy-price-ticker" id="buyPriceTicker" style="display:none"></div>
     <button class="buy-btn-sm tba" id="bannerBuyBtn" onclick="openBuy()">BUY $NUT</button>
   </div>
+  <div class="ann-big-pin" id="annBigPin"></div>
   <div class="ann-row">
     <div class="ann-inner" id="annInner">
       <span class="ann-item t-stat">🥜 Live feed · Supabase</span>
@@ -4853,7 +4866,7 @@ function spinWheel() {
         showToast(`🎰 ${seg.label}! +${profit} NUTS`);
         if (window.NutAnnounce) {
           const _uname = nickname || genUserName(sessionId);
-          NutAnnounce.emit({ type:'spin', game:'spin', user:_uname, profit, bet: rouletteBet, mult:seg.mult, big: seg.mult >= 10,
+          NutAnnounce.emit({ type:'spin', game:'spin', user:_uname, profit, bet: rouletteBet, mult:seg.mult, big: seg.mult >= 5 || profit >= 25,
             text:`🎰 ${_uname} hit ${seg.label} for +${profit} NUTS` });
         }
       } else {
@@ -4995,8 +5008,41 @@ if (typeof ResizeObserver !== 'undefined') {
 }
 
 // ── ANNOUNCEMENT TICKER ──────────────────────────────────────────
-// Only real events that actually fired through NutAnnounce.emit().
-// No simulated text, no fake stats, no NPC flavor.
+function mergeFeedsForTicker(remote, local) {
+  const seen = new Set();
+  const out = [];
+  function push(e) {
+    const k = (e.text || '') + '|' + (e.ts || 0);
+    if (seen.has(k)) return;
+    seen.add(k);
+    out.push(e);
+  }
+  (local || []).forEach(push);
+  (remote || []).forEach(push);
+  out.sort((a, b) => {
+    const bigDiff = (b.big ? 1 : 0) - (a.big ? 1 : 0);
+    if (bigDiff) return bigDiff;
+    return (b.ts || 0) - (a.ts || 0);
+  });
+  return out.slice(0, 24);
+}
+
+function renderAnnBigPinLocal(items) {
+  const pin = document.getElementById('annBigPin');
+  if (!pin) return;
+  const win = (items || []).find(e => e.big);
+  if (!win) {
+    pin.style.display = 'none';
+    pin.innerHTML = '';
+    return;
+  }
+  const mult = typeof win.mult === 'number' ? win.mult.toFixed(1) : win.mult;
+  const amt = win.mult >= 2 ? `${mult}× · +${win.profit} NUTS` : `+${win.profit} NUTS`;
+  pin.style.display = 'block';
+  pin.innerHTML = `<span class="abp-kicker">🏆 BIG WIN</span><span class="abp-user">${escHtml(win.user || 'Player')}</span><span class="abp-amt">${amt}</span>`;
+  if (typeof updateBannerSpacer === 'function') updateBannerSpacer();
+}
+
 function renderAnnTicker(mergedFeed) {
   const el = document.getElementById('annInner');
   if (!el) return;
@@ -5004,16 +5050,15 @@ function renderAnnTicker(mergedFeed) {
   let events = mergedFeed;
   if (!events || !events.length) {
     const remote = window.NutCasinoLive ? NutCasinoLive.getFeed() : [];
-    const local = window.NutAnnounce ? NutAnnounce.getRecent(12) : [];
-    events = remote.length ? [...local, ...remote] : local;
-    const seen = new Set();
-    events = events.filter(e => {
-      const k = (e.text || '') + (e.ts || 0);
-      if (seen.has(k)) return false;
-      seen.add(k);
-      return true;
-    }).sort((a, b) => (b.ts || 0) - (a.ts || 0)).slice(0, 20);
+    const local = window.NutAnnounce ? NutAnnounce.getRecent(16) : [];
+    const npc = window.NutNPCs && NutNPCs.getAnnouncements
+      ? NutNPCs.getAnnouncements(Date.now()) : [];
+    events = mergeFeedsForTicker(remote, local.concat(npc));
+  } else {
+    events = mergeFeedsForTicker([], events);
   }
+
+  renderAnnBigPinLocal(events);
 
   if (!events.length) {
     el.className = 'ann-inner ann-static';

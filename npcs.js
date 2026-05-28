@@ -1,9 +1,6 @@
 /**
- * $NUT Community Engine — 1500 NPC Profiles
- *
- * 1500 unique characters. Emoji avatars that rotate every 15 min.
- * Badges based on stats. Live duels + speed rounds. Announcement feed.
- * Supabase injection capped at first 300 NPCs so leaderboard fills fast.
+ * $NUT Community Engine — 1500 NPC Profiles v5
+ * 3-tier names. Real cooldowns. Supabase impact.
  */
 (function () {
 
@@ -16,60 +13,92 @@
   }
   function frac(s) { return (h32(s) >>> 0) / 4294967296; }
 
-  // ── NAMES: 60 × 25 = 1500 unique combinations ───────────────────
-  const NPC_PFXS = [
-    // Scale/intensity
-    'Big','Mega','Ultra','Turbo','Hyper','Giga','Maximum','Supreme',
-    // Timing
-    'Daily','Nightly','Midnight','Morning','Sunday','Friday','Seasonal','Annual',
-    // Vibe
-    'Based','Cursed','Silent','Shadow','Secret','Sketchy','Sticky','Soggy',
-    // Crypto culture
-    'Diamond','Degen','Alpha','Sigma','Omega','Ape','Rekt','Wagmi',
-    // Legitimacy
-    'Real','Actual','Certified','Veteran','Prolific','Legendary','Famous','Notorious',
-    // Adult/crude (some inappropriate as requested)
-    'Chronic','Nasty','Filthy','Sloppy','Juicy','Creamy','Drippy','Wet',
-    // Place/dimension
-    'Local','Global','Digital','Virtual','Cosmic','Ancient','Future','Astral',
-    // Anonymity
-    'Ghost','Anon','Phantom','Nuclear',
+  // ── TIER 1: ~100 curated hand-crafted personality names ─────────
+  const CURATED = [
+    'PapaDaNuts','the_nutfather','xX_NutGod_Xx','wagmi_messiah','LoneWankRanger',
+    'logging_for_science','wife_doesnt_know','StrokeMaster3000','NutLegend','throwaway_but_real',
+    'definitely_not_a_bot','log_everyday_joe','CryptoWanker','just_one_more','nocap_nutter',
+    'TrueNutPatriot','anonNutter','DailyDevotion','GhostLogger','PeakHourPete',
+    'NightOwlNutter','EarlyBirdBaller','MorningWoodWatcher','SundayFunday69','the_algorithm',
+    'LordOfTheLogs','KingNutsworth','CapitanCojones','ProfessorStroke','DocHolliNut',
+    'CoachNuts','SirNutsalot','UncleBalls','DukeDegenerino','BaronVonBalls',
+    'nut_at_work_lol','on_the_clock','boss_doesnt_know','company_wifi','HR_doesnt_know',
+    'phone_in_the_bathroom','logged_from_church','NutOnAPlane','airport_bathroom_log','hotel_wifi_nut',
+    'anon_but_logging','ghost_in_the_data','shadow_on_the_chain','phantom_logger','void_enjoyer',
+    'xXx_DarkNutter_xXx','420NutLogger','69everyday','eight_times_a_week','twice_before_noon',
+    'based_department','wagmi_or_ngmi','diamond_sack','weak_hands_never_log','HODL_deez',
+    'pump_dot_nuts','on_chain_oracle','receipt_enjoyer','timestamp_is_proof','immutable_logs',
+    'NutNarrativeArc','the_comeback_kid','sandbagger_irl','tactical_nutter','clutch_or_nothing',
+    'no_days_off_ever','consistent_king','streak_god','milestone_chaser','top_of_the_board',
+    'Goblin_Mode_On','gremlin_hours','rat_in_the_walls','feral_and_logging','unhinged_but_daily',
+    'retired_but_active','WFH_Logger','remote_work_perks','zoom_is_muted','on_mute_rn',
+    'nutted_before_standup','logged_at_3am','cant_sleep_logging','insomnia_log','sleep_is_overrated',
+    'NutDocumentarian','archiving_forever','data_preservation','permanent_record','for_posterity',
+    'first_one_of_the_day','last_one_tonight','between_meetings','lunch_break_log','coffee_then_log',
+    'gm_logged_gn','rise_and_log','wake_n_nut','pre_coffee_dedication','post_gym_log',
+    'NutBelieveInMiracles','the_chosen_nutter','destiny_is_logging','fate_said_log','universe_aligned',
+    'just_here_to_nut','no_context_needed','vibes_only','no_questions_please','dont_look_at_me',
   ];
-  const NPC_SFXS = [
-    // Data activity
-    'Logger','Counter','Tracker','Stacker','Archivist',
-    // Professional
-    'Analyst','Operator','Curator','Researcher','Observer',
-    // Character
-    'Wizard','Goblin','Chad','Enjoyer','Oracle',
-    // Status
-    'Patriarch','Sovereign','Legend','Baller','Degen',
-    // Adult/crude (some inappropriate as requested)
-    'Stroker','Wanker','Milker','Nutter','Pumper',
+
+  // ── TIER 2: lowercase_underscore formula (50 adj × 20 noun = 1000) ──
+  const T2_ADJ = [
+    'based','silent','midnight','degen','wagmi','anon','ghost','chronic','cursed','feral',
+    'local','global','digital','cosmic','ancient','daily','nightly','serial','rogue','shadow',
+    'secret','sketchy','sticky','soggy','sleepy','grumpy','hungry','rusty','dusty','fuzzy',
+    'turbo','hyper','ultra','mega','giga','sigma','alpha','omega','hollow','stealthy',
+    'casual','retired','active','lurking','dedicated','prolific','veteran','notorious','famous','rare',
+  ];
+  const T2_NOUN = [
+    'logger','nutter','wizard','goblin','archivist','oracle','chad','baller','degen','enjoyer',
+    'witness','analyst','operator','researcher','observer','curator','tracker','stacker','watcher','keeper',
+  ];
+
+  // ── TIER 3: CamelCase title+noun (25 title × 16 noun = 400) ────
+  const T3_TITLE = [
+    'Papa','Lord','King','Duke','Sir','Uncle','Captain','Professor','Doctor','Chief',
+    'Master','Baron','Count','Bishop','General','Major','Colonel','Admiral','Sergeant','Officer',
+    'Coach','Judge','Dean','Agent','Ranger',
+  ];
+  const T3_NOUN = [
+    'Nut','Logger','Wanker','Stroker','Wizard','Goblin','Chad','Degen',
+    'Legend','Oracle','Nutter','Baller','Archivist','Tracker','Stacker','Enjoyer',
   ];
 
   function buildNPCNames() {
-    const all = [];
-    for (const p of NPC_PFXS)
-      for (const s of NPC_SFXS)
-        all.push(p + s);
-    // Deterministic Fisher-Yates so order is consistent across all sessions
+    // Tier 1: exactly as-is (100 names)
+    const t1 = [...CURATED];
+
+    // Tier 2: underscore names
+    const t2 = [];
+    for (const a of T2_ADJ)
+      for (const n of T2_NOUN)
+        t2.push(a + '_' + n);          // 1000 names
+
+    // Tier 3: CamelCase names
+    const t3 = [];
+    for (const ti of T3_TITLE)
+      for (const n of T3_NOUN)
+        t3.push(ti + n);               // 400 names
+
+    const all = [...t1, ...t2, ...t3]; // 1500 total
+
+    // Deterministic Fisher-Yates so order stays consistent cross-session
     for (let i = all.length - 1; i > 0; i--) {
-      const j = h32('shuf4_' + i) % (i + 1);
+      const j = h32('shuf5_' + i) % (i + 1);
       const tmp = all[i]; all[i] = all[j]; all[j] = tmp;
     }
-    return all; // exactly 1500
+    return all;
   }
   const NPC_NAMES = buildNPCNames();
 
-  // ── AVATAR EMOJIS (rotate per 15-min slot) ──────────────────────
+  // ── AVATAR EMOJIS ────────────────────────────────────────────────
   const NPC_EMOJIS = [
     '🥜','🔥','💎','👑','⚡','💀','🐸','🌙','🦊','🗡️',
     '⚔️','🔮','💣','🎯','🃏','🎭','🕹️','👾','🤑','💰',
     '🌊','🍆','💦','🍑','🌰','🎲','🦴','🐲','🌋','🎪',
   ];
 
-  // ── TWITTER BRAINROT BIOS ────────────────────────────────────────
+  // ── BIOS ──────────────────────────────────────────────────────────
   const BIOS = [
     'not financial advice | this app was my first blockchain interaction',
     'on the ledger forever | logged every day since launch | cannot be stopped',
@@ -132,21 +161,15 @@
     'i cried at the milestones screen. it was beautiful.',
     'i log for myself. the leaderboard is just a side effect.',
   ];
-
   function genBio(i) { return BIOS[h32('bio_' + i) % BIOS.length]; }
 
-  // ── NUT TYPES ───────────────────────────────────────────────────
+  // ── NUT TYPES ────────────────────────────────────────────────────
   const NPC_NUT_TYPES = ['solo','solo','solo','solo','solo','partner','quickie','solo','partner','solo'];
   function genNutType(npcId, dateStr) {
     return NPC_NUT_TYPES[h32('ntype_' + npcId + '_' + dateStr) % NPC_NUT_TYPES.length];
   }
 
-  // ── SESSION ID ──────────────────────────────────────────────────
-  function npcSessionId(npc) {
-    return 'npcbot' + String(npc.id).padStart(4, '0');
-  }
-
-  // ── BUILD 1500 PROFILES ─────────────────────────────────────────
+  // ── BUILD 1500 PROFILES ──────────────────────────────────────────
   function buildNPCs() {
     const list = [];
     for (let i = 0; i < 1500; i++) {
@@ -167,7 +190,7 @@
   }
   const NPCS = buildNPCs();
 
-  // ── LOOKUP MAPS ─────────────────────────────────────────────────
+  // ── LOOKUP MAPS ──────────────────────────────────────────────────
   const _byName = Object.create(null);
   const _bySid  = Object.create(null);
   NPCS.forEach(n => {
@@ -179,8 +202,9 @@
   function getNPCBySid(sid){ return _bySid[sid || ''] || null; }
   function getBio(name)    { const n = getNPC(name); return n ? n.bio : null; }
   function isNPCSid(sid)   { return typeof sid === 'string' && sid.startsWith('npcbot') && sid.length === 10; }
+  function npcSessionId(npc) { return 'npcbot' + String(npc.id).padStart(4, '0'); }
 
-  // ── ALL-TIME COUNT (lazy, cached) ───────────────────────────────
+  // ── ALL-TIME COUNT ────────────────────────────────────────────────
   const _ct = {};
   function allTime(npc) {
     if (_ct[npc.id] !== undefined) return _ct[npc.id];
@@ -201,14 +225,13 @@
     return _totalNuts;
   }
 
-  // ── TODAY'S COUNT ───────────────────────────────────────────────
   function todayCount(npc, dateStr) {
     const ds = h32('today_' + npc.id + '_' + dateStr) % 100;
     const df = ds < 20 ? 0 : ds < 55 ? Math.max(0, npc.freq - 1) : ds < 88 ? npc.freq : npc.freq + 1;
     return Math.max(0, df);
   }
 
-  // ── AVATAR HTML ─────────────────────────────────────────────────
+  // ── AVATAR ────────────────────────────────────────────────────────
   const COLORS = ['#4EC97A','#4E9AC9','#C8A96E','#9A4EC9','#C94E78','#C9904E','#4EC9B5','#C9C24E',
                   '#4EC9A0','#C94E4E','#7A9AC9','#C9B24E','#884EC9','#C96E4E','#4E78C9','#A0C94E'];
   function npcColor(id) { return COLORS[id % COLORS.length]; }
@@ -222,7 +245,7 @@
     return `<div class="${cls}" style="background:${color}">${em}</div>`;
   }
 
-  // ── BADGE SYSTEM ────────────────────────────────────────────────
+  // ── BADGES ────────────────────────────────────────────────────────
   function npcBadges(npc) {
     const total  = allTime(npc);
     const badges = [];
@@ -235,12 +258,11 @@
     if (npc.peakH >= 22)   badges.push({ em:'🌙', tip:'Night Owl' });
     return badges;
   }
-
   function badgeHtml(npc) {
     return npcBadges(npc).map(b => `<span class="npc-badge" title="${b.tip}">${b.em}</span>`).join('');
   }
 
-  // ── ACTIVITY SIMULATION: 6-HOUR WINDOW ─────────────────────────
+  // ── ACTIVITY SIMULATION ───────────────────────────────────────────
   function getRecentEvents(count, now) {
     const windowMs = 6 * 3600000;
     const events   = [];
@@ -262,7 +284,7 @@
     return events.slice(0, count);
   }
 
-  // ── ANNOUNCEMENTS ───────────────────────────────────────────────
+  // ── ANNOUNCEMENTS ─────────────────────────────────────────────────
   const ANN_TEMPLATES = [
     n => `🔥 ${n.name} is on a 7-day streak`,
     n => `💎 ${n.name} just passed ${Math.floor(allTime(n)/50)*50} total`,
@@ -277,36 +299,39 @@
   ];
 
   function getAnnouncements(now) {
-    const slot = Math.floor(now / 120000);
-    const out  = [];
-
-    // Recent duel results
-    for (let d = 0; d < 4; d++) {
-      const dSlot = Math.floor(now / 1200000) - d;
-      const i1    = h32('da_' + (d % 6) + '_' + dSlot) % NPCS.length;
-      let   i2    = h32('db_' + (d % 6) + '_' + dSlot) % NPCS.length;
-      if (i1 === i2) i2 = (i2 + 7) % NPCS.length;
-      const wi = h32('dv1_' + d + '_' + dSlot) > h32('dv2_' + d + '_' + dSlot) ? i1 : i2;
-      out.push({ type: 'duel', text: `⚔ ${NPCS[wi].name} won a duel` });
-    }
-
-    // Activity announcements
-    for (let k = 0; k < 6; k++) {
-      const ni  = h32('ann_' + slot + '_' + k) % NPCS.length;
-      const npc = NPCS[ni];
-      const fn  = ANN_TEMPLATES[h32('at_' + slot + '_' + k) % ANN_TEMPLATES.length];
-      out.push({ type: 'activity', text: fn(npc) });
-    }
-
-    // Community stats
-    const tn = getTotalNuts();
-    out.push({ type: 'stat', text: `📊 ${tn.toLocaleString()} community nuts logged` });
-    out.push({ type: 'stat', text: `👥 1,500 active nutloggers on the platform` });
-
+    now = now || Date.now();
+    const out = [];
+    getRecentEvents(4, now).forEach(ev => {
+      out.push({
+        type: 'npc',
+        user: ev.npc.name,
+        text: `🥜 ${ev.npc.name} logged on-chain`,
+        ts: ev.ts,
+        npc: true,
+        sessionId: ev.npc.sessionId,
+      });
+    });
+    const slot = Math.floor(now / 42000);
+    const npc = NPCS[h32('ann_' + slot) % NPCS.length];
+    const tpl = ANN_TEMPLATES[h32('annt_' + slot) % ANN_TEMPLATES.length];
+    out.push({
+      type: 'npc',
+      user: npc.name,
+      text: tpl(npc),
+      ts: now - 1000,
+      npc: true,
+      sessionId: npc.sessionId,
+    });
     return out;
   }
 
-  // ── DUEL TAUNTS (expanded) ───────────────────────────────────────
+  function emitNPC(ev) {
+    if (!window.NutAnnounce) return;
+    const item = Object.assign({ ts: Date.now(), npc: true }, ev);
+    NutAnnounce.emit(item);
+  }
+
+  // ── DUEL TAUNTS ───────────────────────────────────────────────────
   const TAUNT_A = [
     "you're already done, son",
     "not even warming up yet",
@@ -342,7 +367,7 @@
     "my peak hour hasn't even started yet",
   ];
 
-  // ── DUEL SYSTEM ─────────────────────────────────────────────────
+  // ── DUEL SYSTEM ───────────────────────────────────────────────────
   function getActiveDuels(now) {
     const slot  = Math.floor(now / 900000);
     const duels = [];
@@ -376,9 +401,9 @@
     return duels;
   }
 
-  // ── SPEED ROUNDS (3-minute micro-duels) ─────────────────────────
+  // ── SPEED ROUNDS ──────────────────────────────────────────────────
   function getSpeedRounds(now) {
-    const slot   = Math.floor(now / 180000); // 3-min slots
+    const slot   = Math.floor(now / 180000);
     const rounds = [];
     for (let r = 0; r < 3; r++) {
       const i1 = h32('sra_' + r + '_' + slot) % NPCS.length;
@@ -399,7 +424,7 @@
     return rounds;
   }
 
-  // ── UTIL ────────────────────────────────────────────────────────
+  // ── UTIL ──────────────────────────────────────────────────────────
   function timeAgo(ts, now) {
     const d = now - ts;
     if (d < 10000)   return 'just now';
@@ -409,7 +434,7 @@
   }
   function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
 
-  // ── RENDER: COMMUNITY FEED ──────────────────────────────────────
+  // ── RENDER: COMMUNITY FEED ────────────────────────────────────────
   function renderFeed() {
     const el = document.getElementById('npcFeed');
     if (!el) return;
@@ -433,11 +458,9 @@
     }).join('');
   }
 
-  // ── DUEL ANNOUNCEMENT TRACKER ──────────────────────────────────
-  // Fires into NutAnnounce when a duel completes. Set so each duel only announces once.
+  // ── DUEL ANNOUNCEMENT TRACKER ─────────────────────────────────────
   const _announcedDuels = new Set();
 
-  // ── RENDER: DUELS + SPEED ROUNDS ───────────────────────────────
   function renderDuels() {
     const el = document.getElementById('npcDuels');
     if (!el) return;
@@ -446,16 +469,17 @@
     const speeds = getSpeedRounds(now);
     const all    = [...speeds, ...duels];
 
-    // Fire real events for freshly-completed duels
     all.forEach(d => {
       if (d.done && !_announcedDuels.has(d.id)) {
         _announcedDuels.add(d.id);
         if (_announcedDuels.size > 80) _announcedDuels.delete(_announcedDuels.values().next().value);
         const w = d.c1 >= d.c2 ? d.npc1 : d.npc2;
-        const l = d.c1 >= d.c2 ? d.npc2 : d.npc1;
-        if (window.NutAnnounce) NutAnnounce.emit({
-          type: 'duel', npc: true,
-          text: `⚔ ${w.name} destroyed ${l.name} ${d.c1}-${d.c2}`,
+        const isSpeed = d.type === 'speed';
+        emitNPC({
+          type: 'duel',
+          user: w.name,
+          text: `⚔ ${w.name} won ${isSpeed ? 'a speed round' : 'a live duel'}`,
+          sessionId: w.sessionId,
         });
       }
     });
@@ -515,17 +539,7 @@
     }).join('');
   }
 
-  // ── SUPABASE INJECTION ──────────────────────────────────────────
-  // Only inject first 300 NPCs to Supabase — enough to fill the leaderboard.
-  // Remaining 1200 NPCs are local-only (duels, feed, announcements).
-  const _INJECT_CAP  = 300;
-  const _BOOT_KEY    = 'npc_boot_n_v4';
-  const _DAILY_KEY   = 'npc_daily_ts_v3';
-  const _DAILY_CD    = 20 * 60 * 1000;
-  const _MAX_HIST    = 120;
-  const _BOOT_BATCH  = 5;
-  const _WRITE_BATCH = 15;
-
+  // ── SUPABASE: log one nut for one NPC ────────────────────────────
   async function _logNPC(db, npc, dateStr) {
     const nutType = genNutType(npc.id, dateStr);
     try {
@@ -543,12 +557,16 @@
           p_deed_date:  dateStr,
         });
       }
-    } catch (_) { /* silent — dedup ok:false lands here too */ }
+    } catch (_) { /* dedup ok:false lands here — silent */ }
   }
 
   function _dayActive(npc, d) {
     return (h32('day_' + npc.id + '_' + d) % 100) >= 20;
   }
+
+  // ── BOOTSTRAP: inject historical data for one NPC ────────────────
+  const _WRITE_BATCH = 15;
+  const _MAX_HIST    = 120;
 
   async function _bootstrapNPCById(db, npc) {
     const today  = new Date();
@@ -569,9 +587,61 @@
     }
   }
 
+  // ── LIVE ACTIVITY: same cooldown as real players ─────────────────
+  // One log per NPC per 10 minutes max. 4 NPCs fire per 2-minute tick.
+  const _INJECT_CAP  = 300;
+  const _TEN_MIN     = 10 * 60 * 1000;
+  const _LIVE_TICK   = 2  * 60 * 1000;
+  const _lastRealLog = Object.create(null); // npc.id -> timestamp
+
+  async function runLiveNPCActivity(db) {
+    if (!db) return;
+    const now      = Date.now();
+    const todayStr = new Date().toISOString().split('T')[0];
+
+    // Pick 4 NPCs for this tick via hash-based slot
+    const slot = Math.floor(now / _LIVE_TICK);
+    for (let i = 0; i < 4; i++) {
+      const idx = h32('live_' + slot + '_' + i) % _INJECT_CAP;
+      const npc = NPCS[idx];
+      const last = _lastRealLog[npc.id] || 0;
+      if (now - last < _TEN_MIN) continue; // respects cooldown
+      _lastRealLog[npc.id] = now;
+      await _logNPC(db, npc, todayStr);
+      emitNPC({
+        type: 'nut',
+        user: npc.name,
+        text: `🥜 ${npc.name} logged on-chain`,
+        sessionId: npc.sessionId,
+      });
+      await new Promise(r => setTimeout(r, 400));
+    }
+  }
+
+  // ── BOOT: progressive leaderboard seeding ────────────────────────
+  const _BOOT_KEY   = 'npc_boot_n_v5';
+  const _DAILY_KEY  = 'npc_daily_ts_v4';
+  const _DAILY_CD   = 20 * 60 * 1000;
+  const _BOOT_BATCH = 15; // up from 5 for faster leaderboard fill
+
   async function injectToSupabase(db) {
     if (!db) return;
 
+    // Priority bootstrap: top 20 NPCs by allTime() on first-ever load
+    const priorityKey = 'npc_priority_v5';
+    if (!localStorage.getItem(priorityKey)) {
+      const sorted = NPCS.slice(0, _INJECT_CAP)
+        .map(n => ({ n, at: allTime(n) }))
+        .sort((a, b) => b.at - a.at)
+        .slice(0, 20)
+        .map(x => x.n);
+      for (const npc of sorted) {
+        await _bootstrapNPCById(db, npc);
+      }
+      localStorage.setItem(priorityKey, '1');
+    }
+
+    // Progressive bootstrap: 15 more NPCs per page visit
     const bootN = parseInt(localStorage.getItem(_BOOT_KEY) || '0');
     if (bootN < _INJECT_CAP) {
       const endN = Math.min(bootN + _BOOT_BATCH, _INJECT_CAP);
@@ -581,6 +651,7 @@
       localStorage.setItem(_BOOT_KEY, String(endN));
     }
 
+    // Daily pass: 30 random NPCs log today's date (bulk, 20-min cooldown)
     const now       = Date.now();
     const lastDaily = parseInt(localStorage.getItem(_DAILY_KEY) || '0');
     if (now - lastDaily < _DAILY_CD) return;
@@ -595,24 +666,78 @@
     await Promise.allSettled(picks.map(npc => _logNPC(db, npc, todayStr)));
   }
 
-  // ── INIT ────────────────────────────────────────────────────────
+  // ── INIT ──────────────────────────────────────────────────────────
   function init(db) {
     renderDuels();
 
     if (db) {
       injectToSupabase(db).catch(() => {});
+
+      // Live activity loop: fires every 2 min, one NPC per call with 10-min cooldown
+      runLiveNPCActivity(db).catch(() => {});
+      setInterval(() => runLiveNPCActivity(db).catch(() => {}), _LIVE_TICK);
+
+      // Re-run daily batch after cooldown
       setInterval(() => injectToSupabase(db).catch(() => {}), _DAILY_CD + 2 * 60 * 1000);
     }
 
     setInterval(() => { renderDuels(); }, 15000);
+    setInterval(() => tickNPCCasinoHighlights(), 75000);
+    setTimeout(() => tickNPCCasinoHighlights(), 12000);
   }
 
-  // ── PUBLIC API ──────────────────────────────────────────────────
+  // Simulated NPC casino wins → ticker + Supabase casino_events
+  function tickNPCCasinoHighlights() {
+    const now  = Date.now();
+    const slot = Math.floor(now / 75000);
+    if (h32('npc_casino_' + slot) % 4 === 0) return;
+    const npc  = NPCS[h32('npc_cas_' + slot) % Math.min(200, NPCS.length)];
+    const game = ['spin', 'flip', 'crash'][h32('npc_cg_' + slot) % 3];
+    const bet  = 8 + (h32('npc_cb_' + slot) % 55);
+    let mult = 2;
+    let profit = bet;
+    let text = '';
+
+    if (game === 'crash') {
+      mult = parseFloat((1.8 + (h32('npc_cm_' + slot) % 65) / 10).toFixed(1));
+      profit = Math.max(1, Math.floor(bet * mult) - bet);
+      text = `🚀 ${npc.name} cashed crash at ${mult}× for +${profit} NUTS`;
+    } else if (game === 'flip') {
+      mult = 2;
+      profit = bet;
+      text = `🪙 ${npc.name} won flip — +${profit} NUTS`;
+    } else {
+      const mults = [2, 3, 5, 10, 15];
+      mult = mults[h32('npc_cw_' + slot) % mults.length];
+      profit = Math.max(1, Math.floor(bet * mult) - bet);
+      text = `🎰 ${npc.name} hit ${mult}× wheel for +${profit} NUTS`;
+    }
+
+    const big = profit >= 25 || mult >= 5;
+    emitNPC({
+      type: game === 'crash' ? 'crash' : game === 'flip' ? 'flip' : 'spin',
+      game,
+      user: npc.name,
+      text,
+      profit,
+      bet,
+      mult,
+      big,
+      sessionId: npc.sessionId,
+    });
+    if (window.NutCasinoLive && big) {
+      NutCasinoLive.recordNPCCasinoEvent(npc, { game, profit, bet, mult });
+    }
+  }
+
+  // ── PUBLIC API ────────────────────────────────────────────────────
   window.NutNPCs = {
     init,
     getActiveDuels,
     getSpeedRounds,
     getAnnouncements,
+    emitNPC,
+    tickNPCCasinoHighlights,
     allTime,
     todayCount,
     getTotalNuts,
@@ -626,6 +751,7 @@
     npcColor,
     npcAvatarHtml,
     npcBadges,
+    runLiveNPCActivity,
   };
 
 })();
