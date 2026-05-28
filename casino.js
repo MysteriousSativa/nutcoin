@@ -154,22 +154,44 @@
     if (!el) return;
     const bal = typeof pmGetBalance === 'function' ? pmGetBalance() : 0;
     el.innerHTML = `
-      <div class="flip-bal">Balance: <strong>${bal.toLocaleString()}</strong> NUTS</div>
       <div class="flip-choose">
-        <button class="flip-side-btn ${flipSide==='heads'?'active':''}" onclick="NutCasino.chooseSide('heads')">🟡 HEADS</button>
-        <button class="flip-side-btn ${flipSide==='tails'?'active':''}" onclick="NutCasino.chooseSide('tails')">⚪ TAILS</button>
+        <button class="flip-side-btn ${flipSide==='heads'?'active':''}" onclick="NutCasino.chooseSide('heads')">🟡<br><span style="font-size:11px;display:block;margin-top:4px">HEADS</span></button>
+        <button class="flip-side-btn ${flipSide==='tails'?'active':''}" onclick="NutCasino.chooseSide('tails')">⚪<br><span style="font-size:11px;display:block;margin-top:4px">TAILS</span></button>
       </div>
-      <div class="flip-coin-wrap"><div class="flip-coin" id="flipCoin">${flipSide==='heads'?'🟡':flipSide==='tails'?'⚪':'🥜'}</div></div>
+      <div class="flip-coin-wrap">
+        <div class="flip-coin" id="flipCoin">${flipSide==='heads'?'🟡':flipSide==='tails'?'⚪':'🥜'}</div>
+      </div>
       <div class="bet-row">
         <button class="bet-adj" onclick="NutCasino.adjFlipBet(-10)">−</button>
-        <span class="bet-display">Bet: <strong id="flipBetDisplay">${flipBet.toLocaleString()}</strong> NUTS</span>
+        <div class="bet-amount-wrap">
+          <span class="bet-lbl">Bet Amount</span>
+          <span class="bet-val" id="flipBetDisplay">${flipBet.toLocaleString()}</span>
+        </div>
         <button class="bet-adj" onclick="NutCasino.adjFlipBet(10)">+</button>
         <button class="bet-max" onclick="NutCasino.maxFlipBet()">MAX</button>
       </div>
+      <div class="bet-quick-row">
+        <button class="bet-quick-btn" onclick="NutCasino.halfFlipBet()">½ Half</button>
+        <button class="bet-quick-btn" onclick="NutCasino.doubleFlipBet()">2× Double</button>
+      </div>
       <button class="roulette-spin-btn" id="flipGoBtn" onclick="NutCasino.doFlip()" ${!flipSide||flipAnim?'disabled':''}>FLIP</button>
       <div class="spin-result-line" id="flipResult"></div>
-      <div class="flip-odds-note">Win: 47.5% · House edge: 5% · Double or nothing</div>
+      <div class="roulette-bal-line">Balance: <strong>${bal.toLocaleString()}</strong> NUTS</div>
+      <div class="flip-odds-note">Win: 47.5% · House edge: 5%</div>
     `;
+  }
+
+  function halfFlipBet() {
+    flipBet = Math.max(1, Math.floor(flipBet / 2));
+    const el = document.getElementById('flipBetDisplay');
+    if (el) el.textContent = flipBet.toLocaleString();
+  }
+
+  function doubleFlipBet() {
+    const bal = typeof pmGetBalance === 'function' ? pmGetBalance() : 0;
+    flipBet = Math.min(bal, flipBet * 2);
+    const el = document.getElementById('flipBetDisplay');
+    if (el) el.textContent = flipBet.toLocaleString();
   }
 
   function doFlip() {
@@ -355,57 +377,114 @@
     if (!crashCanvas || !crashCtx) return;
     const ctx = crashCtx;
     const W   = crashCanvas.width, H = crashCanvas.height;
-    ctx.clearRect(0, 0, W, H);
-    ctx.fillStyle = '#050301';
+    const PAD = { t: 14, r: 14, b: 28, l: 36 };
+
+    // Background
+    ctx.fillStyle = '#0a1219';
     ctx.fillRect(0, 0, W, H);
 
-    const color = crashState === 'crashed' ? '#ff6060'
-                : crashState === 'cashout' ? '#FFD97D'
-                : '#4EC97A';
+    const color = crashState === 'crashed' ? '#ff4f4f'
+                : crashState === 'cashout' ? '#f6c90e'
+                : '#00e701';
 
     if (crashState === 'idle') {
-      ctx.fillStyle = 'rgba(200,169,110,0.25)';
-      ctx.font = '500 12px ui-monospace,monospace';
+      // Grid lines
+      ctx.strokeStyle = 'rgba(255,255,255,0.04)';
+      ctx.lineWidth = 1;
+      for (let i = 1; i < 4; i++) {
+        const y = PAD.t + (H - PAD.t - PAD.b) * (i / 4);
+        ctx.beginPath(); ctx.moveTo(PAD.l, y); ctx.lineTo(W - PAD.r, y); ctx.stroke();
+      }
+      ctx.fillStyle = '#1a3040';
+      ctx.font = '700 12px ui-monospace,monospace';
       ctx.textAlign = 'center';
       ctx.fillText('PLACE BET AND HIT START', W / 2, H / 2);
       return;
     }
 
+    const chartW = W - PAD.l - PAD.r;
+    const chartH = H - PAD.t - PAD.b;
+    const maxM   = Math.max(crashTarget * 1.08, crashMult * 1.1, 2);
+
+    // Grid lines + Y labels
+    ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+    ctx.lineWidth   = 1;
+    ctx.fillStyle   = 'rgba(255,255,255,0.22)';
+    ctx.font        = '600 9px ui-monospace,monospace';
+    ctx.textAlign   = 'right';
+    const gridLevels = [1, 1.5, 2, 3, 5, 10, 20, 50].filter(v => v <= maxM * 1.1);
+    gridLevels.forEach(v => {
+      const gy = PAD.t + chartH - ((v - 1) / (maxM - 1)) * chartH;
+      ctx.beginPath(); ctx.moveTo(PAD.l, gy); ctx.lineTo(W - PAD.r, gy); ctx.stroke();
+      if (v > 1) ctx.fillText(v + '×', PAD.l - 3, gy + 3);
+    });
+
     // Curve
-    if (crashState === 'running') {
-      const PAD  = 14;
-      const steps = Math.max(2, Math.round((crashMult - 1) * 10));
+    if (crashState === 'running' || crashState === 'cashout' || crashState === 'crashed') {
+      const steps  = Math.max(2, Math.round((crashMult - 1) * 20));
+      const points = [];
+      for (let p = 0; p <= steps; p++) {
+        const m = 1 + (p / steps) * (crashMult - 1);
+        const x = PAD.l + (p / steps) * chartW;
+        const y = PAD.t + chartH - Math.min((m - 1) / (maxM - 1), 1) * chartH;
+        points.push([x, y]);
+      }
+
+      // Gradient fill under curve
+      const grad = ctx.createLinearGradient(0, PAD.t, 0, H - PAD.b);
+      if (crashState === 'crashed') {
+        grad.addColorStop(0, 'rgba(255,79,79,0.18)');
+        grad.addColorStop(1, 'rgba(255,79,79,0.02)');
+      } else {
+        grad.addColorStop(0, 'rgba(0,231,1,0.15)');
+        grad.addColorStop(1, 'rgba(0,231,1,0.01)');
+      }
+      ctx.beginPath();
+      ctx.moveTo(points[0][0], points[0][1]);
+      for (let i = 1; i < points.length; i++) ctx.lineTo(points[i][0], points[i][1]);
+      ctx.lineTo(points[points.length - 1][0], H - PAD.b);
+      ctx.lineTo(PAD.l, H - PAD.b);
+      ctx.closePath();
+      ctx.fillStyle = grad;
+      ctx.fill();
+
+      // Stroke
+      ctx.beginPath();
+      ctx.moveTo(points[0][0], points[0][1]);
+      for (let i = 1; i < points.length; i++) ctx.lineTo(points[i][0], points[i][1]);
       ctx.strokeStyle = color;
       ctx.lineWidth   = 2.5;
-      ctx.beginPath();
-      for (let p = 0; p <= steps; p++) {
-        const m = 1 + p * 0.1;
-        const x = PAD + (p / steps) * (W - PAD * 2);
-        const y = H - PAD - Math.min((m - 1) / Math.max(crashTarget * 1.1 - 1, 1), 1) * (H - PAD * 2 - 10);
-        p === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-      }
       ctx.stroke();
-      ctx.lineTo(W - PAD, H - PAD);
-      ctx.lineTo(PAD, H - PAD);
-      ctx.closePath();
-      ctx.fillStyle = 'rgba(78,201,122,0.08)';
+
+      // Dot at tip
+      const tip = points[points.length - 1];
+      ctx.beginPath();
+      ctx.arc(tip[0], tip[1], 4, 0, Math.PI * 2);
+      ctx.fillStyle = color;
       ctx.fill();
     }
 
-    // Big multiplier
+    // Big multiplier number
+    ctx.shadowColor = color;
+    ctx.shadowBlur  = crashState === 'running' ? 18 : 0;
     ctx.fillStyle   = color;
-    ctx.font        = '900 36px Space\ Mono,ui-monospace,monospace';
+    ctx.font        = '900 38px Space\\ Mono,ui-monospace,monospace';
     ctx.textAlign   = 'center';
-    ctx.fillText(crashMult.toFixed(1) + '×', W / 2, H / 2 + 10);
+    ctx.fillText(crashMult.toFixed(2) + '×', W / 2, H / 2 + 8);
+    ctx.shadowBlur  = 0;
 
-    if (crashState === 'crashed') {
-      ctx.fillStyle = '#ff6060';
-      ctx.font      = '700 13px ui-monospace,monospace';
-      ctx.fillText('💥 BUSTED', W / 2, H / 2 + 32);
+    // Sub-label
+    ctx.font        = '700 11px ui-monospace,monospace';
+    ctx.textAlign   = 'center';
+    if (crashState === 'running') {
+      ctx.fillStyle = 'rgba(0,231,1,0.5)';
+      ctx.fillText('LIVE', W / 2, H / 2 + 26);
+    } else if (crashState === 'crashed') {
+      ctx.fillStyle = '#ff4f4f';
+      ctx.fillText('BUSTED', W / 2, H / 2 + 26);
     } else if (crashState === 'cashout') {
-      ctx.fillStyle = '#FFD97D';
-      ctx.font      = '700 13px ui-monospace,monospace';
-      ctx.fillText('✅ CASHED OUT', W / 2, H / 2 + 32);
+      ctx.fillStyle = '#f6c90e';
+      ctx.fillText('CASHED OUT', W / 2, H / 2 + 26);
     }
   }
 
@@ -415,7 +494,10 @@
     const hist = document.getElementById('crashHistory');
     const bal  = document.getElementById('crashBal');
 
-    if (bal) bal.textContent = (typeof pmGetBalance === 'function' ? pmGetBalance() : 0).toLocaleString();
+    const curBal = typeof pmGetBalance === 'function' ? pmGetBalance() : 0;
+    if (bal) bal.textContent = curBal.toLocaleString();
+    const hdr = document.getElementById('casinoHdrBal');
+    if (hdr) hdr.textContent = curBal.toLocaleString() + ' NUTS';
 
     if (btn) {
       if (crashState === 'idle') {
@@ -461,6 +543,19 @@
   function maxCrashBet() {
     crashBet = Math.max(1, typeof pmGetBalance === 'function' ? pmGetBalance() : 1);
     const el = document.getElementById('crashBetDisplay');
+    if (el) el.textContent = crashBet.toLocaleString();
+  }
+
+  function halfCrashBet() {
+    crashBet = Math.max(1, Math.floor(crashBet / 2));
+    const el = document.getElementById('crashBetDisplay');
+    if (el) el.textContent = crashBet.toLocaleString();
+  }
+
+  function doubleCrashBet() {
+    const bal = typeof pmGetBalance === 'function' ? pmGetBalance() : 0;
+    crashBet  = Math.min(bal, crashBet * 2);
+    const el  = document.getElementById('crashBetDisplay');
     if (el) el.textContent = crashBet.toLocaleString();
   }
 
@@ -529,8 +624,8 @@
     // wheel
     pickSeg, getActiveSegs, saveWheelResult, renderWheelStatus, wheelTargetAngle, resolveWheelSegIdx,
     // flip
-    chooseSide, doFlip, adjFlipBet, maxFlipBet,
+    chooseSide, doFlip, adjFlipBet, maxFlipBet, halfFlipBet, doubleFlipBet,
     // crash
-    startCrash, cashOut, adjCrashBet, maxCrashBet,
+    startCrash, cashOut, adjCrashBet, maxCrashBet, halfCrashBet, doubleCrashBet,
   };
 })();

@@ -43,6 +43,16 @@
     };
   }
 
+  function afterCasinoRecorded() {
+    if (typeof fetchLeaderboard === 'function') {
+      setTimeout(() => fetchLeaderboard(), 500);
+    }
+    if (typeof fetchGlobalCounts === 'function') {
+      setTimeout(() => fetchGlobalCounts(), 500);
+    }
+    setTimeout(refresh, 600);
+  }
+
   async function recordCasinoEvent(ev) {
     if (!ev || !ev.game) return;
     if (typeof db === 'undefined' || !db) return;
@@ -52,7 +62,7 @@
     try {
       const name = (typeof nickname !== 'undefined' && nickname) ||
         (typeof genUserName === 'function' ? genUserName(sessionId) : null);
-      await db.rpc('record_casino_event', {
+      const { data, error } = await db.rpc('record_casino_event', {
         p_session_id: sessionId,
         p_nickname: name,
         p_game: ev.game,
@@ -60,6 +70,8 @@
         p_profit: profit,
         p_mult: ev.mult || null,
       });
+      if (error) throw error;
+      if (data?.ok) afterCasinoRecorded();
     } catch (e) {
       console.warn('record_casino_event', e);
     }
@@ -71,7 +83,7 @@
     const profit = ev.profit || 0;
     if (profit <= 0) return;
     try {
-      await db.rpc('record_casino_event', {
+      const { data, error } = await db.rpc('record_casino_event', {
         p_session_id: npc.sessionId,
         p_nickname: npc.name,
         p_game: ev.game,
@@ -79,6 +91,8 @@
         p_profit: profit,
         p_mult: ev.mult || null,
       });
+      if (error) throw error;
+      if (data?.ok) afterCasinoRecorded();
     } catch (e) {
       console.warn('record_casino_event npc', e);
     }
@@ -131,24 +145,6 @@
     (remote || []).forEach(push);
     out.sort((a, b) => (b.ts || 0) - (a.ts || 0));
     return out.slice(0, 28);
-  }
-
-  function renderAnnBigPin(items) {
-    const el = document.getElementById('annBigPin');
-    if (!el) return;
-    const win = (items || []).find(x => x.big);
-    if (!win) {
-      el.style.display = 'none';
-      el.innerHTML = '';
-      return;
-    }
-    const amt = win.mult >= 2
-      ? `${typeof win.mult === 'number' ? win.mult.toFixed(1) : win.mult}× · +${win.profit} NUTS`
-      : `+${win.profit} NUTS`;
-    el.style.display = 'block';
-    el.innerHTML = `<span class="abp-kicker">🏆 BIG WIN</span>
-      <span class="abp-user">${esc(win.user || 'Player')}</span>
-      <span class="abp-amt">${amt}</span>`;
   }
 
   function maybeShowBigFromFeed(items) {
@@ -214,7 +210,6 @@
       if (typeof renderAnnTicker === 'function') renderAnnTicker(merged);
       if (typeof buildTicker === 'function') buildTicker(merged);
     }
-    renderAnnBigPin(merged);
     maybeShowBigFromFeed(merged);
     renderBigWins(merged);
     watchCache = await fetchWatchlist();

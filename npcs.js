@@ -473,14 +473,7 @@
       if (d.done && !_announcedDuels.has(d.id)) {
         _announcedDuels.add(d.id);
         if (_announcedDuels.size > 80) _announcedDuels.delete(_announcedDuels.values().next().value);
-        const w = d.c1 >= d.c2 ? d.npc1 : d.npc2;
-        const isSpeed = d.type === 'speed';
-        emitNPC({
-          type: 'duel',
-          user: w.name,
-          text: `⚔ ${w.name} won ${isSpeed ? 'a speed round' : 'a live duel'}`,
-          sessionId: w.sessionId,
-        });
+        // Duel resolved — tracked internally only, never surfaces in ticker
       }
     });
 
@@ -537,6 +530,54 @@
         </div>
       </div>`;
     }).join('');
+  }
+
+  let _dbRef = null;
+
+  function casinoProfitToPoints(profit) {
+    return Math.min(10, Math.max(1, Math.ceil((profit || 0) / 10)));
+  }
+
+  function buildNPCCasinoWin(npc, slot) {
+    const game = ['spin', 'flip', 'crash'][h32('npc_cg_' + slot) % 3];
+    const bet  = 10 + (h32('npc_cb_' + slot) % 50);
+    let mult = 2;
+    let profit = bet;
+    let text = '';
+
+    if (game === 'crash') {
+      mult = parseFloat((1.6 + (h32('npc_cm_' + slot) % 80) / 10).toFixed(1));
+      profit = Math.max(1, Math.floor(bet * mult) - bet);
+      text = `🚀 ${npc.name} cashed crash at ${mult}× for +${profit} NUTS`;
+    } else if (game === 'flip') {
+      mult = 2;
+      profit = bet;
+      text = `🪙 ${npc.name} won flip — +${profit} NUTS`;
+    } else {
+      const mults = [2, 3, 5, 8, 10, 15];
+      mult = mults[h32('npc_cw_' + slot) % mults.length];
+      profit = Math.max(1, Math.floor(bet * mult) - bet);
+      text = `🎰 ${npc.name} hit ${mult}× wheel for +${profit} NUTS`;
+    }
+
+    return {
+      type: game === 'crash' ? 'crash' : game === 'flip' ? 'flip' : 'spin',
+      game,
+      user: npc.name,
+      text,
+      profit,
+      bet,
+      mult,
+      big: profit >= 25 || mult >= 5,
+      sessionId: npc.sessionId,
+    };
+  }
+
+  async function playNPCCasinoRound(_db, npc, slot) {
+    const roll = h32('npc_pl_' + slot) % 100;
+    if (roll < 38) return false;
+    // NPC casino round computed internally — not emitted to ticker
+    return true;
   }
 
   // ── SUPABASE: log one nut for one NPC ────────────────────────────
@@ -605,16 +646,21 @@
       const idx = h32('live_' + slot + '_' + i) % _INJECT_CAP;
       const npc = NPCS[idx];
       const last = _lastRealLog[npc.id] || 0;
-      if (now - last < _TEN_MIN) continue; // respects cooldown
+      if (now - last < _TEN_MIN) continue;
       _lastRealLog[npc.id] = now;
+
+      const playCasino = h32('live_cas_' + slot + '_' + i) % 3 === 0;
+      if (playCasino) {
+        const played = await playNPCCasinoRound(db, npc, slot * 10 + i);
+        if (played) {
+          await new Promise(r => setTimeout(r, 400));
+          continue;
+        }
+      }
+
       await _logNPC(db, npc, todayStr);
-      emitNPC({
-        type: 'nut',
-        user: npc.name,
-        text: `🥜 ${npc.name} just logged a nut`,
-        sessionId: npc.sessionId,
-      });
-      await new Promise(r => setTimeout(r, 400));
+      // NPC live log — real Supabase write, no ticker emission
+      await new Promise(r => setTimeout(r, 500));
     }
   }
 
@@ -663,11 +709,19 @@
       const idx = h32('dt_' + todayStr + '_' + i) % _INJECT_CAP;
       picks.push(NPCS[idx]);
     }
-    await Promise.allSettled(picks.map(npc => _logNPC(db, npc, todayStr)));
+    // Stagger: one every 800ms so they look like real humans logging throughout the day
+    for (const npc of picks) {
+      const last = _lastRealLog[npc.id] || 0;
+      if (Date.now() - last < _TEN_MIN) continue;  // respect 10-min cooldown
+      _lastRealLog[npc.id] = Date.now();
+      await _logNPC(db, npc, todayStr);
+      await new Promise(r => setTimeout(r, 800));
+    }
   }
 
   // ── INIT ──────────────────────────────────────────────────────────
   function init(db) {
+    _dbRef = db;
     renderDuels();
 
     if (db) {
@@ -682,52 +736,17 @@
     }
 
     setInterval(() => { renderDuels(); }, 15000);
-    setInterval(() => tickNPCCasinoHighlights(), 75000);
-    setTimeout(() => tickNPCCasinoHighlights(), 12000);
+    setInterval(() => tickNPCCasinoHighlights(), 45000);
+    setTimeout(() => tickNPCCasinoHighlights(), 8000);
   }
 
-  // Simulated NPC casino wins → ticker + Supabase casino_events
-  function tickNPCCasinoHighlights() {
+  // Background casino rounds → ticker, casino_events, leaderboard points
+  async function tickNPCCasinoHighlights() {
     const now  = Date.now();
-    const slot = Math.floor(now / 75000);
-    if (h32('npc_casino_' + slot) % 4 === 0) return;
-    const npc  = NPCS[h32('npc_cas_' + slot) % Math.min(200, NPCS.length)];
-    const game = ['spin', 'flip', 'crash'][h32('npc_cg_' + slot) % 3];
-    const bet  = 8 + (h32('npc_cb_' + slot) % 55);
-    let mult = 2;
-    let profit = bet;
-    let text = '';
-
-    if (game === 'crash') {
-      mult = parseFloat((1.8 + (h32('npc_cm_' + slot) % 65) / 10).toFixed(1));
-      profit = Math.max(1, Math.floor(bet * mult) - bet);
-      text = `🚀 ${npc.name} cashed crash at ${mult}× for +${profit} NUTS`;
-    } else if (game === 'flip') {
-      mult = 2;
-      profit = bet;
-      text = `🪙 ${npc.name} won flip — +${profit} NUTS`;
-    } else {
-      const mults = [2, 3, 5, 10, 15];
-      mult = mults[h32('npc_cw_' + slot) % mults.length];
-      profit = Math.max(1, Math.floor(bet * mult) - bet);
-      text = `🎰 ${npc.name} hit ${mult}× wheel for +${profit} NUTS`;
-    }
-
-    const big = profit >= 25 || mult >= 5;
-    emitNPC({
-      type: game === 'crash' ? 'crash' : game === 'flip' ? 'flip' : 'spin',
-      game,
-      user: npc.name,
-      text,
-      profit,
-      bet,
-      mult,
-      big,
-      sessionId: npc.sessionId,
-    });
-    if (window.NutCasinoLive && big) {
-      NutCasinoLive.recordNPCCasinoEvent(npc, { game, profit, bet, mult });
-    }
+    const slot = Math.floor(now / 45000);
+    if (h32('npc_casino_' + slot) % 5 === 0) return;
+    const npc  = NPCS[h32('npc_cas_' + slot) % Math.min(350, NPCS.length)];
+    await playNPCCasinoRound(_dbRef, npc, slot);
   }
 
   // ── PUBLIC API ────────────────────────────────────────────────────
@@ -738,6 +757,8 @@
     getAnnouncements,
     emitNPC,
     tickNPCCasinoHighlights,
+    playNPCCasinoRound,
+    casinoProfitToPoints,
     allTime,
     todayCount,
     getTotalNuts,

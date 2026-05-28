@@ -4,6 +4,32 @@
 (function () {
   const KEY_SLUG = 'nut_profile_slug_v1';
 
+  /** Site devs — match nickname and/or session_id */
+  const DEV_ACCOUNTS = [
+    {
+      sessionIds: [],
+      nicknames: ['papa nut', 'papa_nut', 'papanut', 'papa da nuts', 'papadanuts'],
+    },
+  ];
+
+  function normalizeNick(s) {
+    return String(s || '').toLowerCase().replace(/[_]+/g, ' ').replace(/\s+/g, ' ').trim();
+  }
+
+  function isDevAccount(sessionId, displayName) {
+    const n = normalizeNick(displayName);
+    for (const acc of DEV_ACCOUNTS) {
+      if (acc.sessionIds && sessionId && acc.sessionIds.includes(sessionId)) return true;
+      if (acc.nicknames && acc.nicknames.some((nn) => normalizeNick(nn) === n)) return true;
+    }
+    if (/papa\s*nut/.test(n)) return true;
+    return false;
+  }
+
+  function devTagHtml() {
+    return '<span class="nut-profile-tag dev" title="Site developer">DEVELOPER</span>';
+  }
+
   function esc(s) {
     return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   }
@@ -39,7 +65,8 @@
   function nameHtml(sessionId, displayName, extraClass) {
     const name = displayName || anonName(sessionId);
     const cls = extraClass ? ` ${extraClass}` : '';
-    return `<a class="nut-name-link${cls}" href="${profileUrl(sessionId)}" title="View profile">${esc(name)}</a>`;
+    const tag = isDevAccount(sessionId, name) ? devTagHtml() : '';
+    return `<span class="nut-name-wrap"><a class="nut-name-link${cls}" href="${profileUrl(sessionId)}" title="View profile">${esc(name)}</a>${tag}</span>`;
   }
 
   function shareProfile(sessionId, displayName) {
@@ -79,6 +106,8 @@
     nutDisplayId,
     ensureSlug,
     anonName,
+    isDevAccount,
+    devTagHtml,
     nameHtml,
     shareProfile,
     parseProfileParam,
