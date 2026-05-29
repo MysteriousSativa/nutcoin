@@ -250,8 +250,7 @@ canvas{display:block;position:fixed;inset:0;z-index:0;}
 const CRASH_WS = (function(){
   const stored = localStorage.getItem('nut_crash_ws')
   if (stored) return stored
-  // ↓ Paste your Render URL here after deployment
-  return 'wss://PASTE_YOUR_RENDER_URL_HERE.onrender.com'
+  return 'wss://nutcrash-server.onrender.com'
 })()
 
 // ═══════════════════════════════════════════════════════════
