@@ -592,34 +592,19 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .st-st-ca{background:rgba(12,8,4,0.9);color:var(--cream);}
 .st-st-chart{background:rgba(12,8,4,0.9);color:var(--gold-bright);}
 
-/* ── Casino NUTTOKEN leaderboard ── */
-.nt-lb-wrap{margin-top:10px;margin-bottom:18px;}
-.nt-lb-hdr{
-  display:flex;align-items:center;justify-content:space-between;
-  background:rgba(15,25,35,0.9);border:1px solid #1f3a50;
-  border-bottom:none;border-radius:12px 12px 0 0;padding:10px 14px;
+/* ── Casino NUTTOKEN leaderboard (reuses lb-row styles — only the wrapper is custom) ── */
+.nt-lb-av{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;}
+/* content box mirrors #lbContent inside lb-inline-wrap */
+#ntLbContent{
+  background:rgba(18,13,6,0.78);
+  border:1px solid var(--border-hi);border-top:none;
+  border-bottom-left-radius:12px;border-bottom-right-radius:12px;
+  padding:8px 14px 14px;
 }
-.nt-lb-title{font-size:10px;font-weight:800;letter-spacing:.13em;color:#f6c90e;text-transform:uppercase;}
-.nt-lb-sub{font-size:9px;color:#4e7a96;}
-.nt-lb-body{
-  background:rgba(12,20,28,0.9);border:1px solid #1f3a50;
-  border-radius:0 0 12px 12px;padding:8px 14px 12px;
-}
-.nt-lb-list{display:flex;flex-direction:column;gap:4px;max-height:280px;overflow-y:auto;}
-.nt-lb-row{
-  display:grid;grid-template-columns:28px 28px 1fr auto auto;
-  align-items:center;gap:6px;padding:6px 4px;border-radius:8px;
-}
-.nt-lb-row.nt-you{background:rgba(246,201,14,0.06);border:1px solid rgba(246,201,14,0.18);}
-.nt-lb-row.nt-top1{background:rgba(255,215,0,0.07);}
-.nt-lb-row.nt-top2{background:rgba(192,192,192,0.05);}
-.nt-lb-row.nt-top3{background:rgba(205,127,50,0.05);}
-.nt-lb-rank{font-size:11px;font-weight:800;color:#5c7a8c;text-align:center;}
-.nt-lb-av{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;}
-.nt-lb-name{font-size:11px;font-weight:700;color:#dce8f0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.nt-lb-chips{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;color:#00e701;text-align:right;}
-.nt-lb-unit{font-size:9px;color:#4e7a96;text-align:right;}
-.nt-you-badge{font-size:8px;background:#f6c90e;color:#1a1000;padding:1px 5px;border-radius:4px;font-weight:800;flex-shrink:0;}
+#ntLbContent .lb-list{max-height:none;overflow-y:visible;padding-right:0;}
+/* highlight CHIPS unit label in Stake green instead of gold */
+#ntLbContent .lb-row-count{color:#00e701;text-shadow:0 0 9px rgba(0,231,1,0.25);}
+#ntLbContent .lb-row-nuts{color:#2e6e4e;}
 
 /* ── FLOATING TOKEN BALANCE (bottom-left) ── */
 #tokenFloat{
@@ -2400,15 +2385,16 @@ body.genesis-mode .hero-title{text-shadow:0 0 40px rgba(255,217,125,0.35);}
   <div class="lb-ghost" id="lbGhost"></div>
 
   <!-- CASINO NUTTOKEN LEADERBOARD -->
-  <div class="nt-lb-wrap" id="ntLbWrap">
-    <div class="nt-lb-hdr">
-      <span class="nt-lb-title">💎 Casino Chips Board</span>
-      <span class="nt-lb-sub">NUTTOKENS · local + live</span>
-    </div>
-    <div class="nt-lb-body">
-      <div class="nt-lb-list" id="ntLbContent">
-        <div style="color:#4e7a96;font-size:11px;padding:8px 0">Convert nuts to get on the board.</div>
+  <div class="lb-inline-wrap" id="ntLbWrap">
+    <div class="nick-bar" style="cursor:default">
+      <div class="nick-left">
+        <span style="color:var(--muted)">Casino Chips</span>
+        <span class="nick-name" style="color:#f6c90e">💎 NUTTOKENS</span>
       </div>
+      <span style="font-size:9px;color:var(--muted);letter-spacing:.08em" id="ntLbMeta">CHIPS BOARD</span>
+    </div>
+    <div id="ntLbContent">
+      <div class="lb-empty">Convert nuts to get on the board.</div>
     </div>
   </div>
 
@@ -3601,60 +3587,66 @@ function renderNTLeaderboard() {
     return h;
   }
 
-  // Build NPC casino chip simulations (top 20 from first 300 NPCs)
+  // Build NPC simulated chip balances
   const npcRows = [];
   const allNPCs = window.NutNPCs ? NutNPCs.NPCS : [];
   const pool = allNPCs.slice(0, 300);
-  const seed = Math.floor(Date.now() / 86400000); // changes daily
-  for (let i = 0; i < Math.min(pool.length, 300); i++) {
+  const seed = Math.floor(Date.now() / 86400000);
+  for (let i = 0; i < pool.length; i++) {
     const npc = pool[i];
     const baseConv = h32sim('ntlb_conv_' + seed + '_' + i) % 200 + 5;
     const winMult  = 0.5 + (h32sim('ntlb_win_' + seed + '_' + i) % 300) / 100;
-    const chips    = Math.floor(baseConv * 1000 * winMult);
-    npcRows.push({ name: npc.name, id: npc.id, chips, sessionId: npc.sessionId });
+    npcRows.push({ name: npc.name, id: npc.id, chips: Math.floor(baseConv * 1000 * winMult) });
   }
   npcRows.sort((a, b) => b.chips - a.chips);
   const top20 = npcRows.slice(0, 20);
 
-  // User row
-  const userBal = window.NutKens ? NutKens.getBalance() : parseInt(localStorage.getItem('nut_pm_bal_v1')||'0',10)||0;
-  const userName = typeof nickname !== 'undefined' && nickname ? nickname : (typeof genUserName === 'function' && typeof sessionId !== 'undefined' ? genUserName(sessionId) : 'You');
-  const userEntry = { name: userName, chips: userBal, isUser: true };
+  // Real user row
+  const userBal  = window.NutKens ? NutKens.getBalance() : parseInt(localStorage.getItem('nut_pm_bal_v1')||'0',10)||0;
+  const userName = (typeof nickname !== 'undefined' && nickname) ? nickname
+                 : (typeof genUserName === 'function' && typeof sessionId !== 'undefined') ? genUserName(sessionId) : 'You';
+  const combined = [...top20, { name: userName, chips: userBal, isUser: true }]
+    .sort((a, b) => b.chips - a.chips)
+    .slice(0, 22);
 
-  // Merge and sort
-  let combined = [...top20, userEntry].sort((a, b) => b.chips - a.chips);
-  // Dedupe user if they naturally appear in top20
-  const userIdx = combined.findIndex(r => r.isUser);
+  const rankIcons = [{cls:'gold',txt:'🥇'},{cls:'silver',txt:'🥈'},{cls:'bronze',txt:'🥉'}];
+  const rowClass  = i => i===0?'top1':i===1?'top2':i===2?'top3':'';
 
-  let html = '';
-  combined.slice(0, 22).forEach((r, i) => {
-    const rank = i + 1;
-    const rankIcon = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : rank;
-    const rowCls = `nt-lb-row${r.isUser ? ' nt-you' : rank<=1?' nt-top1':rank<=2?' nt-top2':rank<=3?' nt-top3':''}`;
+  let html = `<div class="lb-header">
+    <span class="lb-count-label">CASINO CHIPS &nbsp;<span>${combined.length} PLAYERS</span></span>
+  </div><div class="lb-list">`;
+
+  combined.forEach((r, i) => {
+    const isYou = !!r.isUser;
+    const ri    = i < 3 ? rankIcons[i] : null;
+    const rankEl = ri
+      ? `<span class="lb-row-rank ${ri.cls}">${ri.txt}</span>`
+      : `<span class="lb-row-rank plain">${i+1}</span>`;
+
     let avHtml;
-    if (r.isUser) {
-      avHtml = `<div class="nt-lb-av" style="background:#f6c90e;color:#1a1000">YOU</div>`;
+    if (isYou) {
+      avHtml = `<div class="nut-avatar nut-avatar-sm"><div class="nt-lb-av" style="background:#f6c90e;color:#1a1000;font-size:9px;font-weight:900">YOU</div></div>`;
     } else {
       const color = NPC_COLORS[r.id % NPC_COLORS.length];
       const em    = NPC_EMOJIS[h32sim('ntlb_av_' + r.id) % NPC_EMOJIS.length];
-      avHtml = `<div class="nt-lb-av" style="background:${color}">${em}</div>`;
+      avHtml = `<div class="nut-avatar nut-avatar-sm"><div class="nt-lb-av" style="background:${color}">${em}</div></div>`;
     }
+
     const chipsStr = r.chips >= 1000000 ? (r.chips/1000000).toFixed(1)+'M'
-                   : r.chips >= 1000    ? (r.chips/1000).toFixed(1)+'K'
+                   : r.chips >= 1000    ? Math.round(r.chips/1000)+'K'
                    : r.chips.toLocaleString();
-    html += `<div class="${rowCls}">
-      <span class="nt-lb-rank">${rankIcon}</span>
+
+    html += `<div class="lb-row ${rowClass(i)} ${isYou?'you':''}">
+      ${rankEl}
       ${avHtml}
-      <span class="nt-lb-name">${r.name}</span>
-      ${r.isUser ? '<span class="nt-you-badge">YOU</span>' : '<span></span>'}
-      <span class="nt-lb-chips">${chipsStr}</span>
+      <span class="lb-row-name">${escHtml(r.name)}</span>
+      ${isYou ? '<span class="lb-you-badge">YOU</span>' : ''}
+      <span class="lb-row-count">${chipsStr}</span>
+      <span class="lb-row-nuts">CHIPS</span>
     </div>`;
   });
 
-  if (!html) {
-    el.innerHTML = '<div style="color:#4e7a96;font-size:11px;padding:8px 0">Convert nuts to get on the board.</div>';
-    return;
-  }
+  html += '</div>';
   el.innerHTML = html;
 }
 
