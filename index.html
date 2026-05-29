@@ -1046,8 +1046,16 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .ntk-empty{font-size:11px;color:#5c7a8c;text-align:center;padding:6px 0 8px;}
 
 /* ── Casino iframe overlay ── */
-#casinoAppOverlay{display:none;position:fixed;inset:0;z-index:2100;background:#0f1923;flex-direction:column;}
-#casinoAppFrame{width:100%;flex:1;border:none;display:block;min-height:0;}
+#casinoAppOverlay{display:none;position:fixed;inset:0;z-index:2100;background:#0f1923;}
+#casinoAppFrame{position:absolute;inset:0;width:100%;height:100%;border:none;}
+#casinoOverlayClose{
+  position:absolute;top:10px;right:12px;z-index:10;
+  background:rgba(26,44,56,0.92);border:1px solid rgba(255,255,255,0.12);
+  color:#b1bad3;font-size:16px;width:36px;height:36px;border-radius:9px;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  line-height:1;
+}
+#casinoOverlayClose:hover{background:#213743;color:#e8f0f6;}
 
 /* stake-casino class is now a no-op — all styling is on .roulette-box directly */
 /* Blackjack */
@@ -5758,7 +5766,8 @@ window.addEventListener('nutkens:balance', () => { updateNTFloat(); renderNTLead
 
 <!-- CASINO APP OVERLAY (fullscreen iframe for canvas casino) -->
 <div id="casinoAppOverlay">
-  <iframe id="casinoAppFrame" src="" title="NUT CASINO" allowtransparency="false"></iframe>
+  <button id="casinoOverlayClose" onclick="if(window.NutKens)NutKens.closeCasino()" title="Close casino">✕</button>
+  <iframe id="casinoAppFrame" src="" title="NUT CASINO"></iframe>
 </div>
 
 </body>
