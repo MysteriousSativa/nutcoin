@@ -3561,6 +3561,9 @@ function updateUI() {
   document.getElementById('p4-sesh').textContent=countSession.toLocaleString();
   updateCooldown();
   if (window.NutKens) NutKens.renderPanel(countAllTime);
+  // Float box: left side = real nut count, right side = NUTTOKENS
+  const pmBF = document.getElementById('pmBalFloat');
+  if (pmBF) pmBF.textContent = countAllTime.toLocaleString();
   updateNTFloat();
   renderNTLeaderboard();
 }
@@ -4713,12 +4716,12 @@ function pmSetBalance(v) {
   localStorage.setItem(KEY_PM_BAL, String(Math.max(0, Math.floor(v))));
   const bal = pmGetBalance();
   const balStr = bal.toLocaleString();
+  // pmBal = play-token display in the market section
   const el = document.getElementById('pmBal');
   if (el) el.textContent = balStr;
-  const fl = document.getElementById('pmBalFloat');
-  if (fl) fl.textContent = balStr;
-  const fu = document.getElementById('pmBalFloatUSD');
-  if (fu) fu.textContent = pmSimUSD(bal);
+  // pmBalFloat shows real nut count — do NOT overwrite it with token balance
+  // ntBalFloat is updated separately by updateNTFloat()
+  updateNTFloat();
 }
 function pmEarnTokens(n) {
   let mult = 1;

@@ -20,10 +20,17 @@
   function _setBalance(n) {
     localStorage.setItem(KEY_BAL, String(Math.max(0, Math.floor(n))));
     const bal = getBalance();
-    // Sync all existing balance display elements
-    ['pmBal','pmBalFloat','ntBal','casinoHdrBal'].forEach(id => {
+    // Only update NUTTOKEN-specific display elements — never pmBalFloat (that shows real nut count)
+    ['pmBal','ntBal','ntBalFloat','casinoHdrBal'].forEach(id => {
       const el = document.getElementById(id);
-      if (el) el.textContent = bal.toLocaleString() + (id === 'casinoHdrBal' ? ' NUTTOKENS' : '');
+      if (!el) return;
+      if (id === 'casinoHdrBal') {
+        el.textContent = bal.toLocaleString() + ' NUTTOKENS';
+      } else if (id === 'ntBalFloat') {
+        el.textContent = bal >= 1000 ? Math.round(bal/1000)+'K' : bal.toLocaleString();
+      } else {
+        el.textContent = bal.toLocaleString();
+      }
     });
     window.dispatchEvent(new CustomEvent('nutkens:balance', { detail: { balance: bal } }));
     return bal;
