@@ -1,0 +1,37 @@
+name: AI Task
+description: A task for the overnight Claude agent to pick up
+title: '[ai] '
+labels: ['ai-task', 'auto-ready']
+body:
+  - type: textarea
+    id: goal
+    attributes:
+      label: Goal
+      description: What should be built or fixed? Be specific.
+    validations:
+      required: true
+  - type: textarea
+    id: files
+    attributes:
+      label: Files involved
+      description: Which files should Claude look at or edit?
+    validations:
+      required: false
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Done when
+      description: How will you know this is finished?
+    validations:
+      required: true
+  - type: checkboxes
+    id: rules
+    attributes:
+      label: Agent rules (auto-checked)
+      options:
+        - label: No push to main
+          required: true
+        - label: Open a PR only
+          required: true
+        - label: No hyphens or em dashes in visible text
+          required: true

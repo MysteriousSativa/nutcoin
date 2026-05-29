@@ -1,0 +1,46 @@
+name: Claude On Demand
+
+# Trigger by commenting "@claude <task>" on any issue or PR.
+# Claude will read the issue/PR context plus CLAUDE.md, then
+# create a branch and open a PR with the work.
+
+on:
+  issue_comment:
+    types: [created]
+  pull_request_review_comment:
+    types: [created]
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  claude:
+    name: Claude response
+    # Only run if comment contains @claude
+    if: |
+      (github.event_name == 'issue_comment' || github.event_name == 'pull_request_review_comment') &&
+      contains(github.event.comment.body, '@claude')
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run Claude Code
+        uses: anthropic-ai/claude-code-action@beta
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          allowed_tools: 'Bash,Read,Write,Edit,Glob,Grep'
+          timeout_minutes: 18
+          trigger_phrase: '@claude'
+          custom_instructions: |
+            Always read CLAUDE.md first. Follow all rules there.
+            Never push to main. Always open a PR.
+            Never use hyphens or em dashes in user-visible text.
+            Branch names: auto/YYYY-MM-DD-HHmm-short-description

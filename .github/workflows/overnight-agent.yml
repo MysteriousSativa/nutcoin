@@ -1,0 +1,104 @@
+name: Overnight Improvement Agent
+
+on:
+  # Run every 2 hours around the clock
+  schedule:
+    - cron: '0 */2 * * *'
+  # Allow manual trigger from GitHub Actions tab
+  workflow_dispatch:
+    inputs:
+      focus:
+        description: 'Optional focus area (leave blank for full audit)'
+        required: false
+        default: ''
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  audit-and-improve:
+    name: Audit + Improve (${{ github.event.inputs.focus || 'full pass' }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set run timestamp
+        id: ts
+        run: echo "stamp=$(date -u '+%Y-%m-%d-%H%M')" >> $GITHUB_OUTPUT
+
+      - name: Run Claude Code improvement agent
+        uses: anthropic-ai/claude-code-action@beta
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          allowed_tools: 'Bash,Read,Write,Edit,Glob,Grep'
+          timeout_minutes: 25
+          direct_prompt: |
+            Read CLAUDE.md completely before doing anything else. It contains rules you must not violate.
+
+            You are running as an autonomous overnight improvement agent for the $NUT casino website.
+            Timestamp: ${{ steps.ts.outputs.stamp }} UTC
+            Focus override: "${{ github.event.inputs.focus }}"
+
+            ## Your Mission
+
+            Perform a full audit and improvement pass following the "Overnight Audit Protocol" in CLAUDE.md.
+            If a focus override is set, prioritize that area while still doing a full structural audit.
+
+            ## Step-by-Step Instructions
+
+            ### 1. Create a working branch
+            ```bash
+            git config user.email "claude-agent@anthropic.com"
+            git config user.name "Claude Agent"
+            git checkout -b auto/${{ steps.ts.outputs.stamp }}-audit
+            ```
+
+            ### 2. Read every file in the repo
+            Start with: index.html, casino-app.html, crash-live.html, poker-live.html,
+            nutslope.html, nutkens.js, casino.js, casino-live.js, blackjack.js,
+            addons.js, predictor.js, dream.js, drop.js, chaos.js, quirks.js,
+            profiles.js, npcs.js, chart.js, buycta.js, allocation.js,
+            server/index.js, vercel.json.
+
+            Then: predictions.html, profile.html, whitepaper.html.
+
+            ### 3. Audit per CLAUDE.md Phase 1 protocol
+            Document every issue you find. Do not fix yet.
+
+            ### 4. Fix per CLAUDE.md Phase 2 priority order
+            Make all fixes. After each fix, explain in a comment what changed and why.
+
+            ### 5. Walk through the Phase 3 test checklist mentally
+            Note any flow that cannot complete due to a code bug.
+
+            ### 6. Commit your changes
+            ```bash
+            git add -A
+            git commit -m "auto: audit + improve ${{ steps.ts.outputs.stamp }}"
+            ```
+
+            ### 7. Push the branch
+            ```bash
+            git push origin auto/${{ steps.ts.outputs.stamp }}-audit
+            ```
+
+            ### 8. Open a PR
+            Use `gh pr create` with this exact format:
+            - Title: [auto] Audit pass ${{ steps.ts.outputs.stamp }} UTC
+            - Body: include all sections from Phase 4 of CLAUDE.md
+
+            ### Critical Constraints
+            - Do NOT push to main
+            - Do NOT merge anything
+            - Do NOT use hyphens or em dashes in any user-visible text you write to HTML/JS files
+            - Do NOT change Supabase schema or column names
+            - Do NOT add any new external origins without also adding them to vercel.json CSP
+            - If you find a serious issue you cannot safely fix, document it prominently and stop
