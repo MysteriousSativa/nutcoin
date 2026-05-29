@@ -241,7 +241,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--s
     <button class="tab" data-game="flip">🪙 Flip</button>
     <button class="tab" data-game="crash">📈 Crash</button>
     <button class="tab" data-game="bj">🃏 21</button>
-    <button class="tab" data-game="slope">🏂 Slope</button>
+    <button class="tab" data-game="poker">♠ Poker</button>
     <button class="tab" data-game="live">🚀 Live</button>
   </div>
 
@@ -302,6 +302,11 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--s
     <!-- SLOPE -->
     <div class="game-panel" id="panel_slope" style="padding:0;overflow:hidden;">
       <iframe id="slopeFrame" src="" style="border:none;flex:1;min-height:0;width:100%;"></iframe>
+    </div>
+
+    <!-- POKER -->
+    <div class="game-panel" id="panel_poker" style="padding:0;overflow:hidden;">
+      <iframe id="pokerFrame" src="" style="border:none;width:100%;height:100%;display:block;"></iframe>
     </div>
 
     <!-- LIVE CRASH -->
@@ -396,9 +401,13 @@ document.querySelectorAll('.tab').forEach(btn => {
       const lf=document.getElementById('liveFrame');
       if(lf&&!lf.src) lf.src='./crash-live.html';
     }
-    // Hide shared bet controls for slope/live (they have their own controls)
+    if (currentGame==='poker') {
+      const pf=document.getElementById('pokerFrame');
+      if(pf&&!pf.src) pf.src='./poker-live.html';
+    }
+    // Hide shared bet controls for slope/live/poker (they have their own controls)
     const bc=document.getElementById('betControls');
-    if(bc) bc.style.display=(currentGame==='slope'||currentGame==='live')?'none':'';
+    if(bc) bc.style.display=(currentGame==='slope'||currentGame==='live'||currentGame==='poker')?'none':'';
   });
 });
 
@@ -1032,6 +1041,12 @@ window.addEventListener('message', (e)=>{
   }
   // Live crash close: switch back to wheel tab
   if(e.data.type==='live:close'){
+    const wheelTab=document.querySelector('.tab[data-game="wheel"]');
+    if(wheelTab) wheelTab.click();
+    syncBal();
+  }
+  // Poker close: switch back to wheel tab
+  if(e.data.type==='poker:close'){
     const wheelTab=document.querySelector('.tab[data-game="wheel"]');
     if(wheelTab) wheelTab.click();
     syncBal();

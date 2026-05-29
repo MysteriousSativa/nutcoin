@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>NUT Poker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@700&family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --felt:#1a5c2a;--felt2:#0d3318;--felt3:#091f10;
+  --gold:#c9a227;--gold2:#f0d060;--gold3:#8b6914;
+  --bg:#0a0507;--surface:rgba(255,255,255,0.06);
+  --text:#f0e8d8;--muted:#8a7060;--label:#c0a880;
+  --green:#00e701;--red:#ff4f4f;--blue:#4da6ff;
+  --mono:'Space Mono',monospace;--sans:'Inter',sans-serif;
+}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--sans);overflow:hidden;user-select:none;}
+
+/* ── ROOM ── */
+#room{
+  display:flex;flex-direction:column;height:100vh;max-width:480px;margin:0 auto;
+  background:radial-gradient(ellipse 120% 80% at 50% 20%, #1a0a04 0%, #0a0507 70%);
+  position:relative;
+}
+
+/* ── HEADER ── */
+#hdr{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 14px;flex-shrink:0;
+  border-bottom:1px solid rgba(201,162,39,0.15);
+  background:rgba(0,0,0,0.4);
+}
+.hdr-brand{font-size:13px;font-weight:900;letter-spacing:.06em;color:var(--gold);}
+.hdr-bal{background:rgba(201,162,39,0.1);border:1px solid rgba(201,162,39,0.3);border-radius:8px;padding:4px 10px;font-size:11px;font-weight:700;color:var(--gold);font-family:var(--mono);}
+.hdr-close{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:#8a7060;font-size:13px;cursor:pointer;width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:var(--sans);}
+.hdr-close:hover{background:rgba(255,255,255,0.12);color:var(--text);}
+
+/* ── TABLE AREA ── */
+#tableArea{flex:1;position:relative;display:flex;align-items:center;justify-content:center;padding:8px;overflow:hidden;}
+
+/* ── FELT TABLE ── */
+#table{
+  position:relative;
+  width:100%;max-width:440px;
+  height:260px;
+  border-radius:50%;
+  background:radial-gradient(ellipse 80% 70% at 50% 40%, #2a7a3a 0%, #1a5c2a 35%, #0d3318 70%, #091f10 100%);
+  border:4px solid var(--gold);
+  box-shadow:
+    0 0 0 2px var(--gold3),
+    0 0 0 8px #1a0a04,
+    0 0 0 10px rgba(201,162,39,0.2),
+    inset 0 0 40px rgba(0,0,0,0.5),
+    0 20px 80px rgba(0,0,0,0.9),
+    0 0 60px rgba(0,0,0,0.7);
+  flex-shrink:0;
+}
+
+/* Inner rail */
+#table::before{
+  content:'';position:absolute;inset:8px;border-radius:50%;
+  border:2px solid rgba(255,255,255,0.06);
+  pointer-events:none;
+}
+
+/* ── COMMUNITY CARDS ── */
+#community{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-54%);
+  display:flex;gap:4px;align-items:center;
+}
+.comm-card{
+  width:38px;height:53px;border-radius:5px;
+  background:#1a2c38;border:1px solid rgba(255,255,255,0.1);
+  display:flex;align-items:center;justify-content:center;
+  font-size:10px;color:#5f7281;overflow:hidden;
+  box-shadow:0 3px 10px rgba(0,0,0,0.7);
+  transition:transform .3s ease,opacity .3s ease;
+}
+.comm-card img{width:100%;height:100%;object-fit:cover;border-radius:4px;}
+.comm-card.empty{opacity:0.4;}
+.comm-card.new{animation:cardDeal .4s ease-out;}
+@keyframes cardDeal{from{transform:scale(0.5) translateY(-20px);opacity:0;}to{transform:scale(1) translateY(0);opacity:1;}}
+
+/* ── POT ── */
+#potArea{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,10px);
+  text-align:center;
+}
+.pot-label{font-size:9px;font-weight:700;letter-spacing:.1em;color:rgba(201,162,39,0.6);text-transform:uppercase;}
+.pot-amount{font-family:var(--mono);font-size:14px;font-weight:700;color:var(--gold);line-height:1.2;}
+
+/* ── PHASE BADGE ── */
+#phaseBadge{
+  position:absolute;top:12px;left:50%;transform:translateX(-50%);
+  background:rgba(0,0,0,0.7);border:1px solid rgba(201,162,39,0.3);
+  border-radius:20px;padding:3px 12px;
+  font-size:9px;font-weight:800;letter-spacing:.1em;
+  color:var(--gold);text-transform:uppercase;white-space:nowrap;
+}
+
+/* ── PLAYER SEATS ── */
+.seat{
+  position:absolute;
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+  pointer-events:none;
+  transition:all .3s ease;
+}
+/* Slot positions around the oval */
+.slot-0{bottom:-58px;left:50%;transform:translateX(-50%);}    /* hero */
+.slot-1{bottom:-28px;right:2%;}                               /* bottom-right */
+.slot-2{top:50%;right:-18px;transform:translateY(-50%);}       /* right */
+.slot-3{top:-52px;right:14%;}                                  /* top-right */
+.slot-4{top:-52px;left:14%;}                                   /* top-left */
+.slot-5{top:50%;left:-18px;transform:translateY(-50%);}        /* left */
+
+.seat-inner{
+  background:rgba(0,0,0,0.75);border:1px solid rgba(255,255,255,0.1);
+  border-radius:10px;padding:5px 8px;min-width:72px;text-align:center;
+  backdrop-filter:blur(4px);
+  transition:border-color .2s ease, box-shadow .2s ease;
+}
+.seat-inner.is-acting{
+  border-color:var(--gold);
+  box-shadow:0 0 12px rgba(201,162,39,0.5), 0 0 0 1px var(--gold);
+}
+.seat-inner.folded{opacity:0.4;}
+.seat-inner.winner{
+  border-color:var(--green);
+  box-shadow:0 0 16px rgba(0,231,1,0.6), 0 0 0 1px var(--green);
+  animation:winPulse 1s ease-in-out 3;
+}
+@keyframes winPulse{0%,100%{box-shadow:0 0 16px rgba(0,231,1,0.6);}50%{box-shadow:0 0 30px rgba(0,231,1,0.9);}}
+
+.seat-name{font-size:9px;font-weight:700;color:var(--label);letter-spacing:.03em;max-width:70px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.seat-chips{font-family:var(--mono);font-size:11px;font-weight:700;color:var(--gold);}
+.seat-bet{font-size:9px;color:rgba(201,162,39,0.7);font-family:var(--mono);min-height:12px;}
+.seat-cards{display:flex;gap:2px;justify-content:center;margin-top:3px;}
+.seat-badge{
+  font-size:8px;font-weight:800;letter-spacing:.05em;
+  padding:1px 5px;border-radius:4px;display:inline-block;margin-bottom:2px;
+}
+.badge-d{background:rgba(255,255,255,0.2);color:#fff;}
+.badge-sb{background:rgba(77,166,255,0.25);color:#4da6ff;}
+.badge-bb{background:rgba(255,79,79,0.25);color:#ff4f4f;}
+
+/* ── CARD IMAGES ── */
+.card-img{
+  width:28px;height:39px;border-radius:3px;
+  object-fit:cover;
+  box-shadow:0 2px 6px rgba(0,0,0,0.8);
+  border:1px solid rgba(255,255,255,0.15);
+}
+.card-back{
+  width:28px;height:39px;border-radius:3px;
+  background:linear-gradient(135deg,#1a3a5c,#0d2038);
+  border:1px solid rgba(255,255,255,0.12);
+  box-shadow:0 2px 6px rgba(0,0,0,0.8);
+  display:flex;align-items:center;justify-content:center;
+  color:#334;font-size:14px;
+}
+/* Hero cards bigger */
+.hero-card{width:44px;height:61px;}
+
+/* ── ACTION TIMER ── */
+#actionTimer{
+  position:absolute;bottom:-54px;left:50%;transform:translateX(-50%);
+  display:none;
+}
+.timer-ring{
+  width:28px;height:28px;border-radius:50%;
+  border:2.5px solid var(--gold);
+  display:flex;align-items:center;justify-content:center;
+  font-size:9px;font-weight:900;color:var(--gold);font-family:var(--mono);
+  animation:timerSpin 30s linear 1 forwards;
+}
+@keyframes timerSpin{
+  from{border-color:var(--gold);}
+  to{border-color:#ff4f4f;}
+}
+
+/* ── ACTIONS PANEL ── */
+#actions{
+  flex-shrink:0;background:rgba(0,0,0,0.6);border-top:1px solid rgba(201,162,39,0.15);
+  padding:10px 12px;display:none;
+}
+#actions.show{display:block;}
+.action-btns{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;margin-bottom:8px;}
+.act-btn{
+  padding:11px 4px;border-radius:9px;font-size:11px;font-weight:800;letter-spacing:.04em;
+  border:none;cursor:pointer;font-family:var(--sans);transition:all .1s;text-transform:uppercase;
+}
+.act-btn:active{opacity:.7;transform:scale(.97);}
+.btn-fold{background:rgba(255,79,79,0.15);border:1px solid rgba(255,79,79,0.35);color:#ff6060;}
+.btn-fold:hover{background:rgba(255,79,79,0.25);}
+.btn-check{background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#c0b0a0;}
+.btn-check:hover{background:rgba(255,255,255,0.12);}
+.btn-call{background:rgba(0,231,1,0.12);border:1px solid rgba(0,231,1,0.3);color:#00e701;}
+.btn-call:hover{background:rgba(0,231,1,0.2);}
+.btn-raise{background:linear-gradient(135deg,rgba(201,162,39,0.2),rgba(201,162,39,0.1));border:1px solid rgba(201,162,39,0.5);color:var(--gold);}
+.btn-raise:hover{background:rgba(201,162,39,0.25);}
+.act-btn:disabled{opacity:.3;cursor:default;pointer-events:none;}
+
+/* Raise slider */
+.raise-row{display:flex;align-items:center;gap:8px;}
+.raise-slider{flex:1;height:4px;-webkit-appearance:none;background:rgba(201,162,39,0.2);border-radius:2px;outline:none;cursor:pointer;}
+.raise-slider::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--gold);cursor:pointer;box-shadow:0 0 6px rgba(201,162,39,0.6);}
+.raise-val{font-family:var(--mono);font-size:11px;color:var(--gold);min-width:40px;text-align:right;}
+
+/* ── STATUS BAR ── */
+#status{
+  flex-shrink:0;
+  min-height:32px;padding:6px 14px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.04em;
+  background:rgba(0,0,0,0.5);
+}
+#status.highlight{color:var(--gold);}
+#status.good{color:var(--green);}
+#status.bad{color:var(--red);}
+
+/* ── LOBBY/WAITING overlay ── */
+#lobbyOverlay{
+  position:absolute;inset:0;background:rgba(5,3,2,0.88);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:14px;z-index:50;text-align:center;padding:24px;
+}
+.lobby-title{font-size:22px;font-weight:900;color:var(--gold);letter-spacing:.04em;}
+.lobby-sub{font-size:13px;color:var(--muted);max-width:240px;line-height:1.5;}
+.join-btn{
+  background:linear-gradient(135deg,#c9a227,#8b6914);
+  border:none;color:#000;border-radius:12px;padding:14px 32px;
+  font-size:14px;font-weight:900;letter-spacing:.06em;
+  cursor:pointer;font-family:var(--sans);text-transform:uppercase;
+  box-shadow:0 4px 20px rgba(201,162,39,0.4);
+  transition:opacity .1s;
+}
+.join-btn:hover{opacity:.9;}
+.lobby-info{font-size:10px;color:rgba(201,162,39,0.5);font-family:var(--mono);}
+
+/* ── RESULT OVERLAY ── */
+#resultOverlay{
+  position:absolute;inset:0;background:rgba(0,0,0,0.78);
+  display:none;flex-direction:column;align-items:center;justify-content:center;
+  gap:8px;z-index:40;text-align:center;padding:20px;
+}
+#resultOverlay.show{display:flex;}
+.result-heading{font-size:28px;font-weight:900;color:var(--gold);text-shadow:0 0 30px rgba(201,162,39,0.7);}
+.result-hand{font-size:13px;color:var(--label);margin-bottom:6px;}
+.result-cards{display:flex;gap:6px;justify-content:center;margin:8px 0;}
+.result-cards .card-img{width:48px;height:67px;}
+.result-amount{font-family:var(--mono);font-size:18px;font-weight:700;color:var(--green);}
+
+/* ── CONNECTING overlay ── */
+#connectOverlay{
+  position:absolute;inset:0;background:rgba(5,3,2,0.95);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;z-index:60;
+}
+.connect-spin{
+  width:40px;height:40px;border-radius:50%;
+  border:3px solid rgba(201,162,39,0.2);
+  border-top-color:var(--gold);
+  animation:spin .9s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.connect-text{font-size:12px;color:var(--muted);letter-spacing:.08em;}
+
+/* ── HAND RANK REVEAL labels ── */
+.hand-result-row{
+  display:flex;align-items:center;gap:8px;
+  background:rgba(201,162,39,0.08);border:1px solid rgba(201,162,39,0.2);
+  border-radius:8px;padding:6px 12px;margin:4px 0;width:100%;max-width:280px;
+}
+.hr-name{flex:1;font-size:12px;font-weight:700;color:var(--label);text-align:left;}
+.hr-desc{font-size:10px;color:var(--gold);font-family:var(--mono);}
+</style>
+</head>
+<body>
+<div id="room">
+
+  <!-- HEADER -->
+  <div id="hdr">
+    <div style="display:flex;align-items:center;gap:8px;">
+      <span class="hdr-brand">🃏 NUT POKER</span>
+      <span style="font-size:10px;color:#5f7281;">Texas Hold'em</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <span class="hdr-bal" id="balDisplay">0 NUTTOKENS</span>
+      <button class="hdr-close" onclick="leaveTable()">✕</button>
+    </div>
+  </div>
+
+  <!-- TABLE AREA -->
+  <div id="tableArea">
+    <div id="table">
+      <!-- Phase badge -->
+      <div id="phaseBadge">Waiting...</div>
+
+      <!-- Community cards (5 slots) -->
+      <div id="community">
+        <div class="comm-card empty" id="cc0">🂠</div>
+        <div class="comm-card empty" id="cc1">🂠</div>
+        <div class="comm-card empty" id="cc2">🂠</div>
+        <div class="comm-card empty" id="cc3">🂠</div>
+        <div class="comm-card empty" id="cc4">🂠</div>
+      </div>
+
+      <!-- Pot -->
+      <div id="potArea">
+        <div class="pot-label">POT</div>
+        <div class="pot-amount" id="potAmt">—</div>
+      </div>
+
+      <!-- 6 seat slots positioned around table -->
+      <div class="seat slot-0" id="slot0"></div>
+      <div class="seat slot-1" id="slot1"></div>
+      <div class="seat slot-2" id="slot2"></div>
+      <div class="seat slot-3" id="slot3"></div>
+      <div class="seat slot-4" id="slot4"></div>
+      <div class="seat slot-5" id="slot5"></div>
+    </div>
+  </div>
+
+  <!-- STATUS BAR -->
+  <div id="status">Connecting to server...</div>
+
+  <!-- ACTION BUTTONS -->
+  <div id="actions">
+    <div class="action-btns">
+      <button class="act-btn btn-fold"  id="btnFold"  onclick="sendAction('fold')">FOLD</button>
+      <button class="act-btn btn-check" id="btnCheck" onclick="sendAction('check')">CHECK</button>
+      <button class="act-btn btn-call"  id="btnCall"  onclick="sendAction('call')">CALL</button>
+      <button class="act-btn btn-raise" id="btnRaise" onclick="sendRaise()">RAISE</button>
+    </div>
+    <div class="raise-row">
+      <span style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;">Raise to</span>
+      <input class="raise-slider" id="raiseSlider" type="range" min="20" max="2000" value="60" step="10" oninput="updateRaiseVal()">
+      <span class="raise-val" id="raiseVal">60</span>
+    </div>
+  </div>
+
+  <!-- LOBBY OVERLAY -->
+  <div id="lobbyOverlay">
+    <div class="lobby-title">🃏 NUT POKER</div>
+    <div class="lobby-sub">Texas Hold'em · Live multiplayer · 2,000 NUTTOKENS to start</div>
+    <button class="join-btn" id="joinBtn" onclick="joinTable()">TAKE A SEAT</button>
+    <div class="lobby-info" id="lobbyInfo">Connecting...</div>
+  </div>
+
+  <!-- RESULT OVERLAY -->
+  <div id="resultOverlay">
+    <div class="result-heading" id="resultHeading">🏆 WIN!</div>
+    <div class="result-hand" id="resultHand"></div>
+    <div class="result-cards" id="resultCards"></div>
+    <div class="result-amount" id="resultAmt"></div>
+    <div id="resultRows" style="margin-top:8px;width:100%;max-width:280px;"></div>
+  </div>
+
+  <!-- CONNECTING OVERLAY -->
+  <div id="connectOverlay">
+    <div class="connect-spin"></div>
+    <div class="connect-text">CONNECTING TO TABLE...</div>
+  </div>
+
+</div><!-- /room -->
+
+<script>
+// ═══════════════════════════════════════════════
+// CONSTANTS & CONFIG
+// ═══════════════════════════════════════════════
+const WS_URL   = 'wss://nutcrash-server.onrender.com/poker'
+const KEY_BAL  = 'nut_pm_bal_v1'
+const KEY_SID  = 'nut_session_id_v1'
+const KEY_NAME = 'nut_nickname_v1'
+const IMG_BASE = 'https://deckofcardsapi.com/static/img/'
+
+function getCardUrl(code) {
+  if (!code || code === 'back') return IMG_BASE + 'back.png'
+  const r = code[0] === 'T' ? '0' : code[0]  // T (Ten) → 0 in their API
+  return IMG_BASE + r + code[1] + '.png'
+}
+
+// ═══════════════════════════════════════════════
+// SESSION
+// ═══════════════════════════════════════════════
+function getSid() {
+  let sid = localStorage.getItem(KEY_SID)
+  if (!sid) { sid = 'p_' + Math.random().toString(36).slice(2,10); localStorage.setItem(KEY_SID,sid) }
+  return sid
+}
+function getName() {
+  return localStorage.getItem(KEY_NAME) || localStorage.getItem('nut_nickname') || 'Player'
+}
+const MY_SID = getSid()
+const MY_NAME = getName()
+
+// ═══════════════════════════════════════════════
+// BALANCE
+// ═══════════════════════════════════════════════
+function getBal()    { return Math.max(0,parseInt(localStorage.getItem(KEY_BAL)||'0',10)||0) }
+function setBal(n)   {
+  const v=Math.max(0,Math.floor(n))
+  localStorage.setItem(KEY_BAL,String(v))
+  document.getElementById('balDisplay').textContent=v.toLocaleString()+' NUTTOKENS'
+  window.parent&&window.parent.postMessage({type:'casino:balance',balance:v},'*')
+  return v
+}
+
+// ═══════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════
+let ws = null
+let gameState = null     // last poker:state message
+let mySeat = -1          // which slot index am I
+let sitting = false
+let isMyTurn = false
+let curBet = 20
+
+// ═══════════════════════════════════════════════
+// WEBSOCKET
+// ═══════════════════════════════════════════════
+function connect() {
+  document.getElementById('connectOverlay').style.display='flex'
+  ws = new WebSocket(WS_URL)
+
+  ws.onopen = () => {
+    document.getElementById('connectOverlay').style.display='none'
+    setStatus('Connected · '+pSeated()+' at table','highlight')
+    document.getElementById('lobbyInfo').textContent = 'Table ready · tap to join'
+  }
+
+  ws.onmessage = (ev) => {
+    try { handle(JSON.parse(ev.data)) } catch(e) { console.error('[poker]',e) }
+  }
+
+  ws.onclose = () => {
+    document.getElementById('connectOverlay').style.display='flex'
+    document.getElementById('connectOverlay').querySelector('.connect-text').textContent='DISCONNECTED · RECONNECTING...'
+    setTimeout(connect, 2500)
+  }
+
+  ws.onerror = () => ws.close()
+}
+
+function send(msg) { if(ws&&ws.readyState===WebSocket.OPEN) ws.send(JSON.stringify(msg)) }
+
+// ═══════════════════════════════════════════════
+// MESSAGE HANDLER
+// ═══════════════════════════════════════════════
+function handle(msg) {
+  switch(msg.type) {
+
+    case 'poker:welcome':
+      setStatus(msg.seats+' player'+(msg.seats===1?'':'s')+' at table','highlight')
+      document.getElementById('lobbyInfo').textContent = msg.seats+'/6 seats · join to play'
+      break
+
+    case 'poker:state':
+      gameState = msg
+      const me = msg.players.find(p=>p.sid===MY_SID)
+      if (me) {
+        mySeat = me.seat
+        sitting = true
+        setBal(getBal())  // keep NUTTOKEN balance display fresh
+      }
+      renderTable(msg)
+      updateActions(msg)
+      updatePhase(msg)
+      break
+
+    case 'poker:waiting':
+      setStatus('Waiting for more players... ('+msg.seats+'/2 min)','')
+      document.getElementById('lobbyInfo').textContent=msg.seats+'/6 seats · need 2 to start'
+      break
+
+    case 'poker:starting_soon':
+      setStatus('Starting in '+msg.countdown+'s...','highlight')
+      break
+
+    case 'poker:joined':
+      if (msg.sid===MY_SID) {
+        sitting=true
+        document.getElementById('lobbyOverlay').style.display='none'
+      }
+      setStatus(msg.name+' sat down · '+msg.chips.toLocaleString()+' chips','')
+      break
+
+    case 'poker:dealt':
+      setStatus('Cards dealt · Round '+msg.round,'highlight')
+      break
+
+    case 'poker:fold':
+      setStatus(msg.name+' folded','')
+      flashSeat(msg.seat,'fold')
+      break
+
+    case 'poker:call':
+      setStatus(msg.name+' called '+msg.amount.toLocaleString(),'')
+      flashSeat(msg.seat,'call')
+      break
+
+    case 'poker:check':
+      setStatus(msg.name+' checked','')
+      flashSeat(msg.seat,'check')
+      break
+
+    case 'poker:raise':
+      setStatus(msg.name+' raised to '+msg.amount.toLocaleString(),'highlight')
+      flashSeat(msg.seat,'raise')
+      break
+
+    case 'poker:street':
+      setStatus(msg.street.toUpperCase()+' dealt','highlight')
+      renderCommunity(msg.community)
+      break
+
+    case 'poker:prompt':
+      isMyTurn = (msg.sid === MY_SID)
+      if (isMyTurn) {
+        curBet = msg.curBet
+        updateActionButtons(msg.curBet, msg.canCheck)
+        setStatus('YOUR TURN · '+msg.timeout+'s to act','highlight')
+      } else {
+        const p = gameState?.players?.find(p=>p.sid===msg.sid)
+        setStatus((p?.name||'Player')+' is deciding...','')
+      }
+      break
+
+    case 'poker:result':
+      showResult(msg)
+      break
+
+    case 'poker:left':
+      setStatus(msg.name+' left the table','')
+      break
+
+    case 'poker:error':
+      setStatus('⚠ '+msg.message,'bad')
+      break
+  }
+}
+
+// ═══════════════════════════════════════════════
+// TABLE RENDERING
+// ═══════════════════════════════════════════════
+function slotForSeat(seat) {
+  // Rotate so my seat appears at slot 0 (bottom)
+  if (mySeat < 0) return seat
+  return (seat - mySeat + 6) % 6
+}
+
+function renderTable(state) {
+  // Clear all slots
+  for (let i=0;i<6;i++) document.getElementById('slot'+i).innerHTML=''
+
+  // Pot
+  document.getElementById('potAmt').textContent = state.pot>0 ? state.pot.toLocaleString() : '—'
+
+  // Community
+  renderCommunity(state.community)
+
+  // Players
+  for (const p of state.players) {
+    const slot = slotForSeat(p.seat)
+    const el = document.getElementById('slot'+slot)
+    if (!el) continue
+
+    const isMe = p.sid === MY_SID
+    const isActing = state.actSid === p.sid
+    const badges = [
+      p.isDealer ? '<span class="seat-badge badge-d">D</span>' : '',
+      p.isSB     ? '<span class="seat-badge badge-sb">SB</span>' : '',
+      p.isBB     ? '<span class="seat-badge badge-bb">BB</span>' : '',
+    ].join('')
+
+    const cards = p.holeCards.map(c => cardHtml(c, isMe)).join('')
+    const betStr = p.bet > 0 ? p.bet.toLocaleString() : ''
+
+    el.innerHTML = `
+      <div class="seat-inner ${isActing?'is-acting':''} ${p.folded?'folded':''}" id="sinner${p.seat}">
+        ${badges}
+        <div class="seat-name">${isMe?'🫵 '+escHtml(p.name):escHtml(p.name)}</div>
+        <div class="seat-chips">${p.chips.toLocaleString()}</div>
+        <div class="seat-bet">${betStr?betStr+' in':''}</div>
+        <div class="seat-cards">${cards}</div>
+        ${p.allIn?'<div style="font-size:8px;color:#ff9900;font-weight:800;margin-top:2px;">ALL IN</div>':''}
+      </div>
+    `
+  }
+}
+
+function cardHtml(code, isHero) {
+  const sz = isHero ? 'card-img hero-card' : 'card-img'
+  if (!code || code === 'back') {
+    return `<div class="card-back ${isHero?'hero-card':''}">🂠</div>`
+  }
+  return `<img class="${sz}" src="${getCardUrl(code)}" alt="${code}" loading="lazy" onerror="this.outerHTML='<div class=\\'card-back\\'>${code}</div>'">`
+}
+
+function renderCommunity(cards) {
+  cards = cards || []
+  for (let i=0;i<5;i++) {
+    const el = document.getElementById('cc'+i)
+    if (!el) continue
+    const c = cards[i]
+    if (c) {
+      el.classList.remove('empty')
+      el.innerHTML = `<img src="${getCardUrl(c)}" alt="${c}" style="width:100%;height:100%;object-fit:cover;border-radius:4px;" onerror="this.parentElement.textContent='${c}'">`
+      if (!el.dataset.dealt) { el.classList.add('new'); el.dataset.dealt='1'; setTimeout(()=>el.classList.remove('new'),500) }
+    } else {
+      el.classList.add('empty')
+      el.innerHTML = '🂠'
+      delete el.dataset.dealt
+    }
+  }
+}
+
+function updatePhase(state) {
+  const ph = state.phase
+  const labels = {lobby:'LOBBY',preflop:'PRE-FLOP',flop:'FLOP',turn:'TURN',river:'RIVER',showdown:'SHOWDOWN'}
+  document.getElementById('phaseBadge').textContent = labels[ph]||ph.toUpperCase()
+}
+
+function flashSeat(seat, type) {
+  const slot = slotForSeat(seat)
+  const inner = document.querySelector('#slot'+slot+' .seat-inner')
+  if (!inner) return
+  const clr = type==='fold'?'#ff4f4f':type==='raise'?'#f6c90e':'#00e701'
+  inner.style.boxShadow = `0 0 20px ${clr}`
+  setTimeout(()=>{ inner.style.boxShadow='' }, 600)
+}
+
+function pSeated() {
+  return gameState ? gameState.players.length : 0
+}
+
+// ═══════════════════════════════════════════════
+// ACTIONS
+// ═══════════════════════════════════════════════
+function updateActions(state) {
+  const me = state.players.find(p=>p.sid===MY_SID)
+  const myTurn = state.actSid === MY_SID
+  isMyTurn = myTurn
+  const panel = document.getElementById('actions')
+  if (myTurn && me && !me.folded && !me.allIn) {
+    panel.classList.add('show')
+    updateActionButtons(state.curBet, me.bet >= state.curBet)
+  } else {
+    panel.classList.remove('show')
+  }
+}
+
+function updateActionButtons(curBet, canCheck) {
+  const me = gameState?.players?.find(p=>p.sid===MY_SID)
+  const myBet = me?.bet||0
+  const toCall = Math.max(0, curBet - myBet)
+  const myChips = me?.chips||0
+
+  document.getElementById('btnCheck').disabled = !canCheck
+  document.getElementById('btnCheck').textContent = canCheck ? 'CHECK' : 'CHECK'
+  document.getElementById('btnCall').textContent = toCall>0 ? 'CALL '+toCall.toLocaleString() : 'CALL'
+  document.getElementById('btnCall').disabled = toCall<=0
+
+  const slider = document.getElementById('raiseSlider')
+  const minRaise = Math.max(curBet*2, curBet+20)
+  slider.min = minRaise
+  slider.max = myChips + myBet
+  slider.value = Math.min(Math.max(slider.value, minRaise), myChips+myBet)
+  updateRaiseVal()
+
+  document.getElementById('btnRaise').disabled = myChips <= 0
+}
+
+function updateRaiseVal() {
+  const v = parseInt(document.getElementById('raiseSlider').value)||0
+  document.getElementById('raiseVal').textContent = v.toLocaleString()
+}
+
+function sendAction(type) {
+  if (!isMyTurn) return
+  send({ type:'poker:'+type, sid:MY_SID, name:MY_NAME })
+  isMyTurn = false
+  document.getElementById('actions').classList.remove('show')
+}
+
+function sendRaise() {
+  if (!isMyTurn) return
+  const amt = parseInt(document.getElementById('raiseSlider').value)||0
+  send({ type:'poker:raise', sid:MY_SID, name:MY_NAME, amount:amt })
+  isMyTurn = false
+  document.getElementById('actions').classList.remove('show')
+}
+
+// ═══════════════════════════════════════════════
+// RESULT OVERLAY
+// ═══════════════════════════════════════════════
+function showResult(msg) {
+  const isWinner = msg.winners.some(w=>w.sid===MY_SID)
+  const myResult = msg.winners.find(w=>w.sid===MY_SID) || msg.scored?.find(p=>p.sid===MY_SID)
+
+  const overlay = document.getElementById('resultOverlay')
+  const heading = document.getElementById('resultHeading')
+  const hand    = document.getElementById('resultHand')
+  const cards   = document.getElementById('resultCards')
+  const amt     = document.getElementById('resultAmt')
+  const rows    = document.getElementById('resultRows')
+
+  if (isWinner) {
+    const win = msg.winners.find(w=>w.sid===MY_SID)
+    heading.textContent = '🏆 YOU WIN!'
+    heading.style.color = '#00e701'
+    hand.textContent = win.desc
+    amt.textContent = '+'+win.amount.toLocaleString()+' NUTTOKENS'
+    amt.style.color = '#00e701'
+    cards.innerHTML = (win.holeCards||[]).map(c=>`<img class="card-img" style="width:48px;height:67px;" src="${getCardUrl(c)}" alt="${c}">`).join('')
+    setBal(getBal() + win.amount)
+  } else {
+    const winner = msg.winners[0]
+    heading.textContent = '💸 '+escHtml(winner.name)+' wins!'
+    heading.style.color = '#f6c90e'
+    hand.textContent = winner.desc
+    amt.textContent = winner.amount.toLocaleString()+' pot'
+    amt.style.color = '#f6c90e'
+    cards.innerHTML = (winner.holeCards||[]).map(c=>`<img class="card-img" style="width:48px;height:67px;" src="${getCardUrl(c)}" alt="${c}">`).join('')
+  }
+
+  // Show all hands scored
+  rows.innerHTML = (msg.scored||[]).map(p=>`
+    <div class="hand-result-row">
+      <span class="hr-name">${p.sid===MY_SID?'🫵 ':''} ${escHtml(p.name)}</span>
+      <span class="hr-desc">${p.desc}</span>
+    </div>
+  `).join('')
+
+  overlay.classList.add('show')
+  setTimeout(()=>overlay.classList.remove('show'), 7000)
+}
+
+// ═══════════════════════════════════════════════
+// JOIN / LEAVE
+// ═══════════════════════════════════════════════
+function joinTable() {
+  document.getElementById('joinBtn').disabled=true
+  document.getElementById('joinBtn').textContent='Joining...'
+  send({ type:'poker:join', sid:MY_SID, name:MY_NAME })
+}
+
+function leaveTable() {
+  if (sitting) send({ type:'poker:leave', sid:MY_SID, name:MY_NAME })
+  window.parent&&window.parent.postMessage({type:'poker:close'},'*')
+}
+
+// ═══════════════════════════════════════════════
+// UTILS
+// ═══════════════════════════════════════════════
+function setStatus(msg, cls) {
+  const el = document.getElementById('status')
+  el.textContent = msg
+  el.className = cls||''
+}
+
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+}
+
+// ═══════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════
+// Sync balance display on load
+setBal(getBal())
+connect()
+</script>
+</body>
+</html>
