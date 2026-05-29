@@ -5620,7 +5620,7 @@ scrollNutBtn.addEventListener('click', () => {
 <div id="dreamPanel"></div>
 <div id="tokenFloat">
   <div class="tf-bal">
-    <span class="tf-amount" id="pmBalFloat"><span class="tf-loading"></span></span>
+    <span class="tf-amount" id="pmBalFloat">0</span>
     <span class="tf-label">NUTS</span>
     <span class="tf-usd" id="pmBalFloatUSD">TBA</span>
   </div>
@@ -5632,6 +5632,16 @@ scrollNutBtn.addEventListener('click', () => {
   <button type="button" class="tf-spin" onclick="NutKens ? NutKens.openCasino() : openRoulette()" title="Open Casino">🎰</button>
   <button type="button" class="tf-buy tba" onclick="openBuy()">BUY $NUT</button>
 </div>
+<script>
+(function(){
+  var nuts  = parseInt(localStorage.getItem('nut_alltime_v1')||'0',10)||0;
+  var chips = parseInt(localStorage.getItem('nut_pm_bal_v1') ||'0',10)||0;
+  var pmBF  = document.getElementById('pmBalFloat');
+  var ntBF  = document.getElementById('ntBalFloat');
+  if (pmBF && nuts  > 0) pmBF.innerHTML = '<span class="tf-loading"></span>';
+  if (ntBF && chips > 0) ntBF.innerHTML = '<span class="tf-loading"></span>';
+})();
+</script>
 
 <!-- CASINO MODAL -->
 <div class="roulette-overlay" id="rouletteModal" onclick="if(event.target===this)closeRoulette()">
