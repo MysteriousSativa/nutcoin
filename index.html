@@ -592,6 +592,11 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .st-st-ca{background:rgba(12,8,4,0.9);color:var(--cream);}
 .st-st-chart{background:rgba(12,8,4,0.9);color:var(--gold-bright);}
 
+/* ── Dual leaderboard side-by-side ── */
+.lb-dual-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:start;}
+.lb-dual-col{min-width:0;}
+@media(max-width:600px){.lb-dual-row{grid-template-columns:1fr;}}
+
 /* ── Casino NUTTOKEN leaderboard (reuses lb-row styles — only the wrapper is custom) ── */
 .nt-lb-av{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;}
 /* content box mirrors #lbContent inside lb-inline-wrap */
@@ -2365,37 +2370,46 @@ body.genesis-mode .hero-title{text-shadow:0 0 40px rgba(255,217,125,0.35);}
     <div class="quirks-live" id="quirksLive"></div>
   </div>
 
-  <!-- INLINE LEADERBOARD -->
-  <div class="lb-inline-wrap">
-    <div class="nick-bar" id="nickBar">
-      <div class="nick-left">
-        <span style="color:var(--muted)">Leaderboard</span>
-        <span class="nick-name" id="nickDisplay">Loading…</span>
-        <span class="nick-rank" id="nickRankDisplay"></span>
-      </div>
-      <button class="nick-btn" onclick="openNickModal()">Set Name</button>
-    </div>
-    <div id="lbContent">
-      <div class="lb-empty">Connecting to the ledger...</div>
-    </div>
-    <div class="lb-join" id="lbJoin" style="display:none">
-      <button class="lb-join-btn" onclick="openNickModal()">Set Your Name →</button>
-    </div>
-  </div>
-  <div class="lb-ghost" id="lbGhost"></div>
+  <!-- DUAL LEADERBOARD ROW -->
+  <div class="lb-dual-row">
 
-  <!-- CASINO NUTTOKEN LEADERBOARD -->
-  <div class="lb-inline-wrap" id="ntLbWrap">
-    <div class="nick-bar" style="cursor:default">
-      <div class="nick-left">
-        <span style="color:var(--muted)">Casino Chips</span>
-        <span class="nick-name" style="color:#f6c90e">💎 NUTTOKENS</span>
+    <!-- NUT LEADERBOARD -->
+    <div class="lb-dual-col">
+      <div class="lb-inline-wrap">
+        <div class="nick-bar" id="nickBar">
+          <div class="nick-left">
+            <span style="color:var(--muted)">Leaderboard</span>
+            <span class="nick-name" id="nickDisplay">Loading…</span>
+            <span class="nick-rank" id="nickRankDisplay"></span>
+          </div>
+          <button class="nick-btn" onclick="openNickModal()">Set Name</button>
+        </div>
+        <div id="lbContent">
+          <div class="lb-empty">Connecting to the ledger...</div>
+        </div>
+        <div class="lb-join" id="lbJoin" style="display:none">
+          <button class="lb-join-btn" onclick="openNickModal()">Set Your Name →</button>
+        </div>
       </div>
-      <span style="font-size:9px;color:var(--muted);letter-spacing:.08em" id="ntLbMeta">CHIPS BOARD</span>
+      <div class="lb-ghost" id="lbGhost"></div>
     </div>
-    <div id="ntLbContent">
-      <div class="lb-empty">Convert nuts to get on the board.</div>
+
+    <!-- CASINO CHIPS LEADERBOARD -->
+    <div class="lb-dual-col">
+      <div class="lb-inline-wrap" id="ntLbWrap">
+        <div class="nick-bar" style="cursor:default">
+          <div class="nick-left">
+            <span style="color:var(--muted)">Casino Chips</span>
+            <span class="nick-name" style="color:#f6c90e">💎 NUTTOKENS</span>
+          </div>
+          <span style="font-size:9px;color:var(--muted);letter-spacing:.08em" id="ntLbMeta">CHIPS BOARD</span>
+        </div>
+        <div id="ntLbContent">
+          <div class="lb-empty">Convert nuts to get on the board.</div>
+        </div>
+      </div>
     </div>
+
   </div>
 
   <div class="clock-bar" id="clockBar">
@@ -3581,8 +3595,6 @@ function renderNTLeaderboard() {
   const el = document.getElementById('ntLbContent');
   if (!el) return;
 
-  const NPC_COLORS = ['#4EC97A','#4E9AC9','#C8A96E','#9A4EC9','#C94E78','#C9904E','#4EC9B5','#C9C24E'];
-  const NPC_EMOJIS = ['🥜','🔥','💎','👑','⚡','💀','🐸','🌙','🦊','🎯','🃏','🎭','🤑','💰','🌊'];
   function h32sim(s) {
     let h = 2166136261 >>> 0;
     for (let i = 0; i < s.length; i++)
@@ -3590,58 +3602,63 @@ function renderNTLeaderboard() {
     return h;
   }
 
-  // Build NPC simulated chip balances
-  const npcRows = [];
+  // Build all NPC simulated chip balances
   const allNPCs = window.NutNPCs ? NutNPCs.NPCS : [];
-  const pool = allNPCs.slice(0, 300);
-  const seed = Math.floor(Date.now() / 86400000);
-  for (let i = 0; i < pool.length; i++) {
-    const npc = pool[i];
+  const pool    = allNPCs.slice(0, 300);
+  const seed    = Math.floor(Date.now() / 86400000);
+  const npcRows = pool.map((npc, i) => {
     const baseConv = h32sim('ntlb_conv_' + seed + '_' + i) % 200 + 5;
     const winMult  = 0.5 + (h32sim('ntlb_win_' + seed + '_' + i) % 300) / 100;
-    npcRows.push({ name: npc.name, id: npc.id, chips: Math.floor(baseConv * 1000 * winMult) });
-  }
+    return { name: npc.name, sessionId: npc.sessionId, chips: Math.floor(baseConv * 1000 * winMult) };
+  });
   npcRows.sort((a, b) => b.chips - a.chips);
-  const top20 = npcRows.slice(0, 20);
 
-  // Real user row
+  // Real user
   const userBal  = window.NutKens ? NutKens.getBalance() : parseInt(localStorage.getItem('nut_pm_bal_v1')||'0',10)||0;
   const userName = (typeof nickname !== 'undefined' && nickname) ? nickname
                  : (typeof genUserName === 'function' && typeof sessionId !== 'undefined') ? genUserName(sessionId) : 'You';
-  const combined = [...top20, { name: userName, chips: userBal, isUser: true }]
-    .sort((a, b) => b.chips - a.chips)
-    .slice(0, 22);
+  const userEntry = { name: userName, sessionId: typeof sessionId !== 'undefined' ? sessionId : '', chips: userBal, isUser: true };
+
+  // Full sorted list — find user's real rank among all 300 NPCs + user
+  const fullList = [...npcRows, userEntry].sort((a, b) => b.chips - a.chips);
+  const userTrueRank = fullList.findIndex(r => r.isUser) + 1; // 1-based
+  const totalPlayers = fullList.length;
+
+  // Display: top 19 NPCs + the user at their real position (insert or replace)
+  let display;
+  if (userTrueRank <= 20) {
+    // User is in the natural top 20 — just show first 20
+    display = fullList.slice(0, 20);
+  } else {
+    // Show top 19, then a gap marker, then the user
+    display = [...fullList.slice(0, 19), { isSeparator: true }, userEntry];
+  }
 
   const rankIcons = [{cls:'gold',txt:'🥇'},{cls:'silver',txt:'🥈'},{cls:'bronze',txt:'🥉'}];
-  const rowClass  = i => i===0?'top1':i===1?'top2':i===2?'top3':'';
 
   let html = `<div class="lb-header">
-    <span class="lb-count-label">CASINO CHIPS &nbsp;<span>${combined.length} PLAYERS</span></span>
+    <span class="lb-count-label">CASINO CHIPS &nbsp;<span>${totalPlayers} PLAYERS</span></span>
   </div><div class="lb-list">`;
 
-  combined.forEach((r, i) => {
-    const isYou = !!r.isUser;
-    const ri    = i < 3 ? rankIcons[i] : null;
-    const rankEl = ri
-      ? `<span class="lb-row-rank ${ri.cls}">${ri.txt}</span>`
-      : `<span class="lb-row-rank plain">${i+1}</span>`;
-
-    let avHtml;
-    if (isYou) {
-      avHtml = `<div class="nut-avatar nut-avatar-sm"><div class="nt-lb-av" style="background:#f6c90e;color:#1a1000;font-size:9px;font-weight:900">YOU</div></div>`;
-    } else {
-      const color = NPC_COLORS[r.id % NPC_COLORS.length];
-      const em    = NPC_EMOJIS[h32sim('ntlb_av_' + r.id) % NPC_EMOJIS.length];
-      avHtml = `<div class="nut-avatar nut-avatar-sm"><div class="nt-lb-av" style="background:${color}">${em}</div></div>`;
+  display.forEach((r, i) => {
+    if (r.isSeparator) {
+      html += `<div style="text-align:center;color:var(--muted);font-size:11px;padding:4px 0">· · ·</div>`;
+      return;
     }
+    const isYou   = !!r.isUser;
+    const trueRank = isYou ? userTrueRank : i + 1;
+    const ri       = trueRank <= 3 ? rankIcons[trueRank - 1] : null;
+    const rankEl   = ri
+      ? `<span class="lb-row-rank ${ri.cls}">${ri.txt}</span>`
+      : `<span class="lb-row-rank plain">${trueRank}</span>`;
 
     const chipsStr = r.chips >= 1000000 ? (r.chips/1000000).toFixed(1)+'M'
                    : r.chips >= 1000    ? Math.round(r.chips/1000)+'K'
                    : r.chips.toLocaleString();
 
-    html += `<div class="lb-row ${rowClass(i)} ${isYou?'you':''}">
+    html += `<div class="lb-row ${trueRank===1?'top1':trueRank===2?'top2':trueRank===3?'top3':''} ${isYou?'you':''}">
       ${rankEl}
-      ${avHtml}
+      ${nutAvatarHtml(r.sessionId, 'nut-avatar-sm')}
       <span class="lb-row-name">${escHtml(r.name)}</span>
       ${isYou ? '<span class="lb-you-badge">YOU</span>' : ''}
       <span class="lb-row-count">${chipsStr}</span>
