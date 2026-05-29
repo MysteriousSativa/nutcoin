@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>NUT Wheel 3D</title>
+<title>NUT Wheel</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@700&family=Inter:wght@600;700;800;900&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -13,10 +13,9 @@
   --label:#b09070;--sans:'Inter',sans-serif;--mono:'Space Mono',monospace;
 }
 html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--sans);overflow:hidden;user-select:none;}
-
 #app{display:flex;flex-direction:column;height:100vh;max-width:480px;margin:0 auto;position:relative;}
 
-/* ── HEADER ── */
+/* HEADER */
 #hdr{
   display:flex;align-items:center;justify-content:space-between;
   padding:9px 14px;flex-shrink:0;background:rgba(0,0,0,0.5);
@@ -33,32 +32,93 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--s
   color:var(--muted);font-size:13px;cursor:pointer;
   width:30px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;
 }
-#hdrClose:hover{color:var(--text);background:rgba(255,255,255,0.12);}
+#hdrClose:hover{color:var(--text);}
 
-/* ── RANK BAR ── */
+/* RANK BAR */
 #rankBar{
   display:flex;align-items:center;justify-content:space-between;
   padding:5px 14px;background:rgba(0,0,0,0.3);border-bottom:1px solid rgba(255,255,255,0.04);
   flex-shrink:0;gap:10px;
 }
 #rankBadge{font-size:11px;}
-#rankLevel{
-  font-size:8.5px;font-family:var(--mono);color:var(--muted);
-  flex:1;text-align:right;letter-spacing:.06em;text-transform:uppercase;
-}
+#rankLevel{font-size:8.5px;font-family:var(--mono);color:var(--muted);flex:1;text-align:right;letter-spacing:.06em;text-transform:uppercase;}
 
-/* ── VIEWPORT ── */
+/* VIEWPORT */
 #viewport{
-  flex:1;position:relative;overflow:hidden;background:#06040a;
-  display:flex;align-items:center;justify-content:center;min-height:0;
+  flex:1;position:relative;overflow:hidden;
+  background:radial-gradient(ellipse at 50% 0%, #1a0e04 0%, #06040a 70%);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  min-height:0;gap:0;
 }
-#viewport canvas{display:block;width:100%!important;height:100%!important;}
 
-/* ── RESULT OVERLAY ── */
+/* 3D WHEEL STAGE */
+.w3d{
+  perspective:700px;
+  perspective-origin:50% -15%;
+  flex-shrink:0;
+}
+.wt{
+  transform:rotateX(42deg);
+  transform-origin:center center;
+  position:relative;
+  line-height:0;
+}
+#wc{
+  border-radius:50%;
+  display:block;
+  /* Near-edge gold rim visible through perspective */
+  box-shadow:
+    0 0 0 9px #6a4208,
+    0 0 0 13px #c9a227,
+    0 0 0 17px #4a2c04,
+    0 12px 0 17px rgba(0,0,0,0.7),
+    0 0 80px rgba(201,162,39,0.25),
+    0 0 140px rgba(100,60,10,0.3);
+}
+/* Gloss overlay on the wheel face */
+.wt::before{
+  content:'';position:absolute;inset:0;border-radius:50%;
+  background:radial-gradient(ellipse at 45% 28%, rgba(255,255,255,0.13) 0%, rgba(255,255,255,0) 65%);
+  pointer-events:none;z-index:2;
+}
+/* Felt table surface illusion below wheel */
+.felt{
+  width:100%;height:40px;
+  background:radial-gradient(ellipse at 50% 0%, rgba(20,10,2,0.9) 0%, transparent 100%);
+  flex-shrink:0;
+  margin-top:-6px;
+}
+
+/* POINTER — static, points at the near edge (bottom of tilted canvas) */
+.ptr-row{
+  display:flex;justify-content:center;
+  position:absolute;
+  /* position just below visual near edge of tilted wheel; adjusted via JS */
+  left:0;right:0;
+  z-index:10;
+}
+.ptr{
+  width:0;height:0;
+  border-left:13px solid transparent;
+  border-right:13px solid transparent;
+  border-top:22px solid #f0d060;
+  filter:drop-shadow(0 -4px 10px rgba(240,208,96,0.7));
+}
+.ptr-shaft{
+  position:absolute;
+  top:0;left:50%;
+  width:5px;height:18px;
+  background:linear-gradient(180deg,#f0d060,#8b6914);
+  border-radius:2px;
+  transform:translateX(-50%) translateY(-100%);
+  filter:drop-shadow(0 0 6px rgba(240,208,96,0.5));
+}
+
+/* RESULT OVERLAY */
 #resultOverlay{
-  position:absolute;inset:0;background:rgba(4,2,8,0.75);
+  position:absolute;inset:0;background:rgba(4,2,8,0.78);
   display:none;flex-direction:column;align-items:center;justify-content:center;
-  gap:6px;z-index:30;pointer-events:none;backdrop-filter:blur(3px);
+  gap:6px;z-index:30;pointer-events:none;
 }
 #resultOverlay.show{display:flex;}
 #resultBig{
@@ -69,20 +129,19 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--s
 #resultBig.bust{color:var(--red);text-shadow:0 0 30px rgba(255,79,79,0.5);}
 #resultBig.jackpot{
   color:var(--gold2);text-shadow:0 0 60px rgba(240,208,96,0.9);
-  animation:jackpotPulse 0.6s ease-in-out infinite alternate;
+  animation:jpPulse .6s ease-in-out infinite alternate;
 }
-@keyframes jackpotPulse{0%{text-shadow:0 0 40px rgba(240,208,96,0.7);}100%{text-shadow:0 0 80px rgba(240,208,96,1),0 0 120px rgba(240,208,96,0.5);}}
+@keyframes jpPulse{0%{text-shadow:0 0 40px rgba(240,208,96,0.7);}100%{text-shadow:0 0 80px rgba(240,208,96,1),0 0 120px rgba(240,208,96,0.5);}}
 #resultSub{font-size:14px;font-weight:700;color:var(--label);}
 
-/* ── WHEEL STATUS BAR ── */
+/* STATUS BAR */
 #wheelStatus{
-  position:absolute;bottom:0;left:0;right:0;
-  text-align:center;padding:5px;font-size:10px;font-weight:700;
+  position:absolute;bottom:4px;left:0;right:0;
+  text-align:center;font-size:10px;font-weight:700;
   color:var(--muted);letter-spacing:.08em;pointer-events:none;
-  background:linear-gradient(transparent,rgba(0,0,0,0.4));
 }
 
-/* ── BET CONTROLS ── */
+/* BET CONTROLS */
 #betControls{
   flex-shrink:0;padding:10px 14px 12px;background:rgba(0,0,0,0.45);
   border-top:1px solid rgba(255,255,255,0.05);
@@ -90,12 +149,10 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--s
 .bet-row{display:grid;grid-template-columns:38px 1fr 38px 60px;gap:6px;margin-bottom:6px;align-items:center;}
 .adj{
   background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);
-  color:var(--text);border-radius:8px;width:38px;height:38px;font-size:20px;
-  font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center;
-  font-family:var(--sans);transition:background .1s;
+  color:var(--text);border-radius:8px;width:38px;height:38px;font-size:20px;font-weight:900;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:var(--sans);
 }
 .adj:hover{background:rgba(255,255,255,0.14);}
-.adj:active{opacity:.6;}
 .bet-box{
   background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.09);
   border-radius:8px;padding:4px 8px;text-align:center;
@@ -105,15 +162,14 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--s
 .max-btn{
   background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);
   color:var(--label);border-radius:8px;height:38px;font-size:9px;font-weight:800;
-  letter-spacing:.06em;text-transform:uppercase;cursor:pointer;font-family:var(--sans);
-  width:100%;transition:background .1s;
+  letter-spacing:.06em;text-transform:uppercase;cursor:pointer;font-family:var(--sans);width:100%;
 }
 .max-btn:hover{background:rgba(201,162,39,0.15);color:var(--gold);}
 .quick-row{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px;}
 .quick-btn{
   background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.09);
   color:var(--label);border-radius:8px;padding:6px;font-size:12px;font-weight:800;
-  cursor:pointer;font-family:var(--sans);transition:all .1s;
+  cursor:pointer;font-family:var(--sans);
 }
 .quick-btn:hover{background:rgba(201,162,39,0.12);color:var(--gold);}
 #spinBtn{
@@ -127,7 +183,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--s
 #spinBtn:not(:disabled):hover{opacity:.88;}
 #spinBtn:not(:disabled):active{opacity:.7;}
 
-/* ── BROKE MSG ── */
+/* BROKE MSG */
 #brokeMsg{
   position:absolute;inset:0;background:rgba(6,4,10,0.92);
   display:none;flex-direction:column;align-items:center;justify-content:center;
@@ -142,13 +198,23 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--s
   font-weight:700;cursor:pointer;font-family:var(--sans);
 }
 .broke-btn:hover{background:rgba(255,255,255,0.14);}
+
+/* PARTICLES (CSS) */
+.spark{
+  position:absolute;border-radius:50%;pointer-events:none;
+  animation:sparkAnim 1.1s ease-out forwards;
+}
+@keyframes sparkAnim{
+  0%{transform:translate(0,0) scale(1);opacity:1;}
+  100%{opacity:0;}
+}
 </style>
 </head>
 <body>
 <div id="app">
 
   <div id="hdr">
-    <span class="hdr-brand">🎡 NUT WHEEL 3D</span>
+    <span class="hdr-brand">🎡 NUT WHEEL</span>
     <span id="balDisplay">0 NUTTOKENS</span>
     <button id="hdrClose" onclick="closeGame()">✕</button>
   </div>
@@ -159,28 +225,40 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--s
   </div>
 
   <div id="viewport">
-    <!-- Three.js renders here -->
+    <div class="w3d">
+      <div class="wt">
+        <canvas id="wc"></canvas>
+      </div>
+    </div>
+    <div class="ptr-row" id="ptrRow">
+      <div style="position:relative;">
+        <div class="ptr-shaft"></div>
+        <div class="ptr"></div>
+      </div>
+    </div>
+    <div class="felt"></div>
+
     <div id="wheelStatus">PLACE YOUR BET AND SPIN</div>
     <div id="resultOverlay">
-      <div id="resultBig">—</div>
+      <div id="resultBig"></div>
       <div id="resultSub"></div>
     </div>
     <div id="brokeMsg">
       <div class="broke-title">🪙 Out of NUTTOKENS</div>
-      <div class="broke-sub">Convert more nuts on the main page to get chips.</div>
-      <button class="broke-btn" onclick="closeGame()">Get More Tokens</button>
+      <div class="broke-sub">Click nuts on the main page to get more chips.</div>
+      <button class="broke-btn" onclick="closeGame()">Back to Clicker</button>
       <button class="broke-btn" onclick="document.getElementById('brokeMsg').classList.remove('show')">Dismiss</button>
     </div>
   </div>
 
   <div id="betControls">
     <div class="bet-row">
-      <button class="adj" id="adjMinus" onclick="adjBet(-50)">−</button>
+      <button class="adj" onclick="adjBet(-50)">−</button>
       <div class="bet-box">
         <span class="bet-lbl">Bet Amount</span>
         <span class="bet-num" id="betAmt">50</span>
       </div>
-      <button class="adj" id="adjPlus" onclick="adjBet(50)">+</button>
+      <button class="adj" onclick="adjBet(50)">+</button>
       <button class="max-btn" onclick="setBetMax()">MAX</button>
     </div>
     <div class="quick-row">
@@ -192,31 +270,30 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--s
 
 </div>
 
-<script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
 <script src="./nutrank.js"></script>
 <script>
-// ═══════════════════════════════════════════════════════════════
-// CONFIG
-// ═══════════════════════════════════════════════════════════════
+// ─── Config ────────────────────────────────────────────────────
 const KEY_BAL     = 'nut_pm_bal_v1'
 const KEY_ALLTIME = 'nut_alltime_v1'
 
-// ═══════════════════════════════════════════════════════════════
-// BALANCE & RANK
-// ═══════════════════════════════════════════════════════════════
-function getBal()   { return Math.max(0,parseInt(localStorage.getItem(KEY_BAL)||'0',10)||0) }
-function getAllTime(){ return parseInt(localStorage.getItem(KEY_ALLTIME)||'0',10)||0 }
-function setBal(n)  {
-  const v=Math.max(0,Math.floor(n))
-  localStorage.setItem(KEY_BAL,String(v))
-  document.getElementById('balDisplay').textContent=v.toLocaleString()+' NUTTOKENS'
-  window.parent&&window.parent.postMessage({type:'casino:balance',balance:v},'*')
+// ─── Balance / Rank ────────────────────────────────────────────
+function getBal()    { return Math.max(0, parseInt(localStorage.getItem(KEY_BAL)||'0',10)||0) }
+function getAllTime() { return parseInt(localStorage.getItem(KEY_ALLTIME)||'0',10)||0 }
+function setBal(n) {
+  const v = Math.max(0, Math.floor(n))
+  localStorage.setItem(KEY_BAL, String(v))
+  document.getElementById('balDisplay').textContent = v.toLocaleString() + ' NUTTOKENS'
+  window.parent && window.parent.postMessage({ type:'casino:balance', balance:v }, '*')
   return v
+}
+function closeGame() {
+  window.parent && window.parent.postMessage({ type:'casino:close' }, '*')
+  window.location.href = './index.html'
 }
 
 let nutCount = getAllTime()
-let rank     = (window.NutRank||{getRank:()=>({level:0,name:'Seedling',badge:'🌱',color:'#4ade80'})}).getRank(nutCount)
-let segments = (window.NutRank||{getWheelSegments:()=>[]}).getWheelSegments(rank.level)
+let rank     = window.NutRank ? NutRank.getRank(nutCount) : { level:0 }
+let segments = window.NutRank ? NutRank.getWheelSegments(rank.level) : []
 
 function refreshRankDisplay() {
   nutCount = getAllTime()
@@ -225,475 +302,320 @@ function refreshRankDisplay() {
   const badgeEl = document.getElementById('rankBadge')
   const levelEl = document.getElementById('rankLevel')
   if (badgeEl) badgeEl.innerHTML = NutRank.getBadgeHTML(nutCount)
-  if (levelEl) levelEl.textContent = nutCount.toLocaleString()+' nuts total'
-  return { rank, segments }
+  if (levelEl) levelEl.textContent = nutCount.toLocaleString() + ' nuts total'
+  return segments
 }
 
-// ═══════════════════════════════════════════════════════════════
-// BET
-// ═══════════════════════════════════════════════════════════════
+// ─── Bet ───────────────────────────────────────────────────────
 let bet = Math.min(50, Math.max(1, getBal()))
-
-function refreshBetDisplay() {
-  document.getElementById('betAmt').textContent = bet.toLocaleString()
-}
+function refreshBetDisplay() { document.getElementById('betAmt').textContent = bet.toLocaleString() }
 function adjBet(d) {
-  const bal=getBal()
-  bet=Math.max(1,Math.min(bal||1,bet+d))
+  const bal = getBal()
+  bet = Math.max(1, Math.min(bal||1, bet+d))
   refreshBetDisplay()
 }
-function setBetMax() { bet=Math.max(1,getBal()); refreshBetDisplay() }
+function setBetMax() { bet = Math.max(1, getBal()); refreshBetDisplay() }
 function adjBetMult(m) {
-  const bal=getBal()
-  bet=m<1?Math.max(1,Math.floor(bet*m)):Math.min(bal||1,Math.floor(bet*m))
+  const bal = getBal()
+  bet = m < 1 ? Math.max(1, Math.floor(bet*m)) : Math.min(bal||1, Math.floor(bet*m))
   refreshBetDisplay()
 }
 
-// ═══════════════════════════════════════════════════════════════
-// CLOSE
-// ═══════════════════════════════════════════════════════════════
-function closeGame() {
-  window.parent&&window.parent.postMessage({type:'casino:close'},'*')
+// ─── Canvas Setup ──────────────────────────────────────────────
+const wc  = document.getElementById('wc')
+const ctx = wc.getContext('2d')
+let   WCS = 0  // canvas pixel size (square)
+
+function sizeCanvas() {
+  const vp = document.getElementById('viewport')
+  // Fit inside viewport, accounting for tilt making it appear narrower
+  const avail = Math.min(vp.clientWidth * 0.88, vp.clientHeight * 0.72, 310)
+  WCS = Math.floor(avail)
+  wc.width = wc.height = WCS
+  // Position the pointer just below the visual near edge
+  positionPointer()
 }
 
-// ═══════════════════════════════════════════════════════════════
-// THREE.JS SCENE
-// ═══════════════════════════════════════════════════════════════
-const container = document.getElementById('viewport')
-const W = ()=>container.clientWidth
-const H = ()=>container.clientHeight
+function positionPointer() {
+  // With perspective:700px rotateX(42deg), near edge of canvas appears
+  // roughly at: y_center + radius * cos(42°) * perspective_correction
+  // Approximate: near edge drops ~38% below the canvas center visually
+  const ptrRow = document.getElementById('ptrRow')
+  const wt = document.querySelector('.wt')
+  const rect = wt.getBoundingClientRect()
+  const vpRect = document.getElementById('viewport').getBoundingClientRect()
+  // Position pointer row at the bottom of the tilted canvas visual bounds
+  ptrRow.style.top = (rect.bottom - vpRect.top - 6) + 'px'
+}
 
-const scene    = new THREE.Scene()
-scene.fog      = new THREE.FogExp2(0x06040a, 0.06)
-
-const camera   = new THREE.PerspectiveCamera(45, W()/H(), 0.1, 80)
-camera.position.set(0, 3.8, 5.2)
-camera.lookAt(0, -0.2, 0)
-
-const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false })
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
-renderer.setSize(W(), H())
-renderer.shadowMap.enabled = true
-renderer.shadowMap.type    = THREE.PCFSoftShadowMap
-renderer.toneMapping       = THREE.ACESFilmicToneMapping
-renderer.toneMappingExposure = 1.3
-container.appendChild(renderer.domElement)
-
-// ── Lights ──────────────────────────────────────────────────
-const ambient = new THREE.AmbientLight(0xfff4e8, 0.5)
-scene.add(ambient)
-
-const sun = new THREE.DirectionalLight(0xfff8f0, 1.4)
-sun.position.set(2, 8, 4)
-sun.castShadow = true
-sun.shadow.mapSize.set(2048, 2048)
-sun.shadow.camera.near = 0.5
-sun.shadow.camera.far  = 30
-sun.shadow.camera.left = sun.shadow.camera.bottom = -6
-sun.shadow.camera.right = sun.shadow.camera.top = 6
-sun.shadow.bias = -0.001
-scene.add(sun)
-
-const rimA = new THREE.PointLight(0xff8800, 1.8, 16)
-rimA.position.set(-4, 2, 2)
-scene.add(rimA)
-
-const rimB = new THREE.PointLight(0x2244cc, 1.2, 14)
-rimB.position.set(4, 2, -2)
-scene.add(rimB)
-
-const topSpot = new THREE.SpotLight(0xffeedd, 2.5, 14, Math.PI*0.18, 0.5, 1.5)
-topSpot.position.set(0, 9, 1)
-topSpot.castShadow = true
-topSpot.shadow.mapSize.set(1024, 1024)
-scene.add(topSpot)
-
-// ── Table surface ─────────────────────────────────────────────
-const tableGeo = new THREE.PlaneGeometry(16, 16)
-tableGeo.rotateX(-Math.PI/2)
-const tableMat = new THREE.MeshStandardMaterial({
-  color:0x0c0608, roughness:0.95, metalness:0.02,
-})
-const table = new THREE.Mesh(tableGeo, tableMat)
-table.position.y = -0.22
-table.receiveShadow = true
-scene.add(table)
-
-// ── WHEEL CANVAS TEXTURE ─────────────────────────────────────
-const CANVAS_SIZE = 1024
-const wheelCanvas = document.createElement('canvas')
-wheelCanvas.width = wheelCanvas.height = CANVAS_SIZE
-const wheelCtx = wheelCanvas.getContext('2d')
-let wheelTexture = new THREE.CanvasTexture(wheelCanvas)
-
+// ─── Draw Wheel ────────────────────────────────────────────────
 function lerpColor(a, b, t) {
-  const ah=a.replace('#',''),bh=b.replace('#','')
+  const ah=a.replace('#',''), bh=b.replace('#','')
+  const r=(v=>v.toString(16).padStart(2,'0'))
+  const n=s=>parseInt(s.slice(0,2),16)
   const r1=parseInt(ah.slice(0,2),16),g1=parseInt(ah.slice(2,4),16),b1=parseInt(ah.slice(4,6),16)
   const r2=parseInt(bh.slice(0,2),16),g2=parseInt(bh.slice(2,4),16),b2=parseInt(bh.slice(4,6),16)
   return '#'+[r1+t*(r2-r1),g1+t*(g2-g1),b1+t*(b2-b1)].map(v=>Math.round(v).toString(16).padStart(2,'0')).join('')
 }
 
-function drawWheelCanvas(segs, highlightIdx) {
-  const ctx = wheelCtx, S = CANVAS_SIZE, cx = S/2, cy = S/2
-  const outerR = S*0.48, innerR = S*0.065
-  const n = segs.length
-  const arc = (Math.PI*2) / n
+function drawWheel(segs, hlIdx, rot) {
+  if (!segs || !segs.length) return
+  const S=WCS, cx=S/2, cy=S/2
+  const outerR=S*0.465, innerR=S*0.065
+  const n=segs.length, arc=(Math.PI*2)/n
+
   ctx.clearRect(0,0,S,S)
 
-  // Shadow ring
-  ctx.beginPath()
-  ctx.arc(cx,cy,outerR+8,0,Math.PI*2)
-  ctx.fillStyle='rgba(0,0,0,0.4)'
-  ctx.fill()
+  // Apply rotation around canvas center
+  ctx.save()
+  ctx.translate(cx,cy)
+  ctx.rotate(rot||0)
+  ctx.translate(-cx,-cy)
 
-  for (let i = 0; i < n; i++) {
-    const seg = segs[i]
-    const startA = -Math.PI/2 + i*arc
-    const endA   = startA + arc
-    const midA   = startA + arc/2
-    const isHL   = i === highlightIdx
+  // Outer shadow ring
+  ctx.beginPath(); ctx.arc(cx,cy,outerR+10,0,Math.PI*2)
+  ctx.fillStyle='rgba(0,0,0,0.45)'; ctx.fill()
 
-    // Pie segment
+  // Segments
+  for (let i=0; i<n; i++) {
+    const seg=segs[i]
+    const startA=-Math.PI/2 + i*arc
+    const endA=startA+arc
+    const midA=startA+arc/2
+    const isHL=(i===hlIdx)
+
     ctx.beginPath()
-    ctx.moveTo(cx + innerR*Math.cos(startA), cy + innerR*Math.sin(startA))
-    ctx.arc(cx, cy, outerR, startA, endA)
-    ctx.arc(cx, cy, innerR, endA, startA, true)
+    ctx.moveTo(cx+innerR*Math.cos(startA), cy+innerR*Math.sin(startA))
+    ctx.arc(cx,cy,outerR,startA,endA)
+    ctx.arc(cx,cy,innerR,endA,startA,true)
     ctx.closePath()
 
     // Radial gradient fill
-    const gx = cx + outerR*0.55*Math.cos(midA)
-    const gy = cy + outerR*0.55*Math.sin(midA)
-    const grad = ctx.createRadialGradient(gx,gy, 0, cx,cy, outerR)
-    grad.addColorStop(0, lerpColor(seg.color, '#ffffff', 0.18))
-    grad.addColorStop(0.45, seg.color)
-    grad.addColorStop(1,    lerpColor(seg.color, '#000000', 0.55))
-    ctx.fillStyle = isHL ? 'rgba(255,255,180,0.35)' : grad
-    if (!isHL) {
-      ctx.fill()
-    } else {
-      // Gold highlight overlay
-      ctx.fillStyle = grad; ctx.fill()
-      ctx.fillStyle = 'rgba(255,240,120,0.28)'; ctx.fill()
-    }
+    const gx=cx+outerR*0.55*Math.cos(midA), gy=cy+outerR*0.55*Math.sin(midA)
+    const grad=ctx.createRadialGradient(gx,gy,0,cx,cy,outerR)
+    grad.addColorStop(0, lerpColor(seg.color,'#ffffff',0.2))
+    grad.addColorStop(0.5, seg.color)
+    grad.addColorStop(1, lerpColor(seg.color,'#000000',0.55))
+    ctx.fillStyle=grad; ctx.fill()
+    if (isHL) { ctx.fillStyle='rgba(255,245,140,0.32)'; ctx.fill() }
 
     // Segment border
-    ctx.strokeStyle = 'rgba(255,255,255,0.12)'
-    ctx.lineWidth = 2.5
-    ctx.stroke()
+    ctx.strokeStyle='rgba(255,255,255,0.14)'; ctx.lineWidth=2; ctx.stroke()
 
-    // Metallic sheen stripe
-    const sheenGrad = ctx.createLinearGradient(
-      cx+outerR*0.2*Math.cos(midA-0.08), cy+outerR*0.2*Math.sin(midA-0.08),
-      cx+outerR*0.2*Math.cos(midA+0.08), cy+outerR*0.2*Math.sin(midA+0.08)
-    )
-    sheenGrad.addColorStop(0,'rgba(255,255,255,0)')
-    sheenGrad.addColorStop(0.5,'rgba(255,255,255,0.09)')
-    sheenGrad.addColorStop(1,'rgba(255,255,255,0)')
-    ctx.fillStyle=sheenGrad; ctx.fill()
-
-    // Label text
-    const textR = (outerR+innerR)*0.54
-    const tx = cx + textR*Math.cos(midA)
-    const ty = cy + textR*Math.sin(midA)
+    // Label
+    const textR=(outerR+innerR)*0.54
+    const tx=cx+textR*Math.cos(midA), ty=cy+textR*Math.sin(midA)
     ctx.save()
-    ctx.translate(tx, ty)
-    ctx.rotate(midA + Math.PI/2)
-    ctx.shadowColor='rgba(0,0,0,0.9)'; ctx.shadowBlur=8
-    ctx.fillStyle = seg.textColor || '#ffffff'
-    const fontSize = Math.round(S * (seg.label.length > 4 ? 0.038 : 0.046))
-    ctx.font = `900 ${fontSize}px 'Space Mono',monospace`
+    ctx.translate(tx,ty)
+    ctx.rotate(midA+Math.PI/2)
+    ctx.shadowColor='rgba(0,0,0,0.95)'; ctx.shadowBlur=7
+    ctx.fillStyle=seg.textColor||'#ffffff'
+    const fs=Math.round(S*(seg.label.length>4?0.038:0.046))
+    ctx.font=`900 ${fs}px 'Space Mono',monospace`
     ctx.textAlign='center'; ctx.textBaseline='middle'
-    ctx.fillText(seg.label, 0, 0)
+    ctx.fillText(seg.label,0,0)
     ctx.restore()
 
     // Gold pin at segment border
-    const pinR = outerR*0.95
-    const pinX = cx + pinR*Math.cos(startA), pinY = cy + pinR*Math.sin(startA)
-    ctx.beginPath(); ctx.arc(pinX,pinY,6,0,Math.PI*2)
-    const pinGrad = ctx.createRadialGradient(pinX-1,pinY-1,0,pinX,pinY,6)
-    pinGrad.addColorStop(0,'#f0d060')
-    pinGrad.addColorStop(1,'#8b6914')
-    ctx.fillStyle=pinGrad; ctx.fill()
-    ctx.strokeStyle='rgba(255,255,255,0.25)'; ctx.lineWidth=1; ctx.stroke()
+    const pinR=outerR*0.93
+    const pinX=cx+pinR*Math.cos(startA), pinY=cy+pinR*Math.sin(startA)
+    ctx.beginPath(); ctx.arc(pinX,pinY,5,0,Math.PI*2)
+    const pg=ctx.createRadialGradient(pinX-1,pinY-1,0,pinX,pinY,5)
+    pg.addColorStop(0,'#f0d060'); pg.addColorStop(1,'#8b6914')
+    ctx.fillStyle=pg; ctx.fill()
+    ctx.strokeStyle='rgba(255,255,255,0.3)'; ctx.lineWidth=1; ctx.stroke()
   }
 
-  // Spoke dividers (thin metallic lines)
+  // Spoke dividers
   for (let i=0;i<n;i++) {
-    const a = -Math.PI/2 + i*arc
+    const a=-Math.PI/2+i*arc
     ctx.beginPath()
     ctx.moveTo(cx+innerR*1.1*Math.cos(a), cy+innerR*1.1*Math.sin(a))
-    ctx.lineTo(cx+outerR*0.96*Math.cos(a), cy+outerR*0.96*Math.sin(a))
-    ctx.strokeStyle='rgba(201,162,39,0.25)'; ctx.lineWidth=1.5; ctx.stroke()
+    ctx.lineTo(cx+outerR*0.94*Math.cos(a), cy+outerR*0.94*Math.sin(a))
+    ctx.strokeStyle='rgba(201,162,39,0.28)'; ctx.lineWidth=1.5; ctx.stroke()
   }
-
-  // Center hub
-  const hubR = innerR*1.15
-  const hubGrad = ctx.createRadialGradient(cx-4,cy-4,0,cx,cy,hubR)
-  hubGrad.addColorStop(0,'#e8c040')
-  hubGrad.addColorStop(0.4,'#a07820')
-  hubGrad.addColorStop(1,'#402800')
-  ctx.beginPath(); ctx.arc(cx,cy,hubR,0,Math.PI*2)
-  ctx.fillStyle=hubGrad; ctx.fill()
-  ctx.strokeStyle='rgba(255,220,80,0.5)'; ctx.lineWidth=3; ctx.stroke()
-
-  // Center NUT emoji
-  ctx.shadowBlur=0
-  ctx.font=`${Math.round(hubR*0.9)}px serif`
-  ctx.textAlign='center'; ctx.textBaseline='middle'
-  ctx.fillText('🥜',cx,cy+1)
 
   // Outer decorative ring
   ctx.beginPath(); ctx.arc(cx,cy,outerR,0,Math.PI*2)
-  const ringGrad = ctx.createLinearGradient(0,0,S,S)
-  ringGrad.addColorStop(0,'rgba(201,162,39,0.4)')
-  ringGrad.addColorStop(0.5,'rgba(255,220,80,0.6)')
-  ringGrad.addColorStop(1,'rgba(201,162,39,0.4)')
-  ctx.strokeStyle=ringGrad; ctx.lineWidth=5; ctx.stroke()
+  const rg=ctx.createLinearGradient(0,0,S,S)
+  rg.addColorStop(0,'rgba(201,162,39,0.5)')
+  rg.addColorStop(0.5,'rgba(255,220,80,0.7)')
+  rg.addColorStop(1,'rgba(201,162,39,0.5)')
+  ctx.strokeStyle=rg; ctx.lineWidth=4; ctx.stroke()
+
+  // Center hub
+  const hubR=innerR*1.18
+  const hg=ctx.createRadialGradient(cx-S*0.01,cy-S*0.01,0,cx,cy,hubR)
+  hg.addColorStop(0,'#e8c040'); hg.addColorStop(0.4,'#a07820'); hg.addColorStop(1,'#402800')
+  ctx.beginPath(); ctx.arc(cx,cy,hubR,0,Math.PI*2)
+  ctx.fillStyle=hg; ctx.fill()
+  ctx.strokeStyle='rgba(255,220,80,0.55)'; ctx.lineWidth=3; ctx.stroke()
+
+  ctx.restore()
+
+  // Center nut emoji (drawn after restore so it doesn't rotate)
+  ctx.shadowBlur=0
+  const eSize=Math.round(hubR*0.85)
+  ctx.font=`${eSize}px serif`
+  ctx.textAlign='center'; ctx.textBaseline='middle'
+  ctx.fillText('🥜', cx, cy+1)
 }
 
-// ── WHEEL GROUP ───────────────────────────────────────────────
-const wheelGroup = new THREE.Group()
-scene.add(wheelGroup)
+// ─── Spin State ────────────────────────────────────────────────
+// Pointer is at BOTTOM of canvas (angle = π/2 from canvas top)
+// Segment i center (unrotated) = -π/2 + (i+0.5)*arc
+// Win condition: (-π/2 + (winnerIdx+0.5)*arc) + rot = π/2
+// → rot_target = π - (winnerIdx+0.5)*arc
 
-// Outer wood ring
-const ringMat = new THREE.MeshStandardMaterial({ color:0x1a0c04, roughness:0.85, metalness:0.08 })
-const ringGeo = new THREE.CylinderGeometry(2.7, 2.7, 0.36, 80)
-const ring = new THREE.Mesh(ringGeo, ringMat)
-ring.castShadow = true; ring.receiveShadow = true
-wheelGroup.add(ring)
-
-// Outer gold trim band
-const trimMat = new THREE.MeshStandardMaterial({ color:0xc9a227, roughness:0.3, metalness:0.8 })
-const trimGeo = new THREE.TorusGeometry(2.7, 0.055, 8, 80)
-const trimTop = new THREE.Mesh(trimGeo, trimMat)
-trimTop.rotation.x = Math.PI/2
-trimTop.position.y = 0.18
-wheelGroup.add(trimTop)
-const trimBot = trimTop.clone(); trimBot.position.y = -0.18; wheelGroup.add(trimBot)
-
-// Inner disc — canvas texture on top face
-drawWheelCanvas(segments, -1)
-// Three materials: top (canvas), side (dark wood), bottom (dark)
-const discMats = [
-  new THREE.MeshStandardMaterial({ color:0x1e0e04, roughness:0.8, metalness:0.05 }), // side
-  new THREE.MeshStandardMaterial({ map:wheelTexture, roughness:0.28, metalness:0.45 }), // top
-  new THREE.MeshStandardMaterial({ color:0x0a0604, roughness:0.9, metalness:0.0  }), // bottom
-]
-const discGeo = new THREE.CylinderGeometry(2.6, 2.6, 0.22, 80)
-const disc = new THREE.Mesh(discGeo, discMats)
-disc.position.y = 0.07
-disc.castShadow = true
-wheelGroup.add(disc)
-
-// ── POINTER ───────────────────────────────────────────────────
-// Static frame — NOT part of wheelGroup
-const pointerGroup = new THREE.Group()
-scene.add(pointerGroup)
-
-// Arm
-const armMat  = new THREE.MeshStandardMaterial({ color:0xc9a227, roughness:0.25, metalness:0.9 })
-const armGeo  = new THREE.CylinderGeometry(0.04, 0.04, 1.4, 12)
-const arm     = new THREE.Mesh(armGeo, armMat)
-arm.position.set(0, 0.6, 2.0)
-arm.rotation.x = Math.PI * 0.15
-pointerGroup.add(arm)
-
-// Arrow tip (cone pointing toward wheel)
-const tipMat = new THREE.MeshStandardMaterial({ color:0xffd060, roughness:0.15, metalness:0.95, emissive:0xffd060, emissiveIntensity:0.12 })
-const tipGeo = new THREE.ConeGeometry(0.12, 0.32, 12)
-const tip    = new THREE.Mesh(tipGeo, tipMat)
-tip.position.set(0, 0.26, 2.55)
-tip.rotation.x = Math.PI * 0.5
-pointerGroup.add(tip)
-
-// ── PARTICLES ─────────────────────────────────────────────────
-let particles = null
-let particleVels = []
-let particleLife = 0
-const PARTICLE_COUNT = 120
-
-function createParticles(color) {
-  if (particles) { scene.remove(particles); particles.geometry.dispose() }
-  const geom = new THREE.BufferGeometry()
-  const pos = new Float32Array(PARTICLE_COUNT * 3)
-  particleVels = []
-  for (let i=0;i<PARTICLE_COUNT;i++) {
-    const θ = Math.random()*Math.PI*2
-    const r = Math.random()*0.3
-    pos[i*3]   = Math.cos(θ)*r
-    pos[i*3+1] = 0.2
-    pos[i*3+2] = Math.sin(θ)*r
-    particleVels.push({
-      x: (Math.random()-0.5)*0.12,
-      y: 0.06+Math.random()*0.14,
-      z: (Math.random()-0.5)*0.12,
-    })
-  }
-  geom.setAttribute('position', new THREE.BufferAttribute(pos, 3))
-  const pMat = new THREE.PointsMaterial({ color, size:0.09, transparent:true, opacity:1.0, sizeAttenuation:true })
-  particles = new THREE.Points(geom, pMat)
-  scene.add(particles)
-  particleLife = 1.0
-}
-
-function updateParticles(dt) {
-  if (!particles || particleLife <= 0) return
-  particleLife -= dt * 0.7
-  particles.material.opacity = Math.max(0, particleLife)
-  const pos = particles.geometry.attributes.position.array
-  for (let i=0;i<PARTICLE_COUNT;i++) {
-    pos[i*3]   += particleVels[i].x * dt * 60
-    pos[i*3+1] += particleVels[i].y * dt * 60
-    pos[i*3+2] += particleVels[i].z * dt * 60
-    particleVels[i].y -= 0.004
-  }
-  particles.geometry.attributes.position.needsUpdate = true
-  if (particleLife <= 0) { scene.remove(particles); particles=null }
-}
-
-// ── SPIN STATE ────────────────────────────────────────────────
-let wheelAngle   = 0   // continuously increasing — clockwise spin
-let isSpinning   = false
-let spinStart    = 0
-let spinFrom     = 0
-let spinTo       = 0
-const SPIN_DUR   = 5200  // ms
+const POINTER_ANGLE = Math.PI / 2  // bottom
+const TAU = Math.PI * 2
+let rot       = 0
+let spinFrom  = 0
+let spinTo    = 0
+let spinStart = 0
+let spinning  = false
+let idleDrift = 0
+const SPIN_DUR = 5200
 
 function easeOutQuint(t) { return 1 - Math.pow(1-t, 5) }
 
 function startSpin() {
-  if (isSpinning) return
-  const bal = getBal()
-  if (bal < 1 || bet < 1) { document.getElementById('brokeMsg').classList.add('show'); return }
-  const actualBet = Math.min(bet, bal)
-  setBal(bal - actualBet)
+  if (spinning) return
+  const bal=getBal()
+  if (bal<1||bet<1) { document.getElementById('brokeMsg').classList.add('show'); return }
+  const actualBet=Math.min(bet,bal)
+  setBal(bal-actualBet)
 
-  // Refresh segments in case nuts changed
-  const { rank: r, segments: segs } = refreshRankDisplay()
-  segments = segs
+  segments=refreshRankDisplay()
+  const n=segments.length
+  const arc=TAU/n
+  const winnerIdx=NutRank.pickWeighted(segments)
+  const winner=segments[winnerIdx]
 
-  const n = segments.length
-  const arc = (Math.PI*2) / n
-  const winnerIdx = NutRank.pickWeighted(segments)
-  const winner = segments[winnerIdx]
+  // Compute target rotation
+  const segCenter=-Math.PI/2+(winnerIdx+0.5)*arc
+  const rotTarget=POINTER_ANGLE-segCenter  // basic target
 
-  // Target angle: segment winnerIdx center is at pointer when wheelAngle = (winnerIdx+0.5)*arc
-  const targetNorm = (winnerIdx + 0.5) * arc
-  const curNorm    = ((wheelAngle % (Math.PI*2)) + Math.PI*2) % (Math.PI*2)
-  let   delta      = ((targetNorm - curNorm) + Math.PI*2) % (Math.PI*2)
-  if   (delta < 0.1) delta += Math.PI*2
-  const spins = 9 + Math.floor(Math.random()*5)
+  // Normalize both to [0, TAU)
+  const tNorm=((rotTarget%TAU)+TAU)%TAU
+  const cNorm=((rot%TAU)+TAU)%TAU
+  let delta=(tNorm-cNorm+TAU)%TAU
+  if (delta<0.25) delta+=TAU
+
+  const spins=8+Math.floor(Math.random()*4)
+  spinFrom=rot
+  spinTo=rot+spins*TAU+delta
+  spinStart=performance.now()
+  spinning=true
+  idleDrift=0
 
   document.getElementById('resultOverlay').classList.remove('show')
   document.getElementById('brokeMsg').classList.remove('show')
-  document.getElementById('spinBtn').disabled = true
+  document.getElementById('spinBtn').disabled=true
   setStatus('')
 
-  // Redraw clean canvas
-  drawWheelCanvas(segments, -1)
-  wheelTexture.needsUpdate = true
-
-  spinFrom  = wheelAngle
-  spinTo    = wheelAngle + spins*(Math.PI*2) + delta
-  spinStart = performance.now()
-  isSpinning = true
-
-  // After spin completes
+  // Resolve after spin
   setTimeout(() => {
-    isSpinning   = false
-    wheelAngle   = spinTo
+    spinning=false
+    rot=spinTo
 
-    // Highlight winning segment
-    drawWheelCanvas(segments, winnerIdx)
-    wheelTexture.needsUpdate = true
+    drawWheel(segments, winnerIdx, rot)
 
-    const mult = winner.mult
-    const payout = mult > 0 ? Math.floor(actualBet * mult) : 0
-    const profit = payout - actualBet
+    const mult=winner.mult
+    const payout=mult>0?Math.floor(actualBet*mult):0
+    const profit=payout-actualBet
 
-    if (mult > 0) setBal(getBal() + payout)
+    if (mult>0) setBal(getBal()+payout)
 
-    const rb = document.getElementById('resultBig')
-    const rs = document.getElementById('resultSub')
-    rb.textContent = mult > 0 ? winner.label : 'BUST'
-    rb.className   = mult >= 25 ? 'jackpot' : mult > 0 ? 'win' : 'bust'
-    rs.textContent = mult > 0
-      ? '+' + profit.toLocaleString() + ' NUTTOKENS'
-      : '−' + actualBet.toLocaleString() + ' NUTTOKENS'
+    const rb=document.getElementById('resultBig')
+    const rs=document.getElementById('resultSub')
+    rb.className=mult>=25?'jackpot':mult>0?'win':'bust'
+    rb.textContent=mult>0?winner.label:'BUST'
+    rs.textContent=mult>0
+      ? '+'+profit.toLocaleString()+' NUTTOKENS'
+      : String.fromCharCode(8722)+actualBet.toLocaleString()+' NUTTOKENS'
     document.getElementById('resultOverlay').classList.add('show')
 
-    // Particles
-    if (mult >= 25) createParticles(0xffd060)
-    else if (mult > 0) createParticles(0x00e701)
+    if (mult>=25) spawnSparks(0xffd060, 80)
+    else if (mult>0) spawnSparks(0x00e701, 40)
 
     setTimeout(() => {
       document.getElementById('resultOverlay').classList.remove('show')
-      drawWheelCanvas(segments, -1)
-      wheelTexture.needsUpdate = true
-      document.getElementById('spinBtn').disabled = false
+      drawWheel(segments,-1,rot)
+      document.getElementById('spinBtn').disabled=false
       setStatus('SPIN AGAIN')
-      if (getBal() < 1) {
-        setTimeout(() => document.getElementById('brokeMsg').classList.add('show'), 400)
-      }
-    }, mult >= 25 ? 4500 : 2800)
-  }, SPIN_DUR + 100)
+      if (getBal()<1) setTimeout(()=>document.getElementById('brokeMsg').classList.add('show'),400)
+    }, mult>=25?4500:2800)
+  }, SPIN_DUR+100)
 }
 
-// ── STATUS ────────────────────────────────────────────────────
+// ─── Spark Particles ───────────────────────────────────────────
+function spawnSparks(colorHex, count) {
+  const vp=document.getElementById('viewport')
+  const c='#'+colorHex.toString(16).padStart(6,'0')
+  for (let i=0;i<count;i++) {
+    const el=document.createElement('div')
+    el.className='spark'
+    const sz=4+Math.random()*8
+    el.style.cssText=`
+      width:${sz}px;height:${sz}px;background:${c};
+      left:${30+Math.random()*40}%;top:${20+Math.random()*40}%;
+      animation-duration:${0.7+Math.random()*0.8}s;
+      animation-delay:${Math.random()*0.3}s;
+    `
+    const dx=(Math.random()-0.5)*200, dy=-60-Math.random()*180
+    el.style.setProperty('--dx',dx+'px')
+    el.style.setProperty('--dy',dy+'px')
+    el.style.animation=`none`
+    vp.appendChild(el)
+    setTimeout(()=>el.style.animation=
+      `sparkAnim ${0.7+Math.random()*0.8}s ease-out ${Math.random()*0.3}s forwards`
+    ,10)
+    setTimeout(()=>el.remove(),1400)
+  }
+}
+// Override sparkAnim to use custom dx/dy
+const sparkStyle=document.createElement('style')
+sparkStyle.textContent=`.spark{--dx:0px;--dy:-100px;}`
+document.head.appendChild(sparkStyle)
+
+// ─── Status ────────────────────────────────────────────────────
 function setStatus(msg) {
-  document.getElementById('wheelStatus').textContent = msg || 'PLACE YOUR BET AND SPIN'
+  document.getElementById('wheelStatus').textContent=msg||'PLACE YOUR BET AND SPIN'
 }
 
-// ── AMBIENT IDLE ROTATION ─────────────────────────────────────
-let idleAngle = 0
-
-// ── RENDER LOOP ───────────────────────────────────────────────
-let lastTime = performance.now()
-
+// ─── Render Loop ───────────────────────────────────────────────
 function animate() {
   requestAnimationFrame(animate)
-  const now = performance.now()
-  const dt  = Math.min((now - lastTime) / 1000, 0.05)
-  lastTime  = now
-
-  if (isSpinning) {
-    const elapsed = now - spinStart
-    const t       = Math.min(1, elapsed / SPIN_DUR)
-    const eased   = easeOutQuint(t)
-    wheelAngle    = spinFrom + (spinTo - spinFrom) * eased
-    wheelGroup.rotation.y = -wheelAngle
+  if (spinning) {
+    const now=performance.now()
+    const t=Math.min(1,(now-spinStart)/SPIN_DUR)
+    rot=spinFrom+(spinTo-spinFrom)*easeOutQuint(t)
+    drawWheel(segments,-1,rot)
   } else {
-    // Slow idle drift
-    idleAngle += 0.003
-    wheelGroup.rotation.y = -wheelAngle - idleAngle * 0.15
+    // Gentle idle drift
+    idleDrift+=0.0008
+    drawWheel(segments,-1,rot+idleDrift)
   }
-
-  // Rim light pulse for drama
-  rimA.intensity = 1.4 + 0.4*Math.sin(now*0.0012)
-  rimB.intensity = 0.9 + 0.3*Math.cos(now*0.0009)
-
-  updateParticles(dt)
-  renderer.render(scene, camera)
 }
 
-// ── RESIZE ────────────────────────────────────────────────────
-const resizeObs = new ResizeObserver(() => {
-  camera.aspect = W()/H()
-  camera.updateProjectionMatrix()
-  renderer.setSize(W(), H())
-})
-resizeObs.observe(container)
-
-// ── INIT ──────────────────────────────────────────────────────
+// ─── Init ──────────────────────────────────────────────────────
+sizeCanvas()
 refreshRankDisplay()
 setBal(getBal())
-bet = Math.min(50, Math.max(1, getBal()))
+bet=Math.min(50,Math.max(1,getBal()))
 refreshBetDisplay()
-
-// Draw initial wheel
-drawWheelCanvas(segments, -1)
-wheelTexture.needsUpdate = true
+setStatus('PLACE YOUR BET AND SPIN')
+drawWheel(segments,-1,rot)
 animate()
+
+window.addEventListener('resize',()=>{
+  sizeCanvas()
+  drawWheel(segments,-1,rot)
+})
+window.addEventListener('storage', e=>{
+  if (e.key===KEY_BAL||e.key===KEY_ALLTIME) { setBal(getBal()); refreshRankDisplay() }
+})
 </script>
 </body>
 </html>
