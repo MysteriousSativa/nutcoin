@@ -1217,27 +1217,54 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .tl-empty{font-family:'Crimson Text',serif;font-size:17px;color:var(--muted);font-style:italic;text-align:center;padding:20px 0;}
 
 /* leaderboard panel, mobile-first card rows */
-.lb-list{display:flex;flex-direction:column;gap:5px;max-height:480px;overflow-y:auto;padding-right:2px;}
+.lb-list{display:flex;flex-direction:column;gap:4px;max-height:480px;overflow-y:auto;padding-right:2px;}
 .lb-list::-webkit-scrollbar{width:4px;}
 .lb-list::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
-.lb-row{display:flex;align-items:center;gap:10px;padding:11px 14px;border-radius:12px;
-  background:rgba(20,14,6,0.75);
-  border:1px solid rgba(200,169,110,0.15);transition:border-color .2s,filter .2s;}
-.lb-row.you{background:rgba(40,90,55,0.25);border-color:rgba(78,201,122,0.38);}
-.lb-row.top1{background:rgba(120,90,20,0.25);border-color:rgba(200,169,110,0.55);}
-.lb-row.top2{background:rgba(80,80,80,0.2);border-color:rgba(192,192,192,0.32);}
-.lb-row.top3{background:rgba(120,60,20,0.2);border-color:rgba(180,100,40,0.32);}
-.lb-row-rank{font-family:'Cinzel',serif;font-size:15px;width:32px;flex-shrink:0;text-align:center;line-height:1;}
-.lb-row-rank.gold{color:#FFD700;text-shadow:0 0 10px rgba(255,215,0,0.55);}
-.lb-row-rank.silver{color:#C0C0C0;text-shadow:0 0 8px rgba(192,192,192,0.4);}
-.lb-row-rank.bronze{color:#CD7F32;text-shadow:0 0 8px rgba(205,127,50,0.4);}
-.lb-row-rank.plain{font-family:'Space Mono',monospace;font-size:12px;color:var(--muted);}
-.lb-row-name{flex:1;font-family:'Crimson Text',serif;font-size:18px;color:var(--cream);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.lb-row.you .lb-row-name{color:var(--green);}
-.lb-row-count{font-family:'Space Mono',monospace;font-size:16px;color:var(--gold);flex-shrink:0;text-shadow:0 0 9px rgba(200,169,110,0.3);}
-.lb-row.you .lb-row-count{color:var(--green);text-shadow:0 0 9px rgba(78,201,122,0.3);}
-.lb-row-nuts{font-family:'Cinzel',serif;font-size:8px;letter-spacing:.1em;color:var(--muted);text-transform:uppercase;flex-shrink:0;align-self:flex-end;margin-bottom:2px;}
-.lb-you-badge{font-family:'Cinzel',serif;font-size:8px;letter-spacing:.1em;color:var(--green);background:rgba(78,201,122,0.12);border:1px solid rgba(78,201,122,0.25);border-radius:4px;padding:1px 6px;flex-shrink:0;}
+.lb-row{
+  display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:12px;
+  background:rgba(18,13,6,0.80);
+  border:1px solid rgba(200,169,110,0.13);
+  transition:border-color .18s,background .18s,box-shadow .18s;
+  cursor:pointer;
+}
+.lb-row:hover{background:rgba(28,20,8,0.90);border-color:rgba(200,169,110,0.32);box-shadow:0 2px 12px rgba(200,169,110,0.06);}
+.lb-row.you{
+  background:rgba(30,72,45,0.30);
+  border-color:rgba(78,201,122,0.42);
+  box-shadow:inset 3px 0 0 rgba(78,201,122,0.60);
+}
+.lb-row.you:hover{background:rgba(35,82,52,0.38);border-color:rgba(78,201,122,0.58);}
+.lb-row.top1{background:rgba(110,82,16,0.30);border-color:rgba(200,169,110,0.60);}
+.lb-row.top2{background:rgba(72,72,72,0.22);border-color:rgba(192,192,192,0.38);}
+.lb-row.top3{background:rgba(110,55,15,0.24);border-color:rgba(180,100,40,0.40);}
+.lb-row.top1:hover{border-color:rgba(200,169,110,0.80);}
+.lb-row.top2:hover{border-color:rgba(192,192,192,0.55);}
+.lb-row.top3:hover{border-color:rgba(180,100,40,0.58);}
+.lb-row-rank{font-family:'Cinzel',serif;font-size:15px;width:30px;flex-shrink:0;text-align:center;line-height:1;}
+.lb-row-rank.gold{color:#FFD700;text-shadow:0 0 12px rgba(255,215,0,0.60);}
+.lb-row-rank.silver{color:#C8C8C8;text-shadow:0 0 8px rgba(192,192,192,0.45);}
+.lb-row-rank.bronze{color:#CD7F32;text-shadow:0 0 8px rgba(205,127,50,0.45);}
+.lb-row-rank.plain{font-family:'Space Mono',monospace;font-size:11px;color:rgba(122,104,85,0.85);}
+.lb-row-name{
+  flex:1;font-family:'Crimson Text',serif;font-size:17px;color:var(--cream);
+  min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.lb-row.you .lb-row-name{color:#6ee89a;}
+.lb-row-count{font-family:'Space Mono',monospace;font-size:15px;color:var(--gold);flex-shrink:0;text-shadow:0 0 8px rgba(200,169,110,0.28);}
+.lb-row.you .lb-row-count{color:#4EC97A;text-shadow:0 0 9px rgba(78,201,122,0.35);}
+.lb-row-nuts{font-family:'Cinzel',serif;font-size:8px;letter-spacing:.1em;color:var(--muted);text-transform:uppercase;flex-shrink:0;align-self:flex-end;margin-bottom:1px;}
+.lb-you-badge{
+  font-family:'Cinzel',serif;font-size:8px;letter-spacing:.1em;
+  color:#4EC97A;background:rgba(78,201,122,0.14);
+  border:1px solid rgba(78,201,122,0.32);border-radius:5px;padding:2px 7px;flex-shrink:0;
+  text-shadow:0 0 6px rgba(78,201,122,0.40);
+}
+/* separator row between top entries and "you" */
+.lb-separator{
+  display:flex;align-items:center;gap:8px;padding:1px 6px;
+  color:rgba(122,104,85,0.45);font-size:10px;letter-spacing:.22em;
+}
+.lb-separator::before,.lb-separator::after{content:'';flex:1;height:1px;background:rgba(200,169,110,0.12);}
 .lb-empty{text-align:center;font-family:'Crimson Text',serif;font-size:17px;color:var(--muted);font-style:italic;padding:20px 0;}
 .lb-join{margin-top:16px;text-align:center;}
 .lb-join-btn{
@@ -1248,7 +1275,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
   filter:drop-shadow(0 0 10px rgba(200,140,0,0.2));
   transition:transform .12s,filter .15s;}
 .lb-join-btn:hover{transform:translateY(-2px);filter:drop-shadow(0 0 20px rgba(200,140,0,0.5));}
-.lb-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+.lb-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
 .lb-count-label{font-family:'Cinzel',serif;font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);}
 .lb-count-label span{color:var(--gold);}
 
@@ -3469,10 +3496,15 @@ function renderLeaderboard(rows) {
     {cls:'bronze',txt:'🥉'},
   ];
   const rowClass = i => i===0?'top1':i===1?'top2':i===2?'top3':'';
+
+  // Check if user appears in the returned rows
+  const userInTop = rowsToShow.some(r => r.isYou || r.session_id === sessionId);
+
   let html = `<div class="lb-header">
     <span class="lb-count-label">ALL TIME &nbsp;<span>${rowsToShow.length} NUTTERS</span>${window.NutChaos && NutChaos.isInvertLb && NutChaos.isInvertLb() ? ' · BAG HOLDERS MODE' : ''}</span>
   </div>`;
   html += `<div class="lb-list">`;
+
   rowsToShow.forEach((r,i)=>{
     const isYou = r.isYou || (r.session_id === sessionId) || (!r.isAnon && r.nickname === nickname);
     const ri = i < 3 ? rankIcons[i] : null;
@@ -3480,7 +3512,8 @@ function renderLeaderboard(rows) {
       ? `<span class="lb-row-rank ${ri.cls}">${ri.txt}</span>`
       : `<span class="lb-row-rank plain">${i+1}</span>`;
     const nameStyle = r.isAnon ? 'color:var(--muted);font-style:italic;' : '';
-    html += `<div class="lb-row ${rowClass(i)} ${isYou?'you':''}">
+    const profileHref = window.NutProfiles ? NutProfiles.profileUrl(r.session_id) : '#';
+    html += `<div class="lb-row ${rowClass(i)} ${isYou?'you':''}" onclick="window.location='${profileHref}'">
       ${rankEl}
       ${nutAvatarHtml(r.session_id, 'nut-avatar-sm')}
       <span class="lb-row-name" style="${nameStyle}">${window.NutProfiles ? NutProfiles.nameHtml(r.session_id, r.nickname, '') : escHtml(r.nickname)}</span>
@@ -3489,6 +3522,23 @@ function renderLeaderboard(rows) {
       <span class="lb-row-nuts">NUTS</span>
     </div>`;
   });
+
+  // Append user row at bottom if they're outside the top results
+  if (!userInTop && typeof countAllTime !== 'undefined' && countAllTime >= 0) {
+    const uName = (typeof nickname !== 'undefined' && nickname) ? nickname
+                : (typeof genUserName === 'function') ? genUserName(sessionId) : 'You';
+    html += `<div class="lb-separator">· · ·</div>`;
+    const profileHref = window.NutProfiles ? NutProfiles.profileUrl(sessionId) : '#';
+    html += `<div class="lb-row you" onclick="window.location='${profileHref}'">
+      <span class="lb-row-rank plain">??</span>
+      ${nutAvatarHtml(sessionId, 'nut-avatar-sm')}
+      <span class="lb-row-name">${window.NutProfiles ? NutProfiles.nameHtml(sessionId, uName, '') : escHtml(uName)}</span>
+      <span class="lb-you-badge">YOU</span>
+      <span class="lb-row-count">${countAllTime.toLocaleString()}</span>
+      <span class="lb-row-nuts">NUTS</span>
+    </div>`;
+  }
+
   html += `</div>`;
   el.innerHTML = html;
   document.getElementById('lbJoin').style.display = !nickname ? 'block' : 'none';
@@ -3728,10 +3778,10 @@ function renderNTLeaderboard() {
 
   display.forEach((r, i) => {
     if (r.isSeparator) {
-      html += `<div style="text-align:center;color:var(--muted);font-size:11px;padding:4px 0">· · ·</div>`;
+      html += `<div class="lb-separator">· · ·</div>`;
       return;
     }
-    const isYou   = !!r.isUser;
+    const isYou    = !!r.isUser;
     const trueRank = isYou ? userTrueRank : i + 1;
     const ri       = trueRank <= 3 ? rankIcons[trueRank - 1] : null;
     const rankEl   = ri
@@ -3742,10 +3792,15 @@ function renderNTLeaderboard() {
                    : r.chips >= 1000    ? Math.round(r.chips/1000)+'K'
                    : r.chips.toLocaleString();
 
-    html += `<div class="lb-row ${trueRank===1?'top1':trueRank===2?'top2':trueRank===3?'top3':''} ${isYou?'you':''}">
+    const nameHtml = window.NutProfiles
+      ? NutProfiles.nameHtml(r.sessionId, r.name, '')
+      : escHtml(r.name);
+    const profileHref = window.NutProfiles ? NutProfiles.profileUrl(r.sessionId) : '#';
+
+    html += `<div class="lb-row ${trueRank===1?'top1':trueRank===2?'top2':trueRank===3?'top3':''} ${isYou?'you':''}" onclick="if(event.target.tagName!=='A')window.location='${profileHref}'">
       ${rankEl}
       ${nutAvatarHtml(r.sessionId, 'nut-avatar-sm')}
-      <span class="lb-row-name">${escHtml(r.name)}</span>
+      <span class="lb-row-name">${nameHtml}</span>
       ${isYou ? '<span class="lb-you-badge">YOU</span>' : ''}
       <span class="lb-row-count">${chipsStr}</span>
       <span class="lb-row-nuts">CHIPS</span>
