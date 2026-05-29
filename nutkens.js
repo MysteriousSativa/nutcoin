@@ -135,12 +135,18 @@
   }
 
   // ── Open casino ───────────────────────────────────────────────────
-  function openCasino() {
+  function openCasino(tab) {
     const overlay = document.getElementById('casinoAppOverlay');
     if (!overlay) return;
     overlay.style.display = 'flex';
     const frame = document.getElementById('casinoAppFrame');
-    if (frame && !frame.src) frame.src = './casino-app.html';
+    const url = './casino-app.html' + (tab ? '#' + tab : '');
+    if (!frame.src || frame.src === '' || frame.src === window.location.href) {
+      frame.src = url;
+    } else if (tab) {
+      // Already loaded — just tell it to switch tabs
+      frame.contentWindow && frame.contentWindow.postMessage({ type: 'casino:goto', tab }, '*');
+    }
   }
 
   function closeCasino() {

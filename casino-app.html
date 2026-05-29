@@ -993,7 +993,22 @@ function init() {
   // BJ — hide action button by default
   // (it shows when the tab is active and ready)
   refreshActionBtn();
+
+  // Open to a specific tab if URL hash is set (e.g. casino-app.html#live)
+  const hash = (location.hash||'').replace('#','');
+  if (hash) {
+    const t = document.querySelector('.tab[data-game="'+hash+'"]');
+    if (t) t.click();
+  }
 }
+
+// Handle parent requesting a tab switch after iframe already loaded
+window.addEventListener('message', (e)=>{
+  if(e.data && e.data.type==='casino:goto' && e.data.tab){
+    const t=document.querySelector('.tab[data-game="'+e.data.tab+'"]');
+    if(t) t.click();
+  }
+});
 
 window.addEventListener('resize', ()=>{
   sizeWheelCanvas(); drawWheel(wheelAngle);
