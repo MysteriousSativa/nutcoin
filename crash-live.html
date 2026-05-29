@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>NUT CRASH LIVE</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{
+  width:100%;height:100%;background:#080c12;overflow:hidden;
+  font-family:'Inter',system-ui,sans-serif;color:#e8f0f6;
+  user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent;
+}
+:root{
+  --green:#00e701;--gold:#f6c90e;--red:#ff4f4f;--orange:#ff8c00;
+  --surface:#1a2c38;--surface2:#213743;--border:rgba(255,255,255,0.08);
+  --muted:#5f7281;--label:#b1bad3;--mono:'Space Mono',monospace;
+}
+
+/* ── CANVAS ── */
+canvas{display:block;position:fixed;inset:0;z-index:0;}
+
+/* ── CLOSE ── */
+#closeBtn{
+  position:fixed;top:10px;right:12px;z-index:80;
+  background:rgba(26,44,56,0.92);border:1px solid var(--border);
+  color:var(--label);font-size:14px;width:32px;height:32px;border-radius:8px;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  touch-action:manipulation;
+}
+
+/* ── CONNECTION STATUS ── */
+#connDot{
+  position:fixed;top:14px;left:12px;z-index:80;
+  width:7px;height:7px;border-radius:50%;background:#ff4f4f;
+  transition:background .3s;
+}
+#connDot.ok{background:var(--green);box-shadow:0 0 6px rgba(0,231,1,0.55);}
+
+/* ── HISTORY PILLS ── */
+#hist{
+  position:fixed;top:8px;left:28px;right:52px;z-index:60;
+  display:flex;gap:4px;overflow-x:auto;align-items:center;
+  scrollbar-width:none;padding:4px 2px;
+}
+#hist::-webkit-scrollbar{display:none;}
+.hp{
+  font-family:var(--mono);font-size:9px;font-weight:700;
+  border-radius:5px;padding:3px 8px;flex-shrink:0;white-space:nowrap;
+}
+.hp.red {background:rgba(255,79,79,0.18);color:var(--red);border:1px solid rgba(255,79,79,0.25);}
+.hp.gold{background:rgba(246,201,14,0.14);color:var(--gold);border:1px solid rgba(246,201,14,0.22);}
+.hp.green{background:rgba(0,231,1,0.12);color:var(--green);border:1px solid rgba(0,231,1,0.20);}
+
+/* ── CENTER DISPLAY (multiplier / countdown) ── */
+#centerDisp{
+  position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
+  z-index:50;text-align:center;pointer-events:none;
+}
+#multNum{
+  font-family:var(--mono);font-size:clamp(52px,16vw,80px);font-weight:900;
+  letter-spacing:-0.02em;line-height:1;
+  color:var(--green);text-shadow:0 0 30px rgba(0,231,1,0.55);
+  transition:color .15s,text-shadow .15s;
+}
+#multNum.gold{color:var(--gold);text-shadow:0 0 30px rgba(246,201,14,0.55);}
+#multNum.red{color:var(--red);text-shadow:0 0 30px rgba(255,79,79,0.55);}
+#multNum.orange{color:var(--orange);text-shadow:0 0 30px rgba(255,140,0,0.55);}
+#crashedLabel{
+  font-family:var(--mono);font-size:14px;font-weight:700;letter-spacing:.12em;
+  color:var(--red);margin-bottom:6px;
+  text-shadow:0 0 12px rgba(255,79,79,0.5);display:none;
+}
+#waitLabel{font-size:11px;color:var(--muted);letter-spacing:.12em;margin-top:8px;}
+
+/* ── PLAYERS OVERLAY ── */
+#players{
+  position:fixed;top:44px;left:10px;z-index:55;
+  min-width:140px;max-width:160px;
+}
+.pl-row{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:3px 8px;border-radius:6px;margin-bottom:2px;
+  background:rgba(10,18,25,0.75);
+  font-size:10px;gap:6px;
+}
+.pl-name{color:var(--label);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:70px;flex:1;}
+.pl-amt{font-family:var(--mono);font-size:9px;color:var(--muted);flex-shrink:0;}
+.pl-status{font-family:var(--mono);font-size:9px;font-weight:700;flex-shrink:0;}
+.pl-status.live{color:var(--green);}
+.pl-status.co{color:var(--gold);}
+.pl-status.lost{color:var(--red);}
+
+/* ── BOTTOM PANEL ── */
+#bottom{
+  position:fixed;bottom:0;left:0;right:0;z-index:70;
+  background:linear-gradient(to top,rgba(8,12,18,0.99) 70%,transparent);
+  padding:12px 14px calc(12px + env(safe-area-inset-bottom,0px));
+}
+
+/* Bet UI (shown during waiting) */
+#betUI{display:flex;flex-direction:column;gap:7px;}
+.brow{display:grid;grid-template-columns:40px 1fr 40px;gap:6px;align-items:center;}
+.ns-adj{
+  background:var(--surface);border:1px solid var(--border);color:#e8f0f6;
+  border-radius:9px;width:40px;height:40px;font-size:20px;font-weight:900;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  touch-action:manipulation;
+}
+.ns-adj:hover{background:var(--surface2);}
+.bet-box{background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:5px 10px;text-align:center;}
+.bet-lbl{display:block;font-size:8px;font-weight:700;letter-spacing:.1em;color:var(--muted);text-transform:uppercase;margin-bottom:2px;}
+.bet-num{font-family:var(--mono);font-size:16px;font-weight:700;color:var(--gold);}
+.qrow{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;}
+.ns-q{
+  background:var(--surface);border:1px solid var(--border);color:var(--label);
+  border-radius:8px;padding:7px 4px;font-size:10px;font-weight:800;
+  cursor:pointer;touch-action:manipulation;text-align:center;
+}
+.ns-q:hover{background:var(--surface2);}
+.ns-bet{
+  width:100%;background:linear-gradient(180deg,var(--green),#00b800);
+  border:none;color:#041208;border-radius:11px;padding:14px;
+  font-size:14px;font-weight:900;letter-spacing:.08em;
+  cursor:pointer;touch-action:manipulation;margin-top:1px;
+}
+.ns-bet:disabled{opacity:.3;cursor:default;}
+
+/* Countdown overlay inside bet area */
+#countdownBar{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:4px;
+}
+#cdLabel{font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:.08em;}
+#cdNum{
+  font-family:var(--mono);font-size:18px;font-weight:900;
+  color:var(--gold);text-shadow:0 0 10px rgba(246,201,14,0.5);
+}
+#myBetStatus{
+  text-align:center;font-family:var(--mono);font-size:10px;
+  color:var(--green);padding:2px 0;letter-spacing:.06em;min-height:16px;
+}
+
+/* Cashout UI (shown during flying) */
+#coUI{display:none;text-align:center;}
+.ns-co{
+  width:100%;background:linear-gradient(180deg,var(--gold),#c8a200);
+  border:none;color:#041208;border-radius:11px;padding:15px;
+  font-size:15px;font-weight:900;letter-spacing:.08em;
+  cursor:pointer;touch-action:manipulation;
+  animation:copulse .7s ease-in-out infinite;
+}
+@keyframes copulse{0%,100%{box-shadow:0 0 0 0 transparent;}50%{box-shadow:0 0 20px 4px rgba(246,201,14,.45);}}
+.ns-co.cashed{
+  background:linear-gradient(180deg,#213743,#1a2c38);
+  color:var(--green);animation:none;
+  border:1px solid rgba(0,231,1,.25);font-size:13px;
+}
+#coWin{font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:5px;}
+
+/* No bet / info bar during flying */
+#flyingInfo{display:none;text-align:center;color:var(--muted);font-size:11px;padding:6px 0;letter-spacing:.06em;}
+
+/* Crashed result (shown briefly after crash) */
+#crashedUI{display:none;text-align:center;}
+#crashedRes{
+  font-family:var(--mono);font-size:14px;font-weight:700;margin-bottom:8px;
+  min-height:20px;
+}
+#nextRound{font-size:10px;color:var(--muted);letter-spacing:.1em;}
+
+/* ── TOAST ── */
+#toast{
+  position:fixed;top:50px;left:50%;transform:translateX(-50%);z-index:100;
+  background:rgba(10,18,25,0.95);border:1px solid var(--border);
+  border-radius:10px;padding:8px 18px;font-size:12px;font-weight:700;
+  pointer-events:none;opacity:0;transition:opacity .2s;white-space:nowrap;
+}
+#toast.show{opacity:1;}
+</style>
+</head>
+<body>
+
+<canvas id="gc"></canvas>
+<button id="closeBtn" onclick="closeLive()">✕</button>
+<div id="connDot"></div>
+
+<!-- History pills -->
+<div id="hist"></div>
+
+<!-- Center display -->
+<div id="centerDisp">
+  <div id="crashedLabel">CRASHED @</div>
+  <div id="multNum">1.00×</div>
+  <div id="waitLabel">PLACE YOUR BETS</div>
+</div>
+
+<!-- Players overlay -->
+<div id="players"></div>
+
+<!-- Bottom panel -->
+<div id="bottom">
+  <!-- WAITING phase -->
+  <div id="betUI">
+    <div id="countdownBar">
+      <span id="cdLabel">NEXT ROUND IN</span>
+      <span id="cdNum">10</span>
+    </div>
+    <div id="myBetStatus"></div>
+    <div class="brow">
+      <button class="ns-adj" onclick="adjBet(-50)">−</button>
+      <div class="bet-box">
+        <span class="bet-lbl">BET</span>
+        <span class="bet-num" id="betNum">100</span>
+      </div>
+      <button class="ns-adj" onclick="adjBet(50)">+</button>
+    </div>
+    <div class="qrow">
+      <button class="ns-q" onclick="bPct(.10)">10%</button>
+      <button class="ns-q" onclick="bPct(.25)">25%</button>
+      <button class="ns-q" onclick="bPct(.50)">50%</button>
+      <button class="ns-q" onclick="bMax()">MAX</button>
+    </div>
+    <button class="ns-bet" id="betBtn" onclick="placeBet()">BET</button>
+  </div>
+
+  <!-- FLYING phase: has bet -->
+  <div id="coUI">
+    <button class="ns-co" id="coBtn" onclick="doCashout()">CASH OUT</button>
+    <div id="coWin"></div>
+  </div>
+
+  <!-- FLYING phase: no bet placed -->
+  <div id="flyingInfo">🚀 Round in progress — bet next round</div>
+
+  <!-- CRASHED phase -->
+  <div id="crashedUI">
+    <div id="crashedRes"></div>
+    <div id="nextRound">NEXT ROUND STARTING…</div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+'use strict'
+// ═══════════════════════════════════════════════════════════
+// CONFIG — UPDATE THIS URL AFTER DEPLOYING TO RENDER
+// ═══════════════════════════════════════════════════════════
+const CRASH_WS = (function(){
+  const stored = localStorage.getItem('nut_crash_ws')
+  if (stored) return stored
+  // ↓ Paste your Render URL here after deployment
+  return 'wss://PASTE_YOUR_RENDER_URL_HERE.onrender.com'
+})()
+
+// ═══════════════════════════════════════════════════════════
+// IDENTITY
+// ═══════════════════════════════════════════════════════════
+const KEY_BAL  = 'nut_pm_bal_v1'
+const KEY_NICK = 'nut_nickname_v1'
+const KEY_SID  = 'nut_session_id_v1'
+
+function getBal() { return Math.max(0, parseInt(localStorage.getItem(KEY_BAL)||'0',10)||0) }
+function setBal(n) {
+  n = Math.max(0, Math.floor(n))
+  localStorage.setItem(KEY_BAL, String(n))
+  window.parent && window.parent.postMessage({ type:'casino:balance', balance:n }, '*')
+}
+function closeLive() {
+  window.parent && window.parent.postMessage({ type:'live:close' }, '*')
+}
+
+const mySid  = localStorage.getItem(KEY_SID) || ('live_' + Math.random().toString(36).slice(2,14))
+const myName = localStorage.getItem(KEY_NICK) || 'Anon'
+
+// ═══════════════════════════════════════════════════════════
+// CANVAS SETUP
+// ═══════════════════════════════════════════════════════════
+const canvas = document.getElementById('gc')
+const ctx    = canvas.getContext('2d')
+
+function resizeCanvas() {
+  canvas.width  = window.innerWidth
+  canvas.height = window.innerHeight
+}
+window.addEventListener('resize', resizeCanvas)
+resizeCanvas()
+
+// ═══════════════════════════════════════════════════════════
+// GAME STATE
+// ═══════════════════════════════════════════════════════════
+let phase       = 'waiting'
+let currentMult = 1.00
+let countdown   = 10
+let flightPts   = []    // {t, m} during flying
+let serverBets  = []    // publicBets array from server
+let history     = []    // [{m, color}]
+let roundId     = 0
+
+// My bet state
+let myBet        = 0
+let myBetActive  = false   // true = bet placed, not yet resolved
+let myCashedOut  = false
+let myCashMult   = 0
+
+// Bet amount UI
+let betAmt = 100
+
+// ═══════════════════════════════════════════════════════════
+// WEBSOCKET
+// ═══════════════════════════════════════════════════════════
+let ws = null
+let reconnectT = null
+
+function connect() {
+  clearTimeout(reconnectT)
+  try {
+    ws = new WebSocket(CRASH_WS)
+  } catch {
+    setConnected(false)
+    reconnectT = setTimeout(connect, 5000)
+    return
+  }
+
+  ws.onopen  = () => { setConnected(true) }
+  ws.onclose = () => { setConnected(false); reconnectT = setTimeout(connect, 4000) }
+  ws.onerror = () => { setConnected(false) }
+  ws.onmessage = e => {
+    try { handleMsg(JSON.parse(e.data)) } catch {}
+  }
+}
+
+function setConnected(ok) {
+  document.getElementById('connDot').classList.toggle('ok', ok)
+}
+
+function wsSend(obj) {
+  if (ws && ws.readyState === WebSocket.OPEN) ws.send(JSON.stringify(obj))
+}
+
+// ═══════════════════════════════════════════════════════════
+// MESSAGE HANDLER
+// ═══════════════════════════════════════════════════════════
+function handleMsg(msg) {
+  switch (msg.type) {
+
+    case 'sync':
+      // First message on connection — sync to live state
+      history    = msg.history || []
+      serverBets = msg.bets    || []
+      roundId    = msg.roundId || 0
+      renderHistory()
+
+      if (msg.phase === 'waiting') {
+        setPhase('waiting')
+        countdown   = msg.countdown || 10
+        currentMult = 1.00
+        flightPts   = []
+      } else if (msg.phase === 'flying') {
+        setPhase('flying')
+        currentMult = msg.mult || 1.00
+        // Reconstruct path from elapsed time
+        const el = msg.elapsed || 0
+        flightPts = []
+        for (let s = 0; s <= el; s += 0.12) {
+          flightPts.push({ t: s, m: parseFloat(Math.pow(Math.E, 0.097 * s).toFixed(2)) })
+        }
+        if (flightPts.length === 0 || flightPts[flightPts.length-1].m < currentMult) {
+          flightPts.push({ t: el, m: currentMult })
+        }
+      } else if (msg.phase === 'crashed') {
+        setPhase('crashed')
+        currentMult = msg.mult || 1.00
+      }
+      break
+
+    case 'waiting':
+      if (roundId !== msg.roundId) {
+        // New round — reset my bet state
+        if (myBetActive && !myCashedOut) {
+          // I lost last round (didn't cash out, crash happened)
+          // balance was already deducted when I placed the bet
+        }
+        resetMyRound()
+      }
+      roundId    = msg.roundId
+      countdown  = msg.countdown
+      history    = msg.history || history
+      serverBets = []
+      flightPts  = []
+      currentMult = 1.00
+      if (phase !== 'waiting') setPhase('waiting')
+      document.getElementById('cdNum').textContent = countdown
+      renderHistory()
+      break
+
+    case 'flying':
+      if (phase !== 'flying') setPhase('flying')
+      currentMult = msg.mult
+      serverBets  = msg.bets || serverBets
+      if (msg.elapsed !== undefined) {
+        flightPts.push({ t: msg.elapsed, m: msg.mult })
+      }
+      updateMultDisplay()
+      renderCOWin()
+      renderPlayers()
+      break
+
+    case 'crashed':
+      phase = 'crashed'
+      currentMult = msg.mult
+      serverBets  = msg.bets || serverBets
+      if (myBetActive && !myCashedOut) {
+        // I was in and didn't cash out → lost
+        showToast('💥 CRASHED — −' + myBet.toLocaleString() + ' CHIPS')
+        resetMyRound()
+      }
+      setPhase('crashed')
+      renderHistory()
+      break
+
+    case 'bet_placed':
+      serverBets = serverBets.filter(b => b.sid !== msg.sid)
+      serverBets.push({ sid: msg.sid, name: msg.name, amount: msg.amount, cashedOut: false, cashoutMult: null })
+      renderPlayers()
+      break
+
+    case 'cashout':
+      const cb = serverBets.find(b => b.sid === msg.sid)
+      if (cb) { cb.cashedOut = true; cb.cashoutMult = msg.mult }
+      renderPlayers()
+      break
+
+    case 'cashout_ok':
+      // MY cashout confirmed
+      myCashedOut = true
+      myCashMult  = msg.mult
+      const payout = msg.payout
+      setBal(getBal() + payout)
+      myBetActive = false
+      showToast('✅ Cashed out ' + payout.toLocaleString() + ' CHIPS @ ' + msg.mult + '×')
+      renderCOBtn()
+      break
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// PHASE TRANSITIONS
+// ═══════════════════════════════════════════════════════════
+function setPhase(p) {
+  phase = p
+
+  const betUI      = document.getElementById('betUI')
+  const coUI       = document.getElementById('coUI')
+  const flyInfo    = document.getElementById('flyingInfo')
+  const crashedUI  = document.getElementById('crashedUI')
+  const crashLbl   = document.getElementById('crashedLabel')
+  const waitLbl    = document.getElementById('waitLabel')
+
+  betUI.style.display     = 'none'
+  coUI.style.display      = 'none'
+  flyInfo.style.display   = 'none'
+  crashedUI.style.display = 'none'
+  crashLbl.style.display  = 'none'
+  waitLbl.style.display   = 'none'
+
+  if (p === 'waiting') {
+    betUI.style.display  = 'flex'
+    waitLbl.style.display = 'block'
+    document.getElementById('betBtn').disabled = (getBal() <= 0)
+    document.getElementById('cdNum').textContent = countdown
+    document.getElementById('multNum').textContent = '1.00×'
+    document.getElementById('multNum').className = ''
+    waitLbl.textContent = myBetActive ? '✅ BET PLACED' : 'PLACE YOUR BETS'
+    renderPlayers()
+  }
+
+  if (p === 'flying') {
+    if (myBetActive && !myCashedOut) {
+      coUI.style.display = 'block'
+      renderCOBtn()
+    } else {
+      flyInfo.style.display = 'block'
+    }
+    updateMultDisplay()
+    renderPlayers()
+  }
+
+  if (p === 'crashed') {
+    crashedUI.style.display = 'block'
+    crashLbl.style.display  = 'block'
+    const mn = document.getElementById('multNum')
+    mn.className = 'red'
+    mn.textContent = currentMult.toFixed(2) + '×'
+    const res = document.getElementById('crashedRes')
+    if (myBetActive && !myCashedOut) {
+      res.style.color = '#ff4f4f'
+      res.textContent = '💥 You lost −' + myBet.toLocaleString() + ' CHIPS'
+    } else if (myCashedOut) {
+      res.style.color = '#00e701'
+      res.textContent = '✅ You cashed @ ' + myCashMult.toFixed(2) + '×'
+    } else {
+      res.style.color = '#5f7281'
+      res.textContent = 'No bet this round'
+    }
+    renderPlayers()
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// MULTIPLIER DISPLAY
+// ═══════════════════════════════════════════════════════════
+function updateMultDisplay() {
+  const el = document.getElementById('multNum')
+  el.textContent = currentMult.toFixed(2) + '×'
+  if (currentMult < 2.0)      { el.className = '';       }
+  else if (currentMult < 3.0) { el.className = 'gold';   }
+  else if (currentMult < 7.0) { el.className = 'orange'; }
+  else                         { el.className = 'red';    }
+}
+
+function renderCOBtn() {
+  const btn = document.getElementById('coBtn')
+  if (myCashedOut) {
+    btn.className = 'ns-co cashed'
+    btn.textContent = '✅ Cashed @ ' + myCashMult.toFixed(2) + '×'
+    btn.onclick = null
+  } else {
+    btn.className = 'ns-co'
+    btn.textContent = 'CASH OUT'
+    btn.onclick = doCashout
+  }
+  renderCOWin()
+}
+
+function renderCOWin() {
+  const el = document.getElementById('coWin')
+  if (!el) return
+  if (myBetActive && !myCashedOut) {
+    const win = Math.floor(myBet * currentMult)
+    el.textContent = win.toLocaleString() + ' CHIPS if cashed now'
+    el.style.color = currentMult > 1.5 ? '#f6c90e' : '#5f7281'
+  } else {
+    el.textContent = ''
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// PLAYERS LIST
+// ═══════════════════════════════════════════════════════════
+function renderPlayers() {
+  const el = document.getElementById('players')
+  if (!serverBets.length) { el.innerHTML = ''; return }
+  const show = serverBets.slice(0, 6)
+  el.innerHTML = show.map(b => {
+    let statusHtml
+    if (phase === 'crashed') {
+      statusHtml = b.cashedOut
+        ? `<span class="pl-status co">${b.cashoutMult?.toFixed(2)}×</span>`
+        : `<span class="pl-status lost">BUST</span>`
+    } else if (b.cashedOut) {
+      statusHtml = `<span class="pl-status co">${b.cashoutMult?.toFixed(2)}×</span>`
+    } else {
+      statusHtml = `<span class="pl-status live">IN</span>`
+    }
+    return `<div class="pl-row">
+      <span class="pl-name">${escH(b.name)}</span>
+      <span class="pl-amt">${fmtChips(b.amount)}</span>
+      ${statusHtml}
+    </div>`
+  }).join('')
+}
+
+// ═══════════════════════════════════════════════════════════
+// HISTORY PILLS
+// ═══════════════════════════════════════════════════════════
+function renderHistory() {
+  document.getElementById('hist').innerHTML = history.slice(0, 20).map(h =>
+    `<span class="hp ${h.color}">${h.m.toFixed(2)}×</span>`
+  ).join('')
+}
+
+// ═══════════════════════════════════════════════════════════
+// CANVAS RENDERING
+// ═══════════════════════════════════════════════════════════
+function draw() {
+  const W = canvas.width, H = canvas.height
+  ctx.clearRect(0, 0, W, H)
+
+  // Background
+  ctx.fillStyle = '#080c12'
+  ctx.fillRect(0, 0, W, H)
+
+  if (phase === 'waiting') {
+    drawWaiting(W, H)
+    return
+  }
+
+  if (flightPts.length < 2) return
+
+  const PX  = 22, PY = 54, PB = 168   // padding: left, top, bottom (above bottom panel)
+  const gW  = W - PX * 2
+  const gH  = H - PY - PB
+
+  const maxT = Math.max(flightPts[flightPts.length - 1]?.t || 1, 2)
+  const maxM = Math.max(currentMult * 1.18, 2.0)
+
+  const mx = t => PX + (t / maxT) * gW
+  const my = m => PY + gH - Math.min(gH, ((m - 1) / (maxM - 1)) * gH)
+
+  const crashed = phase === 'crashed'
+  const col = crashed ? '#ff4f4f'
+            : currentMult < 2   ? '#00e701'
+            : currentMult < 5   ? '#f6c90e'
+            : '#ff8c00'
+
+  // ── Fill under curve ──
+  ctx.beginPath()
+  ctx.moveTo(mx(0), my(1))
+  flightPts.forEach(p => ctx.lineTo(mx(p.t), my(p.m)))
+  ctx.lineTo(mx(flightPts[flightPts.length - 1].t), PY + gH)
+  ctx.lineTo(mx(0), PY + gH)
+  ctx.closePath()
+  ctx.fillStyle = crashed ? 'rgba(255,79,79,0.07)' : 'rgba(0,231,1,0.07)'
+  ctx.fill()
+
+  // ── Curve line ──
+  ctx.beginPath()
+  ctx.moveTo(mx(0), my(1))
+  flightPts.forEach(p => ctx.lineTo(mx(p.t), my(p.m)))
+  ctx.strokeStyle = col
+  ctx.lineWidth   = 2.5
+  ctx.shadowColor = col
+  ctx.shadowBlur  = 10
+  ctx.lineJoin    = 'round'
+  ctx.stroke()
+  ctx.shadowBlur = 0
+
+  // ── End dot (only during flying) ──
+  if (phase === 'flying' && flightPts.length) {
+    const last = flightPts[flightPts.length - 1]
+    const ex = mx(last.t), ey = my(last.m)
+    ctx.beginPath()
+    ctx.arc(ex, ey, 5, 0, Math.PI * 2)
+    ctx.fillStyle   = col
+    ctx.shadowColor = col
+    ctx.shadowBlur  = 16
+    ctx.fill()
+    ctx.shadowBlur = 0
+  }
+
+  // ── Y-axis multiplier labels ──
+  ctx.fillStyle   = 'rgba(95,114,129,0.55)'
+  ctx.font        = '10px Space Mono, monospace'
+  ctx.textAlign   = 'right'
+  const marks = [1, 2, 5, 10, 20, 50]
+  marks.forEach(m => {
+    if (m > maxM) return
+    const y = my(m)
+    if (y < PY + 10 || y > PY + gH - 5) return
+    ctx.fillText(m + '×', PX - 4, y + 3)
+    ctx.strokeStyle = 'rgba(255,255,255,0.04)'
+    ctx.lineWidth = 1
+    ctx.beginPath()
+    ctx.moveTo(PX, y)
+    ctx.lineTo(W - PX, y)
+    ctx.stroke()
+  })
+  ctx.textAlign = 'left'
+}
+
+function drawWaiting(W, H) {
+  // Subtle grid lines
+  ctx.strokeStyle = 'rgba(255,255,255,0.025)'
+  ctx.lineWidth = 1
+  for (let y = 50; y < H - 160; y += 50) {
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke()
+  }
+  // "NUT" wordmark faint
+  ctx.fillStyle   = 'rgba(200,169,110,0.04)'
+  ctx.font        = '900 ' + Math.min(180, W * 0.55) + 'px Inter, sans-serif'
+  ctx.textAlign   = 'center'
+  ctx.fillText('$NUT', W / 2, H / 2 - 60)
+  ctx.textAlign = 'left'
+}
+
+// ═══════════════════════════════════════════════════════════
+// ANIMATION LOOP
+// ═══════════════════════════════════════════════════════════
+;(function loop() {
+  requestAnimationFrame(loop)
+  draw()
+})()
+
+// ═══════════════════════════════════════════════════════════
+// BET ACTIONS
+// ═══════════════════════════════════════════════════════════
+function placeBet() {
+  if (phase !== 'waiting' || myBetActive) return
+  const bal = getBal()
+  if (betAmt <= 0 || betAmt > bal) return
+
+  myBet       = betAmt
+  myBetActive = true
+  myCashedOut = false
+  myCashMult  = 0
+  setBal(bal - betAmt)   // optimistic deduct
+  wsSend({ type: 'bet', sid: mySid, name: myName, amount: betAmt })
+
+  document.getElementById('myBetStatus').textContent = '✅ BET PLACED: ' + betAmt.toLocaleString() + ' CHIPS'
+  document.getElementById('betBtn').disabled = true
+  document.getElementById('waitLabel').textContent = '✅ BET PLACED'
+}
+
+function doCashout() {
+  if (phase !== 'flying' || !myBetActive || myCashedOut) return
+  wsSend({ type: 'cashout', sid: mySid, amount: myBet })
+}
+
+function resetMyRound() {
+  myBetActive = false
+  myCashedOut = false
+  myCashMult  = 0
+  myBet       = 0
+  document.getElementById('myBetStatus').textContent = ''
+}
+
+// ═══════════════════════════════════════════════════════════
+// BET UI
+// ═══════════════════════════════════════════════════════════
+function refreshBetUI() {
+  document.getElementById('betNum').textContent = betAmt.toLocaleString()
+  document.getElementById('betBtn').disabled = (getBal() <= 0 || myBetActive)
+}
+function adjBet(d) { betAmt = Math.max(1, Math.min(getBal() || 1, betAmt + d)); refreshBetUI() }
+function bPct(p)   { betAmt = Math.max(1, Math.floor(getBal() * p) || 1); refreshBetUI() }
+function bMax()    { betAmt = Math.max(1, getBal()); refreshBetUI() }
+
+// ═══════════════════════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════════════════════
+let toastTimer = null
+function showToast(msg) {
+  const el = document.getElementById('toast')
+  el.textContent = msg
+  el.classList.add('show')
+  clearTimeout(toastTimer)
+  toastTimer = setTimeout(() => el.classList.remove('show'), 3500)
+}
+
+// ═══════════════════════════════════════════════════════════
+// UTILS
+// ═══════════════════════════════════════════════════════════
+function escH(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') }
+function fmtChips(n) { return n >= 1000 ? Math.round(n/1000)+'K' : n.toLocaleString() }
+
+// ═══════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════
+refreshBetUI()
+connect()
+</script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+{
+  "name": "nutcrash-server",
+  "version": "1.0.0",
+  "description": "NUT Casino live crash game WebSocket server",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "ws": "^8.17.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
