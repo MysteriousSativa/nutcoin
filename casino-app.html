@@ -248,18 +248,9 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--s
   <!-- GAME AREA -->
   <div id="gameArea">
 
-    <!-- WHEEL -->
-    <div class="game-panel active" id="panel_wheel">
-      <div class="recent-row" id="wheelRecent"></div>
-      <div class="canvas-wrap" id="wheelWrap">
-        <div class="oracle-badge" id="oracleBadge">⚡ ORACLE ACTIVE</div>
-        <div class="wheel-pointer-outer"><div class="wheel-ptr"></div></div>
-        <canvas id="wheelCanvas"></canvas>
-        <div class="result-overlay" id="wheelResult">
-          <div class="result-big win" id="wrBig"></div>
-          <div class="result-sub" id="wrSub"></div>
-        </div>
-      </div>
+    <!-- WHEEL 3D -->
+    <div class="game-panel active" id="panel_wheel" style="padding:0;overflow:hidden;">
+      <iframe id="wheelFrame" src="./wheel3d.html" style="border:none;width:100%;height:100%;display:block;"></iframe>
     </div>
 
     <!-- FLIP -->
@@ -389,7 +380,6 @@ document.querySelectorAll('.tab').forEach(btn => {
     document.getElementById('panel_'+btn.dataset.game)?.classList.add('active');
     currentGame = btn.dataset.game;
     refreshActionBtn();
-    if (currentGame==='wheel') { sizeWheelCanvas(); drawWheel(wheelAngle); renderOracleBadge(); }
     if (currentGame==='crash') { sizeCrashCanvas(); drawCrash(); }
     if (currentGame==='flip')  { sizeFlipCanvas();  drawFlip(null); }
     if (currentGame==='bj')    renderBJ();
@@ -405,19 +395,20 @@ document.querySelectorAll('.tab').forEach(btn => {
       const pf=document.getElementById('pokerFrame');
       if(pf&&!pf.src) pf.src='./poker-live.html';
     }
-    // Hide shared bet controls for slope/live/poker (they have their own controls)
+    // Hide shared bet controls for wheel/slope/live/poker (they have their own controls)
     const bc=document.getElementById('betControls');
-    if(bc) bc.style.display=(currentGame==='slope'||currentGame==='live'||currentGame==='poker')?'none':'';
+    if(bc) bc.style.display=(currentGame==='wheel'||currentGame==='slope'||currentGame==='live'||currentGame==='poker')?'none':'';
   });
 });
 
 function refreshActionBtn() {
   const btn = document.getElementById('actionBtn');
   if (!btn) return;
-  if (currentGame==='wheel') { btn.className='action-btn'; btn.textContent='SPIN'; btn.disabled=wheelSpinning; }
+  if (currentGame==='wheel') { btn.style.display='none'; return; }
+  btn.style.display='';
   if (currentGame==='flip')  { btn.className='action-btn'; btn.textContent='FLIP'; btn.disabled=flipAnim||!flipSide; }
   if (currentGame==='crash') updateCrashBtn();
-  if (currentGame==='bj')    btn.style.display='none'; else btn.style.display='';
+  if (currentGame==='bj')    btn.style.display='none';
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -973,7 +964,6 @@ function showBroke() {
 // ACTION BUTTON ROUTING
 // ══════════════════════════════════════════════════════════════
 document.getElementById('actionBtn').addEventListener('click', ()=>{
-  if(currentGame==='wheel')  spinWheel();
   if(currentGame==='flip')   doFlip();
   if(currentGame==='crash' && crashState==='idle')   startCrash();
   if(currentGame==='crash' && crashState==='running') cashOut();
@@ -987,9 +977,9 @@ function init() {
   bet = Math.min(10, Math.max(1, getBal()));
   refreshBetDisplay();
 
-  // Wheel
-  wheelCanvas = document.getElementById('wheelCanvas');
-  if(wheelCanvas){ wheelCtx=wheelCanvas.getContext('2d'); sizeWheelCanvas(); drawWheel(wheelAngle); renderOracleBadge(); renderWheelRecent(); }
+  // Wheel 3D iframe (already has src set; hides bet controls on load)
+  const bc=document.getElementById('betControls');
+  if(bc) bc.style.display='none';
 
   // Flip
   flipCanvas = document.getElementById('flipCanvas');
@@ -1020,7 +1010,6 @@ window.addEventListener('message', (e)=>{
 });
 
 window.addEventListener('resize', ()=>{
-  sizeWheelCanvas(); drawWheel(wheelAngle);
   sizeCrashCanvas(); drawCrash();
   sizeFlipCanvas(); drawFlip(null);
 });

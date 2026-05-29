@@ -20,7 +20,15 @@
     .profile-top{display:flex;gap:16px;align-items:flex-start;margin-bottom:16px;}
     .avatar{width:88px;height:88px;border-radius:16px;overflow:hidden;border:2px solid rgba(200,169,110,0.35);flex-shrink:0;background:rgba(8,5,2,0.7);}
     .avatar img{width:100%;height:100%;object-fit:cover;}
-    .profile-name{font-size:26px;font-weight:900;line-height:1.15;margin-bottom:4px;}
+    .profile-name-row{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:4px;}
+    .profile-name{font-size:26px;font-weight:900;line-height:1.15;}
+    .profile-dev-tag,.nut-profile-tag.dev{
+      font-size:9px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;
+      padding:3px 8px;border-radius:6px;
+      background:linear-gradient(135deg,rgba(78,120,255,0.35),rgba(120,80,255,0.25));
+      border:1px solid rgba(140,180,255,0.55);color:#b8d4ff;
+      box-shadow:0 0 12px rgba(100,140,255,0.25);
+    }
     .profile-id{font-family:ui-monospace,monospace;font-size:11px;color:var(--gold-bright);letter-spacing:.08em;margin-bottom:6px;}
     .profile-you{font-size:10px;color:var(--green);letter-spacing:.12em;text-transform:uppercase;font-weight:800;}
     .profile-bio{font-size:14px;color:var(--muted);font-style:italic;line-height:1.45;margin-bottom:14px;}
@@ -54,6 +62,7 @@
     </div>
   </div>
 
+  <script src="./nutrank.js"></script>
   <script src="./profiles.js"></script>
   <script src="./npcs.js"></script>
   <script>
@@ -212,13 +221,17 @@
         <div class="profile-top">
           <div class="avatar"><img src="${avFor(targetSid)}" alt=""/></div>
           <div>
-            <div class="profile-name">${esc(displayName)}</div>
+            <div class="profile-name-row">
+              <div class="profile-name">${esc(displayName)}</div>
+              ${NutProfiles.isDevAccount(targetSid, displayName) ? NutProfiles.devTagHtml() : ''}
+            </div>
             <div class="profile-id">${esc(nutId)}</div>
             ${isYou ? '<div class="profile-you">This is you</div>' : ''}
           </div>
         </div>
         ${bio ? `<div class="profile-bio">&ldquo;${esc(bio)}&rdquo;</div>` : ''}
-        <div class="rank-line">${rank ? `Leaderboard rank <strong>#${rank}</strong> · ` : ''}<strong>${deeds.toLocaleString()}</strong> all-time nuts</div>
+        <div class="rank-line">${rank ? `Leaderboard rank <strong>#${rank}</strong> · ` : ''}<strong>${deeds.toLocaleString()}</strong> all-time nuts ${window.NutRank ? NutRank.getBadgeHTML(deeds, false) : ''}</div>
+        ${window.NutRank ? `<div style="margin:4px 0 8px;">${NutRank.getLevelProgressHTML(deeds)}</div>` : ''}
         <div class="stats">
           <div class="stat"><div class="stat-n">${typeof today === 'number' ? today.toLocaleString() : today}</div><div class="stat-l">Today</div></div>
           <div class="stat"><div class="stat-n">${deeds.toLocaleString()}</div><div class="stat-l">All time</div></div>

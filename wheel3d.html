@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>NUT Wheel 3D</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@700&family=Inter:wght@600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#06040a;--gold:#c9a227;--gold2:#f0d060;--gold3:#8b6914;
+  --green:#00e701;--red:#ff4f4f;--text:#f0e8d8;--muted:#6a5a48;
+  --label:#b09070;--sans:'Inter',sans-serif;--mono:'Space Mono',monospace;
+}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--sans);overflow:hidden;user-select:none;}
+
+#app{display:flex;flex-direction:column;height:100vh;max-width:480px;margin:0 auto;position:relative;}
+
+/* ── HEADER ── */
+#hdr{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:9px 14px;flex-shrink:0;background:rgba(0,0,0,0.5);
+  border-bottom:1px solid rgba(201,162,39,0.18);
+}
+.hdr-brand{font-size:13px;font-weight:900;letter-spacing:.05em;color:var(--gold);}
+#balDisplay{
+  background:rgba(201,162,39,0.1);border:1px solid rgba(201,162,39,0.35);
+  border-radius:7px;padding:3px 10px;font-size:11px;font-weight:700;
+  color:var(--gold);font-family:var(--mono);
+}
+#hdrClose{
+  background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);
+  color:var(--muted);font-size:13px;cursor:pointer;
+  width:30px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;
+}
+#hdrClose:hover{color:var(--text);background:rgba(255,255,255,0.12);}
+
+/* ── RANK BAR ── */
+#rankBar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:5px 14px;background:rgba(0,0,0,0.3);border-bottom:1px solid rgba(255,255,255,0.04);
+  flex-shrink:0;gap:10px;
+}
+#rankBadge{font-size:11px;}
+#rankLevel{
+  font-size:8.5px;font-family:var(--mono);color:var(--muted);
+  flex:1;text-align:right;letter-spacing:.06em;text-transform:uppercase;
+}
+
+/* ── VIEWPORT ── */
+#viewport{
+  flex:1;position:relative;overflow:hidden;background:#06040a;
+  display:flex;align-items:center;justify-content:center;min-height:0;
+}
+#viewport canvas{display:block;width:100%!important;height:100%!important;}
+
+/* ── RESULT OVERLAY ── */
+#resultOverlay{
+  position:absolute;inset:0;background:rgba(4,2,8,0.75);
+  display:none;flex-direction:column;align-items:center;justify-content:center;
+  gap:6px;z-index:30;pointer-events:none;backdrop-filter:blur(3px);
+}
+#resultOverlay.show{display:flex;}
+#resultBig{
+  font-family:var(--mono);font-size:clamp(32px,9vw,52px);font-weight:700;
+  line-height:1;text-align:center;
+}
+#resultBig.win{color:var(--green);text-shadow:0 0 40px rgba(0,231,1,0.7);}
+#resultBig.bust{color:var(--red);text-shadow:0 0 30px rgba(255,79,79,0.5);}
+#resultBig.jackpot{
+  color:var(--gold2);text-shadow:0 0 60px rgba(240,208,96,0.9);
+  animation:jackpotPulse 0.6s ease-in-out infinite alternate;
+}
+@keyframes jackpotPulse{0%{text-shadow:0 0 40px rgba(240,208,96,0.7);}100%{text-shadow:0 0 80px rgba(240,208,96,1),0 0 120px rgba(240,208,96,0.5);}}
+#resultSub{font-size:14px;font-weight:700;color:var(--label);}
+
+/* ── WHEEL STATUS BAR ── */
+#wheelStatus{
+  position:absolute;bottom:0;left:0;right:0;
+  text-align:center;padding:5px;font-size:10px;font-weight:700;
+  color:var(--muted);letter-spacing:.08em;pointer-events:none;
+  background:linear-gradient(transparent,rgba(0,0,0,0.4));
+}
+
+/* ── BET CONTROLS ── */
+#betControls{
+  flex-shrink:0;padding:10px 14px 12px;background:rgba(0,0,0,0.45);
+  border-top:1px solid rgba(255,255,255,0.05);
+}
+.bet-row{display:grid;grid-template-columns:38px 1fr 38px 60px;gap:6px;margin-bottom:6px;align-items:center;}
+.adj{
+  background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);
+  color:var(--text);border-radius:8px;width:38px;height:38px;font-size:20px;
+  font-weight:900;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  font-family:var(--sans);transition:background .1s;
+}
+.adj:hover{background:rgba(255,255,255,0.14);}
+.adj:active{opacity:.6;}
+.bet-box{
+  background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.09);
+  border-radius:8px;padding:4px 8px;text-align:center;
+}
+.bet-lbl{display:block;font-size:7.5px;font-weight:700;letter-spacing:.1em;color:var(--muted);text-transform:uppercase;margin-bottom:1px;}
+.bet-num{font-family:var(--mono);font-size:17px;font-weight:700;color:var(--gold);}
+.max-btn{
+  background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);
+  color:var(--label);border-radius:8px;height:38px;font-size:9px;font-weight:800;
+  letter-spacing:.06em;text-transform:uppercase;cursor:pointer;font-family:var(--sans);
+  width:100%;transition:background .1s;
+}
+.max-btn:hover{background:rgba(201,162,39,0.15);color:var(--gold);}
+.quick-row{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px;}
+.quick-btn{
+  background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.09);
+  color:var(--label);border-radius:8px;padding:6px;font-size:12px;font-weight:800;
+  cursor:pointer;font-family:var(--sans);transition:all .1s;
+}
+.quick-btn:hover{background:rgba(201,162,39,0.12);color:var(--gold);}
+#spinBtn{
+  width:100%;background:linear-gradient(180deg,#c9a227,#7a5a08);
+  border:none;color:#000;border-radius:10px;padding:14px;
+  font-size:14px;font-weight:900;letter-spacing:.07em;font-family:var(--sans);
+  cursor:pointer;text-transform:uppercase;
+  box-shadow:0 4px 20px rgba(201,162,39,0.35);transition:opacity .12s;
+}
+#spinBtn:disabled{opacity:.3;cursor:default;}
+#spinBtn:not(:disabled):hover{opacity:.88;}
+#spinBtn:not(:disabled):active{opacity:.7;}
+
+/* ── BROKE MSG ── */
+#brokeMsg{
+  position:absolute;inset:0;background:rgba(6,4,10,0.92);
+  display:none;flex-direction:column;align-items:center;justify-content:center;
+  gap:12px;text-align:center;padding:24px;z-index:40;
+}
+#brokeMsg.show{display:flex;}
+.broke-title{font-size:20px;font-weight:900;}
+.broke-sub{font-size:12px;color:var(--muted);}
+.broke-btn{
+  background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);
+  color:var(--text);border-radius:10px;padding:10px 20px;font-size:13px;
+  font-weight:700;cursor:pointer;font-family:var(--sans);
+}
+.broke-btn:hover{background:rgba(255,255,255,0.14);}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <div id="hdr">
+    <span class="hdr-brand">🎡 NUT WHEEL 3D</span>
+    <span id="balDisplay">0 NUTTOKENS</span>
+    <button id="hdrClose" onclick="closeGame()">✕</button>
+  </div>
+
+  <div id="rankBar">
+    <span id="rankBadge"></span>
+    <span id="rankLevel"></span>
+  </div>
+
+  <div id="viewport">
+    <!-- Three.js renders here -->
+    <div id="wheelStatus">PLACE YOUR BET AND SPIN</div>
+    <div id="resultOverlay">
+      <div id="resultBig">—</div>
+      <div id="resultSub"></div>
+    </div>
+    <div id="brokeMsg">
+      <div class="broke-title">🪙 Out of NUTTOKENS</div>
+      <div class="broke-sub">Convert more nuts on the main page to get chips.</div>
+      <button class="broke-btn" onclick="closeGame()">Get More Tokens</button>
+      <button class="broke-btn" onclick="document.getElementById('brokeMsg').classList.remove('show')">Dismiss</button>
+    </div>
+  </div>
+
+  <div id="betControls">
+    <div class="bet-row">
+      <button class="adj" id="adjMinus" onclick="adjBet(-50)">−</button>
+      <div class="bet-box">
+        <span class="bet-lbl">Bet Amount</span>
+        <span class="bet-num" id="betAmt">50</span>
+      </div>
+      <button class="adj" id="adjPlus" onclick="adjBet(50)">+</button>
+      <button class="max-btn" onclick="setBetMax()">MAX</button>
+    </div>
+    <div class="quick-row">
+      <button class="quick-btn" onclick="adjBetMult(0.5)">½ Half</button>
+      <button class="quick-btn" onclick="adjBetMult(2)">2× Double</button>
+    </div>
+    <button id="spinBtn" onclick="startSpin()">SPIN THE WHEEL</button>
+  </div>
+
+</div>
+
+<script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
+<script src="./nutrank.js"></script>
+<script>
+// ═══════════════════════════════════════════════════════════════
+// CONFIG
+// ═══════════════════════════════════════════════════════════════
+const KEY_BAL     = 'nut_pm_bal_v1'
+const KEY_ALLTIME = 'nut_alltime_v1'
+
+// ═══════════════════════════════════════════════════════════════
+// BALANCE & RANK
+// ═══════════════════════════════════════════════════════════════
+function getBal()   { return Math.max(0,parseInt(localStorage.getItem(KEY_BAL)||'0',10)||0) }
+function getAllTime(){ return parseInt(localStorage.getItem(KEY_ALLTIME)||'0',10)||0 }
+function setBal(n)  {
+  const v=Math.max(0,Math.floor(n))
+  localStorage.setItem(KEY_BAL,String(v))
+  document.getElementById('balDisplay').textContent=v.toLocaleString()+' NUTTOKENS'
+  window.parent&&window.parent.postMessage({type:'casino:balance',balance:v},'*')
+  return v
+}
+
+let nutCount = getAllTime()
+let rank     = (window.NutRank||{getRank:()=>({level:0,name:'Seedling',badge:'🌱',color:'#4ade80'})}).getRank(nutCount)
+let segments = (window.NutRank||{getWheelSegments:()=>[]}).getWheelSegments(rank.level)
+
+function refreshRankDisplay() {
+  nutCount = getAllTime()
+  rank     = NutRank.getRank(nutCount)
+  segments = NutRank.getWheelSegments(rank.level)
+  const badgeEl = document.getElementById('rankBadge')
+  const levelEl = document.getElementById('rankLevel')
+  if (badgeEl) badgeEl.innerHTML = NutRank.getBadgeHTML(nutCount)
+  if (levelEl) levelEl.textContent = nutCount.toLocaleString()+' nuts total'
+  return { rank, segments }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// BET
+// ═══════════════════════════════════════════════════════════════
+let bet = Math.min(50, Math.max(1, getBal()))
+
+function refreshBetDisplay() {
+  document.getElementById('betAmt').textContent = bet.toLocaleString()
+}
+function adjBet(d) {
+  const bal=getBal()
+  bet=Math.max(1,Math.min(bal||1,bet+d))
+  refreshBetDisplay()
+}
+function setBetMax() { bet=Math.max(1,getBal()); refreshBetDisplay() }
+function adjBetMult(m) {
+  const bal=getBal()
+  bet=m<1?Math.max(1,Math.floor(bet*m)):Math.min(bal||1,Math.floor(bet*m))
+  refreshBetDisplay()
+}
+
+// ═══════════════════════════════════════════════════════════════
+// CLOSE
+// ═══════════════════════════════════════════════════════════════
+function closeGame() {
+  window.parent&&window.parent.postMessage({type:'casino:close'},'*')
+}
+
+// ═══════════════════════════════════════════════════════════════
+// THREE.JS SCENE
+// ═══════════════════════════════════════════════════════════════
+const container = document.getElementById('viewport')
+const W = ()=>container.clientWidth
+const H = ()=>container.clientHeight
+
+const scene    = new THREE.Scene()
+scene.fog      = new THREE.FogExp2(0x06040a, 0.06)
+
+const camera   = new THREE.PerspectiveCamera(45, W()/H(), 0.1, 80)
+camera.position.set(0, 3.8, 5.2)
+camera.lookAt(0, -0.2, 0)
+
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false })
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+renderer.setSize(W(), H())
+renderer.shadowMap.enabled = true
+renderer.shadowMap.type    = THREE.PCFSoftShadowMap
+renderer.toneMapping       = THREE.ACESFilmicToneMapping
+renderer.toneMappingExposure = 1.3
+container.appendChild(renderer.domElement)
+
+// ── Lights ──────────────────────────────────────────────────
+const ambient = new THREE.AmbientLight(0xfff4e8, 0.5)
+scene.add(ambient)
+
+const sun = new THREE.DirectionalLight(0xfff8f0, 1.4)
+sun.position.set(2, 8, 4)
+sun.castShadow = true
+sun.shadow.mapSize.set(2048, 2048)
+sun.shadow.camera.near = 0.5
+sun.shadow.camera.far  = 30
+sun.shadow.camera.left = sun.shadow.camera.bottom = -6
+sun.shadow.camera.right = sun.shadow.camera.top = 6
+sun.shadow.bias = -0.001
+scene.add(sun)
+
+const rimA = new THREE.PointLight(0xff8800, 1.8, 16)
+rimA.position.set(-4, 2, 2)
+scene.add(rimA)
+
+const rimB = new THREE.PointLight(0x2244cc, 1.2, 14)
+rimB.position.set(4, 2, -2)
+scene.add(rimB)
+
+const topSpot = new THREE.SpotLight(0xffeedd, 2.5, 14, Math.PI*0.18, 0.5, 1.5)
+topSpot.position.set(0, 9, 1)
+topSpot.castShadow = true
+topSpot.shadow.mapSize.set(1024, 1024)
+scene.add(topSpot)
+
+// ── Table surface ─────────────────────────────────────────────
+const tableGeo = new THREE.PlaneGeometry(16, 16)
+tableGeo.rotateX(-Math.PI/2)
+const tableMat = new THREE.MeshStandardMaterial({
+  color:0x0c0608, roughness:0.95, metalness:0.02,
+})
+const table = new THREE.Mesh(tableGeo, tableMat)
+table.position.y = -0.22
+table.receiveShadow = true
+scene.add(table)
+
+// ── WHEEL CANVAS TEXTURE ─────────────────────────────────────
+const CANVAS_SIZE = 1024
+const wheelCanvas = document.createElement('canvas')
+wheelCanvas.width = wheelCanvas.height = CANVAS_SIZE
+const wheelCtx = wheelCanvas.getContext('2d')
+let wheelTexture = new THREE.CanvasTexture(wheelCanvas)
+
+function lerpColor(a, b, t) {
+  const ah=a.replace('#',''),bh=b.replace('#','')
+  const r1=parseInt(ah.slice(0,2),16),g1=parseInt(ah.slice(2,4),16),b1=parseInt(ah.slice(4,6),16)
+  const r2=parseInt(bh.slice(0,2),16),g2=parseInt(bh.slice(2,4),16),b2=parseInt(bh.slice(4,6),16)
+  return '#'+[r1+t*(r2-r1),g1+t*(g2-g1),b1+t*(b2-b1)].map(v=>Math.round(v).toString(16).padStart(2,'0')).join('')
+}
+
+function drawWheelCanvas(segs, highlightIdx) {
+  const ctx = wheelCtx, S = CANVAS_SIZE, cx = S/2, cy = S/2
+  const outerR = S*0.48, innerR = S*0.065
+  const n = segs.length
+  const arc = (Math.PI*2) / n
+  ctx.clearRect(0,0,S,S)
+
+  // Shadow ring
+  ctx.beginPath()
+  ctx.arc(cx,cy,outerR+8,0,Math.PI*2)
+  ctx.fillStyle='rgba(0,0,0,0.4)'
+  ctx.fill()
+
+  for (let i = 0; i < n; i++) {
+    const seg = segs[i]
+    const startA = -Math.PI/2 + i*arc
+    const endA   = startA + arc
+    const midA   = startA + arc/2
+    const isHL   = i === highlightIdx
+
+    // Pie segment
+    ctx.beginPath()
+    ctx.moveTo(cx + innerR*Math.cos(startA), cy + innerR*Math.sin(startA))
+    ctx.arc(cx, cy, outerR, startA, endA)
+    ctx.arc(cx, cy, innerR, endA, startA, true)
+    ctx.closePath()
+
+    // Radial gradient fill
+    const gx = cx + outerR*0.55*Math.cos(midA)
+    const gy = cy + outerR*0.55*Math.sin(midA)
+    const grad = ctx.createRadialGradient(gx,gy, 0, cx,cy, outerR)
+    grad.addColorStop(0, lerpColor(seg.color, '#ffffff', 0.18))
+    grad.addColorStop(0.45, seg.color)
+    grad.addColorStop(1,    lerpColor(seg.color, '#000000', 0.55))
+    ctx.fillStyle = isHL ? 'rgba(255,255,180,0.35)' : grad
+    if (!isHL) {
+      ctx.fill()
+    } else {
+      // Gold highlight overlay
+      ctx.fillStyle = grad; ctx.fill()
+      ctx.fillStyle = 'rgba(255,240,120,0.28)'; ctx.fill()
+    }
+
+    // Segment border
+    ctx.strokeStyle = 'rgba(255,255,255,0.12)'
+    ctx.lineWidth = 2.5
+    ctx.stroke()
+
+    // Metallic sheen stripe
+    const sheenGrad = ctx.createLinearGradient(
+      cx+outerR*0.2*Math.cos(midA-0.08), cy+outerR*0.2*Math.sin(midA-0.08),
+      cx+outerR*0.2*Math.cos(midA+0.08), cy+outerR*0.2*Math.sin(midA+0.08)
+    )
+    sheenGrad.addColorStop(0,'rgba(255,255,255,0)')
+    sheenGrad.addColorStop(0.5,'rgba(255,255,255,0.09)')
+    sheenGrad.addColorStop(1,'rgba(255,255,255,0)')
+    ctx.fillStyle=sheenGrad; ctx.fill()
+
+    // Label text
+    const textR = (outerR+innerR)*0.54
+    const tx = cx + textR*Math.cos(midA)
+    const ty = cy + textR*Math.sin(midA)
+    ctx.save()
+    ctx.translate(tx, ty)
+    ctx.rotate(midA + Math.PI/2)
+    ctx.shadowColor='rgba(0,0,0,0.9)'; ctx.shadowBlur=8
+    ctx.fillStyle = seg.textColor || '#ffffff'
+    const fontSize = Math.round(S * (seg.label.length > 4 ? 0.038 : 0.046))
+    ctx.font = `900 ${fontSize}px 'Space Mono',monospace`
+    ctx.textAlign='center'; ctx.textBaseline='middle'
+    ctx.fillText(seg.label, 0, 0)
+    ctx.restore()
+
+    // Gold pin at segment border
+    const pinR = outerR*0.95
+    const pinX = cx + pinR*Math.cos(startA), pinY = cy + pinR*Math.sin(startA)
+    ctx.beginPath(); ctx.arc(pinX,pinY,6,0,Math.PI*2)
+    const pinGrad = ctx.createRadialGradient(pinX-1,pinY-1,0,pinX,pinY,6)
+    pinGrad.addColorStop(0,'#f0d060')
+    pinGrad.addColorStop(1,'#8b6914')
+    ctx.fillStyle=pinGrad; ctx.fill()
+    ctx.strokeStyle='rgba(255,255,255,0.25)'; ctx.lineWidth=1; ctx.stroke()
+  }
+
+  // Spoke dividers (thin metallic lines)
+  for (let i=0;i<n;i++) {
+    const a = -Math.PI/2 + i*arc
+    ctx.beginPath()
+    ctx.moveTo(cx+innerR*1.1*Math.cos(a), cy+innerR*1.1*Math.sin(a))
+    ctx.lineTo(cx+outerR*0.96*Math.cos(a), cy+outerR*0.96*Math.sin(a))
+    ctx.strokeStyle='rgba(201,162,39,0.25)'; ctx.lineWidth=1.5; ctx.stroke()
+  }
+
+  // Center hub
+  const hubR = innerR*1.15
+  const hubGrad = ctx.createRadialGradient(cx-4,cy-4,0,cx,cy,hubR)
+  hubGrad.addColorStop(0,'#e8c040')
+  hubGrad.addColorStop(0.4,'#a07820')
+  hubGrad.addColorStop(1,'#402800')
+  ctx.beginPath(); ctx.arc(cx,cy,hubR,0,Math.PI*2)
+  ctx.fillStyle=hubGrad; ctx.fill()
+  ctx.strokeStyle='rgba(255,220,80,0.5)'; ctx.lineWidth=3; ctx.stroke()
+
+  // Center NUT emoji
+  ctx.shadowBlur=0
+  ctx.font=`${Math.round(hubR*0.9)}px serif`
+  ctx.textAlign='center'; ctx.textBaseline='middle'
+  ctx.fillText('🥜',cx,cy+1)
+
+  // Outer decorative ring
+  ctx.beginPath(); ctx.arc(cx,cy,outerR,0,Math.PI*2)
+  const ringGrad = ctx.createLinearGradient(0,0,S,S)
+  ringGrad.addColorStop(0,'rgba(201,162,39,0.4)')
+  ringGrad.addColorStop(0.5,'rgba(255,220,80,0.6)')
+  ringGrad.addColorStop(1,'rgba(201,162,39,0.4)')
+  ctx.strokeStyle=ringGrad; ctx.lineWidth=5; ctx.stroke()
+}
+
+// ── WHEEL GROUP ───────────────────────────────────────────────
+const wheelGroup = new THREE.Group()
+scene.add(wheelGroup)
+
+// Outer wood ring
+const ringMat = new THREE.MeshStandardMaterial({ color:0x1a0c04, roughness:0.85, metalness:0.08 })
+const ringGeo = new THREE.CylinderGeometry(2.7, 2.7, 0.36, 80)
+const ring = new THREE.Mesh(ringGeo, ringMat)
+ring.castShadow = true; ring.receiveShadow = true
+wheelGroup.add(ring)
+
+// Outer gold trim band
+const trimMat = new THREE.MeshStandardMaterial({ color:0xc9a227, roughness:0.3, metalness:0.8 })
+const trimGeo = new THREE.TorusGeometry(2.7, 0.055, 8, 80)
+const trimTop = new THREE.Mesh(trimGeo, trimMat)
+trimTop.rotation.x = Math.PI/2
+trimTop.position.y = 0.18
+wheelGroup.add(trimTop)
+const trimBot = trimTop.clone(); trimBot.position.y = -0.18; wheelGroup.add(trimBot)
+
+// Inner disc — canvas texture on top face
+drawWheelCanvas(segments, -1)
+// Three materials: top (canvas), side (dark wood), bottom (dark)
+const discMats = [
+  new THREE.MeshStandardMaterial({ color:0x1e0e04, roughness:0.8, metalness:0.05 }), // side
+  new THREE.MeshStandardMaterial({ map:wheelTexture, roughness:0.28, metalness:0.45 }), // top
+  new THREE.MeshStandardMaterial({ color:0x0a0604, roughness:0.9, metalness:0.0  }), // bottom
+]
+const discGeo = new THREE.CylinderGeometry(2.6, 2.6, 0.22, 80)
+const disc = new THREE.Mesh(discGeo, discMats)
+disc.position.y = 0.07
+disc.castShadow = true
+wheelGroup.add(disc)
+
+// ── POINTER ───────────────────────────────────────────────────
+// Static frame — NOT part of wheelGroup
+const pointerGroup = new THREE.Group()
+scene.add(pointerGroup)
+
+// Arm
+const armMat  = new THREE.MeshStandardMaterial({ color:0xc9a227, roughness:0.25, metalness:0.9 })
+const armGeo  = new THREE.CylinderGeometry(0.04, 0.04, 1.4, 12)
+const arm     = new THREE.Mesh(armGeo, armMat)
+arm.position.set(0, 0.6, 2.0)
+arm.rotation.x = Math.PI * 0.15
+pointerGroup.add(arm)
+
+// Arrow tip (cone pointing toward wheel)
+const tipMat = new THREE.MeshStandardMaterial({ color:0xffd060, roughness:0.15, metalness:0.95, emissive:0xffd060, emissiveIntensity:0.12 })
+const tipGeo = new THREE.ConeGeometry(0.12, 0.32, 12)
+const tip    = new THREE.Mesh(tipGeo, tipMat)
+tip.position.set(0, 0.26, 2.55)
+tip.rotation.x = Math.PI * 0.5
+pointerGroup.add(tip)
+
+// ── PARTICLES ─────────────────────────────────────────────────
+let particles = null
+let particleVels = []
+let particleLife = 0
+const PARTICLE_COUNT = 120
+
+function createParticles(color) {
+  if (particles) { scene.remove(particles); particles.geometry.dispose() }
+  const geom = new THREE.BufferGeometry()
+  const pos = new Float32Array(PARTICLE_COUNT * 3)
+  particleVels = []
+  for (let i=0;i<PARTICLE_COUNT;i++) {
+    const θ = Math.random()*Math.PI*2
+    const r = Math.random()*0.3
+    pos[i*3]   = Math.cos(θ)*r
+    pos[i*3+1] = 0.2
+    pos[i*3+2] = Math.sin(θ)*r
+    particleVels.push({
+      x: (Math.random()-0.5)*0.12,
+      y: 0.06+Math.random()*0.14,
+      z: (Math.random()-0.5)*0.12,
+    })
+  }
+  geom.setAttribute('position', new THREE.BufferAttribute(pos, 3))
+  const pMat = new THREE.PointsMaterial({ color, size:0.09, transparent:true, opacity:1.0, sizeAttenuation:true })
+  particles = new THREE.Points(geom, pMat)
+  scene.add(particles)
+  particleLife = 1.0
+}
+
+function updateParticles(dt) {
+  if (!particles || particleLife <= 0) return
+  particleLife -= dt * 0.7
+  particles.material.opacity = Math.max(0, particleLife)
+  const pos = particles.geometry.attributes.position.array
+  for (let i=0;i<PARTICLE_COUNT;i++) {
+    pos[i*3]   += particleVels[i].x * dt * 60
+    pos[i*3+1] += particleVels[i].y * dt * 60
+    pos[i*3+2] += particleVels[i].z * dt * 60
+    particleVels[i].y -= 0.004
+  }
+  particles.geometry.attributes.position.needsUpdate = true
+  if (particleLife <= 0) { scene.remove(particles); particles=null }
+}
+
+// ── SPIN STATE ────────────────────────────────────────────────
+let wheelAngle   = 0   // continuously increasing — clockwise spin
+let isSpinning   = false
+let spinStart    = 0
+let spinFrom     = 0
+let spinTo       = 0
+const SPIN_DUR   = 5200  // ms
+
+function easeOutQuint(t) { return 1 - Math.pow(1-t, 5) }
+
+function startSpin() {
+  if (isSpinning) return
+  const bal = getBal()
+  if (bal < 1 || bet < 1) { document.getElementById('brokeMsg').classList.add('show'); return }
+  const actualBet = Math.min(bet, bal)
+  setBal(bal - actualBet)
+
+  // Refresh segments in case nuts changed
+  const { rank: r, segments: segs } = refreshRankDisplay()
+  segments = segs
+
+  const n = segments.length
+  const arc = (Math.PI*2) / n
+  const winnerIdx = NutRank.pickWeighted(segments)
+  const winner = segments[winnerIdx]
+
+  // Target angle: segment winnerIdx center is at pointer when wheelAngle = (winnerIdx+0.5)*arc
+  const targetNorm = (winnerIdx + 0.5) * arc
+  const curNorm    = ((wheelAngle % (Math.PI*2)) + Math.PI*2) % (Math.PI*2)
+  let   delta      = ((targetNorm - curNorm) + Math.PI*2) % (Math.PI*2)
+  if   (delta < 0.1) delta += Math.PI*2
+  const spins = 9 + Math.floor(Math.random()*5)
+
+  document.getElementById('resultOverlay').classList.remove('show')
+  document.getElementById('brokeMsg').classList.remove('show')
+  document.getElementById('spinBtn').disabled = true
+  setStatus('')
+
+  // Redraw clean canvas
+  drawWheelCanvas(segments, -1)
+  wheelTexture.needsUpdate = true
+
+  spinFrom  = wheelAngle
+  spinTo    = wheelAngle + spins*(Math.PI*2) + delta
+  spinStart = performance.now()
+  isSpinning = true
+
+  // After spin completes
+  setTimeout(() => {
+    isSpinning   = false
+    wheelAngle   = spinTo
+
+    // Highlight winning segment
+    drawWheelCanvas(segments, winnerIdx)
+    wheelTexture.needsUpdate = true
+
+    const mult = winner.mult
+    const payout = mult > 0 ? Math.floor(actualBet * mult) : 0
+    const profit = payout - actualBet
+
+    if (mult > 0) setBal(getBal() + payout)
+
+    const rb = document.getElementById('resultBig')
+    const rs = document.getElementById('resultSub')
+    rb.textContent = mult > 0 ? winner.label : 'BUST'
+    rb.className   = mult >= 25 ? 'jackpot' : mult > 0 ? 'win' : 'bust'
+    rs.textContent = mult > 0
+      ? '+' + profit.toLocaleString() + ' NUTTOKENS'
+      : '−' + actualBet.toLocaleString() + ' NUTTOKENS'
+    document.getElementById('resultOverlay').classList.add('show')
+
+    // Particles
+    if (mult >= 25) createParticles(0xffd060)
+    else if (mult > 0) createParticles(0x00e701)
+
+    setTimeout(() => {
+      document.getElementById('resultOverlay').classList.remove('show')
+      drawWheelCanvas(segments, -1)
+      wheelTexture.needsUpdate = true
+      document.getElementById('spinBtn').disabled = false
+      setStatus('SPIN AGAIN')
+      if (getBal() < 1) {
+        setTimeout(() => document.getElementById('brokeMsg').classList.add('show'), 400)
+      }
+    }, mult >= 25 ? 4500 : 2800)
+  }, SPIN_DUR + 100)
+}
+
+// ── STATUS ────────────────────────────────────────────────────
+function setStatus(msg) {
+  document.getElementById('wheelStatus').textContent = msg || 'PLACE YOUR BET AND SPIN'
+}
+
+// ── AMBIENT IDLE ROTATION ─────────────────────────────────────
+let idleAngle = 0
+
+// ── RENDER LOOP ───────────────────────────────────────────────
+let lastTime = performance.now()
+
+function animate() {
+  requestAnimationFrame(animate)
+  const now = performance.now()
+  const dt  = Math.min((now - lastTime) / 1000, 0.05)
+  lastTime  = now
+
+  if (isSpinning) {
+    const elapsed = now - spinStart
+    const t       = Math.min(1, elapsed / SPIN_DUR)
+    const eased   = easeOutQuint(t)
+    wheelAngle    = spinFrom + (spinTo - spinFrom) * eased
+    wheelGroup.rotation.y = -wheelAngle
+  } else {
+    // Slow idle drift
+    idleAngle += 0.003
+    wheelGroup.rotation.y = -wheelAngle - idleAngle * 0.15
+  }
+
+  // Rim light pulse for drama
+  rimA.intensity = 1.4 + 0.4*Math.sin(now*0.0012)
+  rimB.intensity = 0.9 + 0.3*Math.cos(now*0.0009)
+
+  updateParticles(dt)
+  renderer.render(scene, camera)
+}
+
+// ── RESIZE ────────────────────────────────────────────────────
+const resizeObs = new ResizeObserver(() => {
+  camera.aspect = W()/H()
+  camera.updateProjectionMatrix()
+  renderer.setSize(W(), H())
+})
+resizeObs.observe(container)
+
+// ── INIT ──────────────────────────────────────────────────────
+refreshRankDisplay()
+setBal(getBal())
+bet = Math.min(50, Math.max(1, getBal()))
+refreshBetDisplay()
+
+// Draw initial wheel
+drawWheelCanvas(segments, -1)
+wheelTexture.needsUpdate = true
+animate()
+</script>
+</body>
+</html>

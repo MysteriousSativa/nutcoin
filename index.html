@@ -3518,6 +3518,7 @@ function renderLeaderboard(rows) {
       ${rankEl}
       ${nutAvatarHtml(r.session_id, 'nut-avatar-sm')}
       <span class="lb-row-name" style="${nameStyle}">${window.NutProfiles ? NutProfiles.nameHtml(r.session_id, r.nickname, '') : escHtml(r.nickname)}</span>
+      ${window.NutRank ? NutRank.getBadgeHTML(r.deeds, true) : ''}
       ${isYou ? '<span class="lb-you-badge">YOU</span>' : ''}
       <span class="lb-row-count">${Number(r.deeds).toLocaleString()}</span>
       <span class="lb-row-nuts">NUTS</span>
@@ -3798,10 +3799,14 @@ function renderNTLeaderboard() {
       : escHtml(r.name);
     const profileHref = window.NutProfiles ? NutProfiles.profileUrl(r.sessionId) : '#';
 
+    const nrNuts = isYou
+      ? parseInt(localStorage.getItem('nut_alltime_v1')||'0',10)||0
+      : (window.NutRank ? NutRank.npcNuts(r.name) : 0);
     html += `<div class="lb-row ${trueRank===1?'top1':trueRank===2?'top2':trueRank===3?'top3':''} ${isYou?'you':''}" onclick="if(event.target.tagName!=='A')window.location='${profileHref}'">
       ${rankEl}
       ${nutAvatarHtml(r.sessionId, 'nut-avatar-sm')}
       <span class="lb-row-name">${nameHtml}</span>
+      ${window.NutRank ? NutRank.getBadgeHTML(nrNuts, true) : ''}
       ${isYou ? '<span class="lb-you-badge">YOU</span>' : ''}
       <span class="lb-row-count">${chipsStr}</span>
       <span class="lb-row-nuts">CHIPS</span>
@@ -4808,6 +4813,7 @@ function downloadCert() {
 <script src="./drop.js"></script>
 <script src="./npcs.js"></script>
 <script src="./casino.js"></script>
+<script src="./nutrank.js"></script>
 <script src="./nutkens.js"></script>
 <script>
 // ═══════════════════════════════
