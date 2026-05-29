@@ -215,7 +215,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--s
 
   <div id="hdr">
     <span class="hdr-brand">🎡 NUT WHEEL</span>
-    <span id="balDisplay">0 NUTTOKENS</span>
+    <span id="balDisplay">0 NUTS</span>
     <button id="hdrClose" onclick="closeGame()">✕</button>
   </div>
 
@@ -244,8 +244,8 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--s
       <div id="resultSub"></div>
     </div>
     <div id="brokeMsg">
-      <div class="broke-title">🪙 Out of NUTTOKENS</div>
-      <div class="broke-sub">Click nuts on the main page to get more chips.</div>
+      <div class="broke-title">🥜 Out of nuts</div>
+      <div class="broke-sub">Keep clicking on the main page to earn more.</div>
       <button class="broke-btn" onclick="closeGame()">Back to Clicker</button>
       <button class="broke-btn" onclick="document.getElementById('brokeMsg').classList.remove('show')">Dismiss</button>
     </div>
@@ -253,12 +253,12 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--s
 
   <div id="betControls">
     <div class="bet-row">
-      <button class="adj" onclick="adjBet(-50)">−</button>
+      <button class="adj" onclick="adjBet(-10)">−</button>
       <div class="bet-box">
         <span class="bet-lbl">Bet Amount</span>
-        <span class="bet-num" id="betAmt">50</span>
+        <span class="bet-num" id="betAmt">10</span>
       </div>
-      <button class="adj" onclick="adjBet(50)">+</button>
+      <button class="adj" onclick="adjBet(10)">+</button>
       <button class="max-btn" onclick="setBetMax()">MAX</button>
     </div>
     <div class="quick-row">
@@ -273,16 +273,16 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--s
 <script src="./nutrank.js"></script>
 <script>
 // ─── Config ────────────────────────────────────────────────────
-const KEY_BAL     = 'nut_pm_bal_v1'
 const KEY_ALLTIME = 'nut_alltime_v1'
 
 // ─── Balance / Rank ────────────────────────────────────────────
-function getBal()    { return Math.max(0, parseInt(localStorage.getItem(KEY_BAL)||'0',10)||0) }
-function getAllTime() { return parseInt(localStorage.getItem(KEY_ALLTIME)||'0',10)||0 }
+// Nuts are the single currency: clicking earns them, spinning bets them.
+function getBal()    { return Math.max(0, parseInt(localStorage.getItem(KEY_ALLTIME)||'0',10)||0) }
+function getAllTime() { return getBal() }
 function setBal(n) {
   const v = Math.max(0, Math.floor(n))
-  localStorage.setItem(KEY_BAL, String(v))
-  document.getElementById('balDisplay').textContent = v.toLocaleString() + ' NUTTOKENS'
+  localStorage.setItem(KEY_ALLTIME, String(v))
+  document.getElementById('balDisplay').textContent = v.toLocaleString() + ' NUTS'
   window.parent && window.parent.postMessage({ type:'casino:balance', balance:v }, '*')
   return v
 }
@@ -307,7 +307,7 @@ function refreshRankDisplay() {
 }
 
 // ─── Bet ───────────────────────────────────────────────────────
-let bet = Math.min(50, Math.max(1, getBal()))
+let bet = Math.min(10, Math.max(1, getBal()))
 function refreshBetDisplay() { document.getElementById('betAmt').textContent = bet.toLocaleString() }
 function adjBet(d) {
   const bal = getBal()
@@ -532,8 +532,8 @@ function startSpin() {
     rb.className=mult>=25?'jackpot':mult>0?'win':'bust'
     rb.textContent=mult>0?winner.label:'BUST'
     rs.textContent=mult>0
-      ? '+'+profit.toLocaleString()+' NUTTOKENS'
-      : String.fromCharCode(8722)+actualBet.toLocaleString()+' NUTTOKENS'
+      ? '+'+profit.toLocaleString()+' NUTS'
+      : String.fromCharCode(8722)+actualBet.toLocaleString()+' NUTS'
     document.getElementById('resultOverlay').classList.add('show')
 
     if (mult>=25) spawnSparks(0xffd060, 80)
@@ -603,7 +603,7 @@ function animate() {
 sizeCanvas()
 refreshRankDisplay()
 setBal(getBal())
-bet=Math.min(50,Math.max(1,getBal()))
+bet=Math.min(10,Math.max(1,getBal()))
 refreshBetDisplay()
 setStatus('PLACE YOUR BET AND SPIN')
 drawWheel(segments,-1,rot)
@@ -614,7 +614,7 @@ window.addEventListener('resize',()=>{
   drawWheel(segments,-1,rot)
 })
 window.addEventListener('storage', e=>{
-  if (e.key===KEY_BAL||e.key===KEY_ALLTIME) { setBal(getBal()); refreshRankDisplay() }
+  if (e.key===KEY_ALLTIME) { setBal(getBal()); refreshRankDisplay() }
 })
 </script>
 </body>

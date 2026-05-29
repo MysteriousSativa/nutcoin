@@ -553,6 +553,21 @@ async function fetchRealLb() {
 }
 fetchRealLb()
 setInterval(fetchRealLb, 60_000)
+
+// Sync counter if casino changes nut_alltime_v1 in another tab
+window.addEventListener('storage', e => {
+  if (e.key === KEY_NUTS) {
+    nuts = Math.max(0, parseInt(e.newValue||'0', 10)||0)
+    render()
+    tickNPCsAndRender()
+  }
+})
+
+// Re-read nuts on page focus (covers same-tab navigation back from casino)
+window.addEventListener('focus', () => {
+  const fresh = Math.max(0, parseInt(localStorage.getItem(KEY_NUTS)||'0', 10)||0)
+  if (fresh !== nuts) { nuts = fresh; render(); tickNPCsAndRender() }
+})
 </script>
 </body>
 </html>
