@@ -1349,35 +1349,107 @@ position:relative;overflow:hidden;
 .nick-skip{font-family:'Cinzel',serif;font-size:10px;letter-spacing:.14em;color:var(--muted);cursor:pointer;margin-top:16px;display:block;transition:color .2s;}
 .nick-skip:hover{color:var(--gold);}
 
-/* milestone modal */
-.milestone-overlay{display:none;position:fixed;inset:0;background:rgba(5,3,1,0.88);z-index:900;align-items:center;justify-content:center;pointer-events:none;}
+/* milestone modal — redesigned */
+.milestone-overlay{
+  display:none;position:fixed;inset:0;
+  background:rgba(3,2,1,0.90);
+  z-index:900;align-items:center;justify-content:center;
+  pointer-events:none;
+}
 .milestone-overlay.show{display:flex;pointer-events:all;}
+@keyframes ms-pop{
+  0%{transform:scale(0.72) translateY(24px);opacity:0;}
+  100%{transform:scale(1) translateY(0);opacity:1;}
+}
+@keyframes ms-orbit{to{transform:rotate(360deg);}}
+@keyframes ms-twinkle{0%,100%{opacity:.25;}50%{opacity:.75;}}
 .milestone-box{
-  background:rgba(12,8,4,0.97);border:2px solid var(--gold);border-radius:24px;
-  padding:54px;text-align:center;max-width:460px;width:92%;
-  box-shadow:0 0 130px rgba(200,169,110,0.35),0 40px 80px rgba(0,0,0,0.5);
-  animation:modal-pop .35s cubic-bezier(.34,1.56,.64,1);
-position:relative;overflow:hidden;
+  position:relative;overflow:hidden;
+  background:linear-gradient(160deg,rgba(18,12,5,0.99) 0%,rgba(7,4,2,1) 100%);
+  border:1.5px solid rgba(200,169,110,0.55);
+  border-radius:20px;padding:44px 36px 32px;
+  text-align:center;max-width:420px;width:92%;
+  box-shadow:0 0 90px rgba(200,169,110,0.15),0 0 0 1px rgba(200,169,110,0.06),0 32px 64px rgba(0,0,0,0.75);
+  animation:ms-pop .38s cubic-bezier(.34,1.56,.64,1);
 }
-.milestone-box::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;
-  background:linear-gradient(90deg,transparent,var(--gold-bright),var(--gold),var(--gold-bright),transparent);
-  opacity:.55;}
-.milestone-emoji{font-size:78px;display:block;margin-bottom:16px;}
-.milestone-title{font-family:'Cinzel',serif;font-size:26px;font-weight:700;color:var(--gold);margin-bottom:12px;text-shadow:0 0 22px rgba(200,169,110,0.5);}
-.milestone-sub{font-family:'Crimson Text',serif;font-size:18px;color:var(--cream);font-style:italic;margin-bottom:22px;}
+.milestone-box::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1.5px;
+  background:linear-gradient(90deg,transparent 8%,var(--gold) 38%,var(--gold-bright) 50%,var(--gold) 62%,transparent 92%);
+}
+.milestone-box::after{
+  content:'✦';position:absolute;top:13px;left:18px;
+  font-size:10px;color:rgba(200,169,110,0.35);
+  animation:ms-twinkle 2.8s ease-in-out infinite;pointer-events:none;
+}
+/* Close button */
+.ms-close{
+  position:absolute;top:11px;right:13px;
+  background:transparent;border:none;
+  color:rgba(200,169,110,0.35);font-size:15px;
+  cursor:pointer;width:28px;height:28px;
+  display:flex;align-items:center;justify-content:center;
+  border-radius:7px;transition:color .15s,background .15s;
+}
+.ms-close:hover{color:var(--gold);background:rgba(200,169,110,0.10);}
+/* Emoji ring */
+.ms-icon-wrap{
+  margin:0 auto 22px;width:90px;height:90px;border-radius:50%;
+  background:radial-gradient(circle,rgba(200,169,110,0.10) 0%,transparent 70%);
+  border:1px solid rgba(200,169,110,0.22);
+  display:flex;align-items:center;justify-content:center;position:relative;
+}
+.ms-icon-wrap::before{
+  content:'';position:absolute;inset:-5px;border-radius:50%;
+  background:conic-gradient(from 0deg,transparent 0%,rgba(200,169,110,0.30) 30%,transparent 60%,rgba(200,169,110,0.18) 90%,transparent 100%);
+  animation:ms-orbit 5s linear infinite;
+}
+.milestone-emoji{font-size:44px;position:relative;z-index:1;line-height:1;}
+/* Decorative divider */
+.ms-divider{
+  display:flex;align-items:center;gap:10px;
+  margin:0 auto 18px;max-width:260px;
+  color:rgba(200,169,110,0.30);font-size:9px;letter-spacing:.18em;
+}
+.ms-divider::before,.ms-divider::after{
+  content:'';flex:1;height:1px;
+  background:linear-gradient(to right,transparent,rgba(200,169,110,0.28),transparent);
+}
+/* Title */
+.milestone-title{
+  font-family:'Cinzel',serif;font-size:24px;font-weight:700;
+  color:var(--gold-bright);margin-bottom:11px;letter-spacing:.05em;
+  text-shadow:0 0 28px rgba(200,169,110,0.45);
+}
+/* Sub */
+.milestone-sub{
+  font-family:'Crimson Text',serif;font-size:17px;
+  color:var(--cream);font-style:italic;
+  margin-bottom:26px;line-height:1.55;opacity:0.82;
+}
+/* Action area */
+.ms-actions{display:flex;flex-direction:column;gap:10px;align-items:center;}
 .milestone-buy{
-  background:var(--btn-ghost);
-  border:1px solid var(--border-hi);
-  border:none;border-radius:999px;padding:14px 36px;
-  font-family:'Cinzel',serif;font-size:12px;font-weight:700;letter-spacing:.14em;
-  color:var(--gold-bright);cursor:pointer;margin-top:4px;
-  filter:drop-shadow(0 0 18px rgba(200,120,0,0.5)) drop-shadow(0 0 40px rgba(180,80,0,0.3));
-  transition:filter .15s,transform .1s;
+  width:100%;
+  background:linear-gradient(135deg,rgba(200,100,10,0.95),rgba(100,42,0,0.98),rgba(165,72,5,0.95));
+  border:1px solid rgba(200,169,110,0.38);
+  border-radius:12px;padding:14px 24px;
+  font-family:'Cinzel',serif;font-size:11px;font-weight:700;letter-spacing:.14em;
+  color:var(--gold-bright);cursor:pointer;text-transform:uppercase;
+  box-shadow:0 0 20px rgba(200,100,0,0.25);
+  transition:filter .15s,transform .12s,box-shadow .15s;
 }
-.milestone-buy:hover{filter:drop-shadow(0 0 28px rgba(220,150,0,0.75)) drop-shadow(0 0 60px rgba(200,100,0,0.45));transform:translateY(-2px);}
-.milestone-coin{width:80px;height:80px;object-fit:contain;margin-bottom:10px;
-  filter:drop-shadow(0 0 22px rgba(200,140,0,0.65)) drop-shadow(0 0 50px rgba(180,80,0,0.35));
+.milestone-buy:hover{
+  filter:brightness(1.18);transform:translateY(-2px);
+  box-shadow:0 6px 28px rgba(200,100,0,0.45);
 }
+.ms-dismiss{
+  background:none;border:none;
+  font-family:'Cinzel',serif;font-size:9px;font-weight:600;
+  letter-spacing:.12em;color:rgba(200,169,110,0.35);
+  cursor:pointer;text-transform:uppercase;padding:4px 8px;
+  transition:color .15s;
+}
+.ms-dismiss:hover{color:rgba(200,169,110,0.75);}
 
 /* certificate modal */
 .cert-inner{
@@ -1753,9 +1825,9 @@ position:relative;overflow:hidden;
   .modal-close{padding:10px 26px;}
   .nick-modal-box{padding:30px 22px;width:94%;}
   .nick-input{font-size:16px;padding:14px 16px;}
-  .milestone-box{padding:32px 22px;}
-  .milestone-emoji{font-size:58px;}
-  .milestone-title{font-size:20px;}
+  .milestone-box{padding:36px 22px 28px;}
+  .milestone-emoji{font-size:40px;}
+  .milestone-title{font-size:21px;}
   .cert-inner{padding:18px 12px;border-radius:16px;}
   .cert-btns{gap:8px;}
   .mood-box{padding:28px 20px;width:94%;}
@@ -2735,13 +2807,19 @@ body.genesis-mode .hero-title{text-shadow:0 0 40px rgba(255,217,125,0.35);}
 </div>
 
 <!-- MILESTONE MODAL -->
-<div class="milestone-overlay" id="milestoneModal">
+<div class="milestone-overlay" id="milestoneModal" onclick="if(event.target===this)closeMilestone()">
   <div class="milestone-box">
-    <img class="milestone-coin" src="./img/milestone-share.png" alt="$NUT Milestone"/>
-    <span class="milestone-emoji" id="mEmoji" style="display:none">🎉</span>
+    <button class="ms-close" onclick="closeMilestone()" title="Close">✕</button>
+    <div class="ms-icon-wrap">
+      <span class="milestone-emoji" id="mEmoji">🎉</span>
+    </div>
+    <div class="ms-divider">✦</div>
     <div class="milestone-title" id="mTitle">MILESTONE!</div>
     <div class="milestone-sub" id="mSub"></div>
-    <button class="milestone-buy" onclick="openBuy()">Celebrate with $NUT</button>
+    <div class="ms-actions">
+      <button class="milestone-buy" onclick="openBuy();closeMilestone()">CELEBRATE WITH $NUT</button>
+      <button class="ms-dismiss" onclick="closeMilestone()">not now</button>
+    </div>
   </div>
 </div>
 
@@ -4219,8 +4297,10 @@ function showMilestone(emoji,title,sub) {
   document.getElementById('mSub').textContent=sub;
   const el=document.getElementById('milestoneModal');
   el.classList.add('show');
-  [0,300,600].forEach(d=>setTimeout(spawnConfetti,d));
-  setTimeout(()=>el.classList.remove('show'),4000);
+  [0,280,560,900].forEach(d=>setTimeout(spawnConfetti,d));
+}
+function closeMilestone() {
+  document.getElementById('milestoneModal').classList.remove('show');
 }
 
 // ═══════════════════════════════
