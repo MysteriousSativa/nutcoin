@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>NUTSLOPE</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{
+  width:100%;height:100%;background:#080c12;overflow:hidden;
+  font-family:'Inter',system-ui,sans-serif;color:#e8f0f6;
+  user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent;
+}
+canvas#c{display:block;position:fixed;inset:0;width:100%!important;height:100%!important;}
+
+/* Close */
+#closeBtn{
+  position:fixed;top:10px;right:12px;z-index:80;
+  background:rgba(26,44,56,0.92);border:1px solid rgba(255,255,255,0.12);
+  color:#b1bad3;font-size:14px;width:32px;height:32px;border-radius:8px;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  touch-action:manipulation;
+}
+
+/* Top HUD */
+#topHud{
+  position:fixed;top:0;left:0;right:0;z-index:60;
+  display:flex;align-items:flex-end;justify-content:space-between;
+  padding:14px 16px 12px;
+  background:linear-gradient(to bottom,rgba(8,12,18,0.92) 55%,transparent);
+  pointer-events:none;
+}
+#multNum{
+  font-size:clamp(36px,11vw,60px);font-weight:900;
+  font-family:'Space Mono',monospace;letter-spacing:-0.02em;line-height:1;
+  color:#00e701;text-shadow:0 0 22px rgba(0,231,1,.55);
+  transition:color .2s,text-shadow .2s;
+}
+#balWrap{text-align:right;}
+#hudBal{display:block;font-family:'Space Mono',monospace;font-size:14px;font-weight:700;color:#f6c90e;}
+.hc-lbl{font-size:9px;color:#5f7281;letter-spacing:.1em;text-transform:uppercase;}
+
+/* Speed meter */
+#spdMeter{
+  position:fixed;right:10px;top:50%;transform:translateY(-50%);z-index:60;
+  width:5px;height:110px;background:rgba(255,255,255,0.07);border-radius:3px;overflow:hidden;
+}
+#spdFill{position:absolute;bottom:0;width:100%;background:#00e701;border-radius:3px;height:3%;}
+
+/* Touch zones */
+#tzL,#tzR{
+  position:fixed;top:0;bottom:150px;width:46%;z-index:50;pointer-events:auto;
+}
+#tzL{left:0;}#tzR{right:0;}
+
+/* Bottom panel */
+#bottom{
+  position:fixed;bottom:0;left:0;right:0;z-index:70;
+  background:linear-gradient(to top,rgba(8,12,18,0.98) 70%,transparent);
+  padding:14px 14px calc(14px + env(safe-area-inset-bottom,0px));
+  pointer-events:auto;
+}
+/* Bet UI */
+#betUI{display:flex;flex-direction:column;gap:8px;}
+.brow{display:grid;grid-template-columns:42px 1fr 42px;gap:7px;align-items:center;}
+.ns-adj{
+  background:#1a2c38;border:1px solid rgba(255,255,255,0.10);color:#e8f0f6;
+  border-radius:10px;width:42px;height:42px;font-size:20px;font-weight:900;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  touch-action:manipulation;
+}
+.ns-adj:hover{background:#213743;}
+.bet-box{background:#1a2c38;border:1px solid rgba(255,255,255,0.10);border-radius:10px;padding:6px 10px;text-align:center;}
+.bet-lbl{display:block;font-size:8px;font-weight:700;letter-spacing:.1em;color:#5f7281;text-transform:uppercase;margin-bottom:2px;}
+.bet-num{font-family:'Space Mono',monospace;font-size:17px;font-weight:700;color:#f6c90e;}
+.qrow{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;}
+.ns-q{
+  background:#1a2c38;border:1px solid rgba(255,255,255,0.10);color:#b1bad3;
+  border-radius:8px;padding:8px 4px;font-size:10px;font-weight:800;
+  cursor:pointer;touch-action:manipulation;text-align:center;
+}
+.ns-q:hover{background:#213743;}
+.ns-play{
+  width:100%;background:linear-gradient(180deg,#00e701,#00b800);
+  border:none;color:#041208;border-radius:12px;padding:15px;
+  font-size:15px;font-weight:900;letter-spacing:.08em;
+  cursor:pointer;touch-action:manipulation;margin-top:2px;
+}
+.ns-play:disabled{opacity:.3;cursor:default;}
+/* Cashout UI */
+#coUI{display:none;text-align:center;}
+.ns-co{
+  width:100%;background:linear-gradient(180deg,#f6c90e,#c8a200);
+  border:none;color:#041208;border-radius:12px;padding:16px;
+  font-size:15px;font-weight:900;letter-spacing:.08em;
+  cursor:pointer;touch-action:manipulation;
+  animation:copulse .75s ease-in-out infinite;
+}
+@keyframes copulse{0%,100%{box-shadow:0 0 0 0 transparent;}50%{box-shadow:0 0 24px 6px rgba(246,201,14,.4);}}
+.co-hint{font-size:10px;color:#5f7281;margin-top:6px;letter-spacing:.06em;}
+/* Result overlay */
+#resOv{
+  display:none;position:fixed;inset:0;z-index:90;
+  background:rgba(8,12,18,0.85);
+  align-items:center;justify-content:center;flex-direction:column;gap:10px;
+  pointer-events:auto;
+}
+#resOv.show{display:flex;}
+.res-big{
+  font-family:'Space Mono',monospace;
+  font-size:clamp(42px,14vw,72px);font-weight:700;line-height:1;text-align:center;
+}
+.res-big.win{color:#00e701;text-shadow:0 0 40px rgba(0,231,1,.7);}
+.res-big.lose{color:#ff4f4f;text-shadow:0 0 30px rgba(255,79,79,.6);}
+.res-sub{font-size:13px;color:#b1bad3;font-weight:600;text-align:center;line-height:1.5;}
+.res-again{
+  margin-top:10px;background:#1a2c38;border:1px solid rgba(255,255,255,0.15);
+  color:#e8f0f6;border-radius:10px;padding:12px 28px;
+  font-size:13px;font-weight:700;cursor:pointer;touch-action:manipulation;
+}
+.res-again:hover{background:#213743;}
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<button id="closeBtn" onclick="closeSlope()">✕</button>
+
+<div id="topHud">
+  <div id="multNum">1.00×</div>
+  <div id="balWrap">
+    <span id="hudBal">0</span>
+    <div class="hc-lbl">NUTTOKENS</div>
+  </div>
+</div>
+
+<div id="spdMeter"><div id="spdFill"></div></div>
+<div id="tzL"></div>
+<div id="tzR"></div>
+
+<div id="bottom">
+  <div id="betUI">
+    <div class="brow">
+      <button class="ns-adj" onclick="adjB(-50)">−</button>
+      <div class="bet-box">
+        <span class="bet-lbl">BET</span>
+        <span class="bet-num" id="betNum">100</span>
+      </div>
+      <button class="ns-adj" onclick="adjB(50)">+</button>
+    </div>
+    <div class="qrow">
+      <button class="ns-q" onclick="bPct(0.10)">10%</button>
+      <button class="ns-q" onclick="bPct(0.25)">25%</button>
+      <button class="ns-q" onclick="bPct(0.50)">50%</button>
+      <button class="ns-q" onclick="bMax()">MAX</button>
+    </div>
+    <button class="ns-play" id="playBtn" onclick="startGame()">▶ PLAY</button>
+  </div>
+  <div id="coUI">
+    <button class="ns-co" onclick="cashOut()">CASH OUT &nbsp;<span id="coAmt"></span></button>
+    <div class="co-hint">← → STEER &nbsp;·&nbsp; TOUCH SIDES TO STEER</div>
+  </div>
+</div>
+
+<div id="resOv">
+  <div class="res-big" id="resBig"></div>
+  <div class="res-sub" id="resSub"></div>
+  <button class="res-again" onclick="resetGame()">PLAY AGAIN</button>
+</div>
+
+<script src="https://unpkg.com/three@0.128.0/build/three.min.js"></script>
+<script>
+'use strict';
+// ════════════════════════════════════════════════
+// CONSTANTS
+// ════════════════════════════════════════════════
+const KEY_BAL = 'nut_pm_bal_v1';
+const TW  = 6.2;   // tile width
+const TH  = 0.32;  // tile height
+const TD  = 5.2;   // tile depth (z-length of one tile)
+const BR  = 0.36;  // ball radius
+const GRV = 0.020; // gravity per frame
+const STR = 0.016; // steer force per frame
+const FRI = 0.84;  // x-velocity friction
+const LAH = 22;    // look-ahead tile count
+const LBK = 5;     // look-behind tile count
+const SLY = 0.22;  // y-drop per tile (makes slope feel downhill)
+
+// ════════════════════════════════════════════════
+// BALANCE
+// ════════════════════════════════════════════════
+function getBal(){return Math.max(0,parseInt(localStorage.getItem(KEY_BAL)||'0',10)||0);}
+function setBal(n){
+  n=Math.max(0,Math.floor(n));
+  localStorage.setItem(KEY_BAL,String(n));
+  document.getElementById('hudBal').textContent=n.toLocaleString();
+  window.parent&&window.parent.postMessage({type:'casino:balance',balance:n},'*');
+}
+function closeSlope(){
+  window.parent&&window.parent.postMessage({type:'slope:close'},'*');
+}
+
+// ════════════════════════════════════════════════
+// RENDERER + SCENE
+// ════════════════════════════════════════════════
+const canvas   = document.getElementById('c');
+const renderer = new THREE.WebGLRenderer({canvas,antialias:true});
+renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+renderer.setClearColor(0x080c12);
+
+const scene = new THREE.Scene();
+scene.fog   = new THREE.Fog(0x080c12, 30, 70);
+
+const camera = new THREE.PerspectiveCamera(62,1,0.1,110);
+
+function onResize(){
+  const w=window.innerWidth,h=window.innerHeight;
+  renderer.setSize(w,h,false);
+  camera.aspect=w/h;
+  camera.updateProjectionMatrix();
+}
+window.addEventListener('resize',onResize);
+onResize();
+
+// Lights
+scene.add(new THREE.AmbientLight(0x1c2e40,1.5));
+const sun=new THREE.DirectionalLight(0xffffff,0.7);
+sun.position.set(5,14,8);
+scene.add(sun);
+const glow=new THREE.PointLight(0x00e701,1.5,10);
+scene.add(glow);
+
+// ════════════════════════════════════════════════
+// BALL
+// ════════════════════════════════════════════════
+const ballMesh=new THREE.Mesh(
+  new THREE.SphereGeometry(BR,24,18),
+  new THREE.MeshStandardMaterial({color:0xf6c90e,emissive:0x4a3200,metalness:0.55,roughness:0.28})
+);
+scene.add(ballMesh);
+
+// ════════════════════════════════════════════════
+// SHARED GEOMETRIES + MATERIALS
+// ════════════════════════════════════════════════
+const TILE_GEO = new THREE.BoxGeometry(TW,TH,TD);
+const EDGE_GEO = new THREE.EdgesGeometry(TILE_GEO);
+const OBS_GEO  = new THREE.BoxGeometry(1.0,1.0,1.0);
+const TILE_MAT = new THREE.MeshStandardMaterial({color:0x1a2c38,emissive:0x060f16,metalness:0.08,roughness:0.9});
+const EDGE_MAT = new THREE.LineBasicMaterial({color:0x00e701,transparent:true,opacity:0.28});
+const OBS_MAT  = new THREE.MeshStandardMaterial({color:0xff4f4f,emissive:0x4a0000,metalness:0.15,roughness:0.65});
+
+// ════════════════════════════════════════════════
+// TRACK STATE
+// ════════════════════════════════════════════════
+let tiles = [];  // [{cx,cy,cz,isGap,mesh,obs}]
+let tileN = 0;   // total tiles generated (seed)
+let trX   = 0;   // track x-center at front
+let trY   = 0;   // track y-top at front
+
+function prng(s,a){
+  let h=((s*2654435761)^(a*1234567891))>>>0;
+  h=((h^(h>>>16))*0x45d9f3b)>>>0;
+  h=((h^(h>>>16))*0x45d9f3b)>>>0;
+  return(h>>>0)/0x100000000;
+}
+
+function spawnTile(zCenter){
+  const idx=tileN++;
+  const chaos=Math.min(1,idx/60);
+
+  // Drift track left/right
+  const drift=(prng(idx,1)-0.5)*2*(0.18+chaos*0.95);
+  trX+=drift;
+  trX=Math.max(-4.2,Math.min(4.2,trX));
+  trY-=SLY;
+  const cx=trX,cy=trY,cz=zCenter;
+
+  // Gap (skip tile entirely) — 7% to 18%
+  if(idx>10&&prng(idx,2)<0.06+chaos*0.12){
+    tiles.push({cx,cy,cz,isGap:true,mesh:null,obs:null});
+    return;
+  }
+
+  // Tile mesh (shared geometry, per-tile mesh)
+  const mesh=new THREE.Mesh(TILE_GEO,TILE_MAT);
+  mesh.position.set(cx,cy,cz);
+  scene.add(mesh);
+  mesh.add(new THREE.LineSegments(EDGE_GEO,EDGE_MAT));
+
+  // Obstacle (13% to 23% chance, not in first 6 tiles)
+  let obs=null;
+  if(idx>6&&prng(idx,3)<0.12+chaos*0.11){
+    obs=new THREE.Mesh(OBS_GEO,OBS_MAT);
+    const ox=cx+(prng(idx,4)-0.5)*(TW-1.4);
+    obs.position.set(ox,cy+TH/2+0.5,cz+(prng(idx,5)-0.5)*(TD-1.2));
+    scene.add(obs);
+  }
+  tiles.push({cx,cy,cz,isGap:false,mesh,obs});
+}
+
+function clearTiles(){
+  for(const t of tiles){
+    if(t.mesh)scene.remove(t.mesh);
+    if(t.obs)scene.remove(t.obs);
+  }
+  tiles=[];tileN=0;trX=0;trY=0;
+}
+
+function buildTrack(){
+  clearTiles();
+  let z=0;
+  for(let i=0;i<LAH+LBK;i++){spawnTile(z);z-=TD;}
+}
+
+function maintainTrack(){
+  const bz=bx_z;
+  // Front
+  let front=Infinity;
+  for(const t of tiles)if(t.cz<front)front=t.cz;
+  while(front>bz-TD*LAH){front-=TD;spawnTile(front);}
+  // Prune rear
+  for(let i=tiles.length-1;i>=0;i--){
+    if(tiles[i].cz>bz+TD*LBK){
+      const t=tiles.splice(i,1)[0];
+      if(t.mesh)scene.remove(t.mesh);
+      if(t.obs)scene.remove(t.obs);
+    }
+  }
+}
+
+// ════════════════════════════════════════════════
+// GAME STATE
+// ════════════════════════════════════════════════
+let bx_x=0,bx_y=2,bx_z=0;  // ball position
+let bv_x=0,bv_y=0;           // ball velocity (z handled by spd)
+let spd=0.07;                 // forward speed (grows each frame)
+let fN=0;                     // frame counter
+let mult=1.0;                 // current multiplier
+let running=false,dead=false;
+let bet=100;
+let rotX=0,rotZ=0;            // ball visual rotation
+
+// Camera state (lerped for smoothness)
+let camX=0,camY=6,camZ=6;
+
+// ════════════════════════════════════════════════
+// INPUT
+// ════════════════════════════════════════════════
+const K={L:false,R:false};
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowLeft'||e.key==='a'||e.key==='A')K.L=true;
+  if(e.key==='ArrowRight'||e.key==='d'||e.key==='D')K.R=true;
+  if(e.key===' '&&running&&!dead)cashOut();
+});
+document.addEventListener('keyup',e=>{
+  if(e.key==='ArrowLeft'||e.key==='a'||e.key==='A')K.L=false;
+  if(e.key==='ArrowRight'||e.key==='d'||e.key==='D')K.R=false;
+});
+document.getElementById('tzL').addEventListener('touchstart',()=>K.L=true,{passive:true});
+document.getElementById('tzL').addEventListener('touchend',  ()=>K.L=false,{passive:true});
+document.getElementById('tzR').addEventListener('touchstart',()=>K.R=true, {passive:true});
+document.getElementById('tzR').addEventListener('touchend',  ()=>K.R=false,{passive:true});
+// Touch cancel (e.g. incoming call)
+document.getElementById('tzL').addEventListener('touchcancel',()=>K.L=false,{passive:true});
+document.getElementById('tzR').addEventListener('touchcancel',()=>K.R=false,{passive:true});
+
+// ════════════════════════════════════════════════
+// PHYSICS STEP
+// ════════════════════════════════════════════════
+function physStep(){
+  // Ramp speed, cap at 0.40
+  spd=Math.min(0.40,0.07+fN*0.000078);
+
+  // Steering
+  if(K.L)bv_x-=STR;
+  if(K.R)bv_x+=STR;
+  bv_x*=FRI;
+
+  // Move
+  bx_z-=spd;
+  bx_x+=bv_x;
+  bv_y-=GRV;
+  bx_y+=bv_y;
+
+  // Ground collision: scan tiles at ball's Z position
+  let grnd=false;
+  let nearSurfY=-Infinity;
+  for(const t of tiles){
+    if(t.isGap)continue;
+    const inZ=Math.abs(bx_z-t.cz)<TD/2;
+    if(!inZ)continue;
+    const inX=Math.abs(bx_x-t.cx)<TW/2-BR*0.2;
+    // Track nearest surface for death check
+    if(inX)nearSurfY=Math.max(nearSurfY,t.cy+TH/2);
+    // Snap to surface if close enough
+    if(inX){
+      const sY=t.cy+TH/2+BR;
+      if(bx_y<=sY+0.22&&bx_y>=sY-0.8){
+        bx_y=sY;bv_y=0;grnd=true;break;
+      }
+    }
+  }
+
+  // Visual roll
+  rotZ-=spd/BR;
+  rotX+=bv_x/BR;
+  ballMesh.rotation.set(rotX,0,rotZ);
+  ballMesh.position.set(bx_x,bx_y,bx_z);
+  glow.position.set(bx_x,bx_y+1,bx_z+0.6);
+
+  fN++;
+  mult=1+fN*0.0011;
+
+  // Death: fell below track
+  const deathY=nearSurfY>-Infinity?nearSurfY-9:-15;
+  if(!grnd&&bx_y<deathY){die();return;}
+
+  // Death: obstacle collision
+  for(const t of tiles){
+    if(!t.obs)continue;
+    const p=t.obs.position;
+    if(Math.abs(bx_x-p.x)<0.5+BR&&Math.abs(bx_y-p.y)<0.5+BR&&Math.abs(bx_z-p.z)<0.5+BR){
+      die();return;
+    }
+  }
+
+  updateHUD();
+}
+
+// ════════════════════════════════════════════════
+// CAMERA
+// ════════════════════════════════════════════════
+function stepCamera(){
+  const tx=bx_x*0.22,ty=bx_y+3.8,tz=bx_z+5.5;
+  camX+=(tx-camX)*0.09;
+  camY+=(ty-camY)*0.08;
+  camZ+=(tz-camZ)*0.09;
+  camera.position.set(camX,camY,camZ);
+  camera.lookAt(bx_x*0.12,bx_y+0.4,bx_z-3.5);
+}
+
+// ════════════════════════════════════════════════
+// HUD UPDATE
+// ════════════════════════════════════════════════
+function updateHUD(){
+  const mn=document.getElementById('multNum');
+  mn.textContent=mult.toFixed(2)+'×';
+  if(mult<2.0){mn.style.color='#00e701';mn.style.textShadow='0 0 22px rgba(0,231,1,.55)';}
+  else if(mult<5.0){mn.style.color='#f6c90e';mn.style.textShadow='0 0 22px rgba(246,201,14,.5)';}
+  else{mn.style.color='#ff4f4f';mn.style.textShadow='0 0 22px rgba(255,79,79,.6)';}
+
+  const ca=document.getElementById('coAmt');
+  if(ca)ca.textContent=Math.floor(bet*mult).toLocaleString()+' CHIPS';
+
+  const sf=document.getElementById('spdFill');
+  if(sf)sf.style.height=Math.min(100,(spd/0.40)*100)+'%';
+}
+
+// ════════════════════════════════════════════════
+// ROUND CONTROL
+// ════════════════════════════════════════════════
+function startGame(){
+  const bal=getBal();
+  if(bal<=0)return;
+  bet=Math.min(bet,bal);
+  setBal(bal-bet);
+
+  // Reset game state
+  bx_x=0;bx_y=2;bx_z=0;
+  bv_x=0;bv_y=0;
+  spd=0.07;fN=0;mult=1.0;
+  rotX=0;rotZ=0;dead=false;running=true;
+  K.L=false;K.R=false;
+  camX=0;camY=bx_y+4.5;camZ=bx_z+6;
+
+  buildTrack();
+
+  document.getElementById('betUI').style.display='none';
+  document.getElementById('coUI').style.display='block';
+  document.getElementById('resOv').classList.remove('show');
+}
+
+function cashOut(){
+  if(!running||dead)return;
+  running=false;dead=true;
+  const won=Math.floor(bet*mult);
+  setBal(getBal()+won);
+  showResult(true,won);
+}
+
+function die(){
+  if(dead)return;
+  running=false;dead=true;
+  showResult(false,0);
+}
+
+function showResult(won,amt){
+  const ov=document.getElementById('resOv');
+  const big=document.getElementById('resBig');
+  const sub=document.getElementById('resSub');
+  if(won){
+    big.className='res-big win';
+    big.textContent='+'+amt.toLocaleString();
+    sub.innerHTML=mult.toFixed(2)+'× cashout<br>Balance: '+getBal().toLocaleString()+' NUTTOKENS';
+  }else{
+    big.className='res-big lose';
+    big.textContent='CRASHED';
+    sub.innerHTML=mult.toFixed(2)+'× reached &nbsp;·&nbsp; −'+bet.toLocaleString()+' NUTTOKENS<br>Balance: '+getBal().toLocaleString()+' NUTTOKENS';
+  }
+  ov.classList.add('show');
+}
+
+function resetGame(){
+  document.getElementById('resOv').classList.remove('show');
+  document.getElementById('betUI').style.display='flex';
+  document.getElementById('coUI').style.display='none';
+  document.getElementById('hudBal').textContent=getBal().toLocaleString();
+  refreshBetUI();
+  running=false;dead=false;
+}
+
+// ════════════════════════════════════════════════
+// BET UI
+// ════════════════════════════════════════════════
+function refreshBetUI(){
+  document.getElementById('betNum').textContent=bet.toLocaleString();
+  document.getElementById('playBtn').disabled=(getBal()<=0);
+}
+function adjB(d){bet=Math.max(1,Math.min(getBal()||1,bet+d));refreshBetUI();}
+function bPct(p){bet=Math.max(1,Math.floor(getBal()*p)||1);refreshBetUI();}
+function bMax(){bet=Math.max(1,getBal());refreshBetUI();}
+
+// ════════════════════════════════════════════════
+// RENDER LOOP
+// ════════════════════════════════════════════════
+function loop(){
+  requestAnimationFrame(loop);
+  if(running){maintainTrack();physStep();}
+  stepCamera();
+  renderer.render(scene,camera);
+}
+
+// ════════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════════
+(function init(){
+  buildTrack();
+  camera.position.set(0,6,7);
+  camera.lookAt(0,1,-3);
+  document.getElementById('hudBal').textContent=getBal().toLocaleString();
+  refreshBetUI();
+  loop();
+})();
+</script>
+</body>
+</html>

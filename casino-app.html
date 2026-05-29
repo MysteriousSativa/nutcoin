@@ -241,6 +241,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--s
     <button class="tab" data-game="flip">🪙 Flip</button>
     <button class="tab" data-game="crash">📈 Crash</button>
     <button class="tab" data-game="bj">🃏 21</button>
+    <button class="tab" data-game="slope">🏂 Slope</button>
   </div>
 
   <!-- GAME AREA -->
@@ -295,6 +296,11 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--s
       <div class="bj-area">
         <div id="bjPanel"></div>
       </div>
+    </div>
+
+    <!-- SLOPE -->
+    <div class="game-panel" id="panel_slope" style="padding:0;overflow:hidden;">
+      <iframe id="slopeFrame" src="" style="border:none;flex:1;min-height:0;width:100%;"></iframe>
     </div>
 
   </div><!-- /gameArea -->
@@ -376,6 +382,13 @@ document.querySelectorAll('.tab').forEach(btn => {
     if (currentGame==='crash') { sizeCrashCanvas(); drawCrash(); }
     if (currentGame==='flip')  { sizeFlipCanvas();  drawFlip(null); }
     if (currentGame==='bj')    renderBJ();
+    if (currentGame==='slope') {
+      const sf=document.getElementById('slopeFrame');
+      if(sf&&!sf.src) sf.src='./nutslope.html';
+    }
+    // Hide shared bet controls for slope (it has its own controls)
+    const bc=document.getElementById('betControls');
+    if(bc) bc.style.display=(currentGame==='slope')?'none':'';
   });
 });
 
@@ -981,6 +994,19 @@ window.addEventListener('resize', ()=>{
 // Balance sync from parent if they update while casino is open
 window.addEventListener('storage', (e)=>{
   if(e.key===KEY_BAL) syncBal();
+});
+
+// Handle messages from slope iframe
+window.addEventListener('message', (e)=>{
+  if(!e.data) return;
+  // Slope close: switch back to wheel tab
+  if(e.data.type==='slope:close'){
+    const wheelTab=document.querySelector('.tab[data-game="wheel"]');
+    if(wheelTab) wheelTab.click();
+    syncBal();
+  }
+  // Balance update from slope (also syncs display)
+  if(e.data.type==='casino:balance') syncBal();
 });
 
 window.addEventListener('load', init);
