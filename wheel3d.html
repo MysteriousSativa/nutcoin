@@ -215,7 +215,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--s
 
   <div id="hdr">
     <span class="hdr-brand">🎡 NUT WHEEL</span>
-    <span id="balDisplay">0 NUTS</span>
+    <span id="balDisplay">0 NUTTOKENS</span>
     <button id="hdrClose" onclick="closeGame()">✕</button>
   </div>
 
@@ -244,9 +244,9 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--s
       <div id="resultSub"></div>
     </div>
     <div id="brokeMsg">
-      <div class="broke-title">🥜 Out of nuts</div>
-      <div class="broke-sub">Keep clicking on the main page to earn more.</div>
-      <button class="broke-btn" onclick="closeGame()">Back to Clicker</button>
+      <div class="broke-title">💎 Out of NUTTOKENS</div>
+      <div class="broke-sub">Convert NUTS to NUTTOKENS on the main page to keep playing.</div>
+      <button class="broke-btn" onclick="closeGame()">Back to Main Page</button>
       <button class="broke-btn" onclick="document.getElementById('brokeMsg').classList.remove('show')">Dismiss</button>
     </div>
   </div>
@@ -273,16 +273,17 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--s
 <script src="./nutrank.js"></script>
 <script>
 // ─── Config ────────────────────────────────────────────────────
-const KEY_ALLTIME = 'nut_alltime_v1'
+const KEY_ALLTIME = 'nut_alltime_v1'  // click count (read-only here, drives rank)
+const KEY_BAL     = 'nut_pm_bal_v1'  // NUTTOKENS casino chips (read/write)
 
 // ─── Balance / Rank ────────────────────────────────────────────
-// Nuts are the single currency: clicking earns them, spinning bets them.
-function getBal()    { return Math.max(0, parseInt(localStorage.getItem(KEY_ALLTIME)||'0',10)||0) }
-function getAllTime() { return getBal() }
+// NUTS = click count; NUTTOKENS = casino chips (convert on main page 1 nut = 1000 NUTTOKENS).
+function getBal()    { return Math.max(0, parseInt(localStorage.getItem(KEY_BAL)||'0',10)||0) }
+function getAllTime() { return Math.max(0, parseInt(localStorage.getItem(KEY_ALLTIME)||'0',10)||0) }
 function setBal(n) {
   const v = Math.max(0, Math.floor(n))
-  localStorage.setItem(KEY_ALLTIME, String(v))
-  document.getElementById('balDisplay').textContent = v.toLocaleString() + ' NUTS'
+  localStorage.setItem(KEY_BAL, String(v))
+  document.getElementById('balDisplay').textContent = v.toLocaleString() + ' NUTTOKENS'
   window.parent && window.parent.postMessage({ type:'casino:balance', balance:v }, '*')
   return v
 }
@@ -532,8 +533,8 @@ function startSpin() {
     rb.className=mult>=25?'jackpot':mult>0?'win':'bust'
     rb.textContent=mult>0?winner.label:'BUST'
     rs.textContent=mult>0
-      ? '+'+profit.toLocaleString()+' NUTS'
-      : String.fromCharCode(8722)+actualBet.toLocaleString()+' NUTS'
+      ? '+'+profit.toLocaleString()+' NUTTOKENS'
+      : String.fromCharCode(8722)+actualBet.toLocaleString()+' NUTTOKENS'
     document.getElementById('resultOverlay').classList.add('show')
 
     if (mult>=25) spawnSparks(0xffd060, 80)
@@ -614,7 +615,8 @@ window.addEventListener('resize',()=>{
   drawWheel(segments,-1,rot)
 })
 window.addEventListener('storage', e=>{
-  if (e.key===KEY_ALLTIME) { setBal(getBal()); refreshRankDisplay() }
+  if (e.key===KEY_BAL)     { setBal(getBal()); }          // NUTTOKENS changed externally
+  if (e.key===KEY_ALLTIME) { refreshRankDisplay() }       // nut count changed (rank update)
 })
 </script>
 </body>
