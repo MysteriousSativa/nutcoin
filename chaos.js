@@ -73,7 +73,7 @@
     localStorage.setItem(KEY_LIQ, JSON.stringify({ real: bal, fake, until: Date.now() + EVENTS.liquidation.ms }));
     if (typeof pmSetBalance === 'function') {
       const el = document.getElementById('nwPortVal');
-      if (el) el.textContent = '$' + fake.toLocaleString();
+      if (el) el.textContent = '$NUT ' + fake.toLocaleString();
       document.getElementById('nutWallet')?.classList.add('liq-flash');
     }
   }

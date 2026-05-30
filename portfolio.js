@@ -113,6 +113,11 @@
     return n.toLocaleString();
   }
 
+  /** Play-money label — not real USD */
+  function fmtNutMoney(n) {
+    return '$NUT ' + Number(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
   function refreshWallet() {
     const nuts  = spendableNuts();
     const chips = spendableChips();
@@ -123,7 +128,7 @@
 
     set('nwNuts', nuts.toLocaleString());
     set('nwChips', fmtChips(chips));
-    set('nwPortVal', '$' + tot.value.toFixed(2));
+    set('nwPortVal', fmtNutMoney(tot.value));
     set('nwOrderCount', String(tot.count));
 
     const pnlEl = document.getElementById('nwPnl');
@@ -159,7 +164,7 @@
         <span class="nidx-order-dot" style="left:${hashStr(o.id) % 92 + 4}%"></span>
         <span class="nidx-order-lbl">${lbl} · ${o.chartY}-${String(o.chartM + 1).padStart(2, '0')}</span>
         <span class="nidx-order-val">${up ? '+' : ''}${v.pnlPct.toFixed(1)}%</span>
-        <span class="nidx-order-usd">$${v.current.toFixed(2)}</span>
+        <span class="nidx-order-usd">${fmtNutMoney(v.current)}</span>
       </div>`;
     }).join('');
   }

@@ -163,12 +163,27 @@
     </div>`;
   }
 
+  function positionDreamPanel() {
+    const panel = document.getElementById('dreamPanel');
+    const wallet = document.getElementById('nutWallet');
+    if (!panel || !wallet) return;
+    const gap = 12;
+    const rect = wallet.getBoundingClientRect();
+    panel.style.left = Math.max(8, rect.left) + 'px';
+    panel.style.width = Math.min(340, Math.max(rect.width, 260)) + 'px';
+    panel.style.bottom = (window.innerHeight - rect.top + gap) + 'px';
+    panel.style.maxHeight = Math.max(160, Math.min(420, rect.top - gap - 20)) + 'px';
+  }
+
   function toggle() {
     open = !open;
     const panel = document.getElementById('dreamPanel');
     if (!panel) return;
     panel.classList.toggle('open', open);
-    if (open) render();
+    if (open) {
+      positionDreamPanel();
+      render();
+    }
   }
 
   function saveTarget() {
@@ -227,6 +242,7 @@
       block.addEventListener('click', toggle);
     }
     document.getElementById('nutWallet')?.addEventListener('dblclick', toggle);
+    window.addEventListener('resize', () => { if (open) positionDreamPanel(); });
   }
 
   window.NutDream = { init, toggle, render, saveTarget, shareBags };
