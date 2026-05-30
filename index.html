@@ -2080,7 +2080,7 @@ position:relative;overflow:hidden;
 .oracle-cite{color:var(--gold);text-decoration:none;margin-left:8px;font-weight:700;}
 .oracle-cite:hover{color:var(--gold-bright);}
 
-/* ── ALLOCATION + CHAOS + DREAM ── */
+/* ── ALLOCATION + CHAOS ── */
 .alloc-card{background:rgba(8,5,2,0.75);border:1px solid rgba(200,169,110,0.28);border-radius:16px;padding:14px;margin-bottom:14px;}
 .alloc-kicker{font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);}
 .alloc-amt{font-size:28px;font-weight:900;color:var(--gold-bright);line-height:1.1;}
@@ -2136,34 +2136,6 @@ body.chaos-invert-lb .lb-row{transform:scaleY(-1);}
 .liq-flash{color:#ff6060 !important;animation:liq-pulse .8s ease infinite;}
 #nutWallet.liq-flash .nw-pval{color:#ff6060 !important;animation:liq-pulse .8s ease infinite;}
 @keyframes liq-pulse{50%{opacity:.5;}}
-#dreamPanel{display:none;position:fixed;left:16px;bottom:170px;z-index:910;width:min(340px,calc(100vw - 32px));max-height:min(45vh,380px);overflow:auto;background:rgba(4,2,0,0.97);border:1px solid rgba(200,169,110,0.4);border-radius:16px;padding:14px;box-shadow:0 12px 40px rgba(0,0,0,0.6);}
-#dreamPanel.open{display:block;}
-.dream-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);}
-.dream-x{background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px;}
-.dream-bal{font-size:22px;font-weight:900;color:var(--gold-bright);margin-bottom:10px;}
-.dream-bal span{font-size:11px;color:var(--muted);}
-.dream-tabs{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;}
-.dream-tab{padding:6px 8px;border-radius:8px;border:1px solid rgba(200,169,110,0.2);background:rgba(8,5,2,0.6);color:var(--muted);font-size:9px;cursor:pointer;}
-.dream-tab.active{color:var(--gold-bright);border-color:rgba(200,169,110,0.45);}
-.dream-ladder{display:flex;flex-direction:column;gap:6px;}
-.dream-rung{display:flex;align-items:center;gap:8px;font-size:11px;}
-.dream-rung-bar{width:8px;background:linear-gradient(180deg,#FFD97D,#C8A96E);border-radius:4px;min-height:8px;}
-.dream-rung-cap{flex:1;color:var(--muted);}
-.dream-hist{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
-.dream-hist-card{padding:10px;border-radius:10px;border:1px solid rgba(200,169,110,0.15);background:rgba(8,5,2,0.55);font-size:11px;}
-.dream-hist-card strong{display:block;color:var(--gold-bright);margin-top:4px;}
-.dream-note{grid-column:1/-1;font-size:10px;color:var(--muted);margin-top:6px;}
-.dream-rank-box{text-align:center;padding:12px;}
-.dream-rank-big{font-size:32px;font-weight:900;color:var(--gold-bright);}
-.dream-rank-sub{font-size:11px;color:var(--muted);margin-top:8px;}
-.dream-wallet{margin-top:12px;padding-top:10px;border-top:1px solid rgba(200,169,110,0.12);font-size:11px;color:var(--muted);}
-.dream-wallet-row{display:flex;gap:8px;margin:8px 0;}
-.dream-wallet-row input{flex:1;padding:8px;border-radius:8px;background:rgba(8,5,2,0.85);border:1px solid rgba(200,169,110,0.22);color:var(--cream);}
-.dream-wallet-row button{padding:8px 12px;border-radius:8px;border:1px solid rgba(200,169,110,0.35);background:rgba(200,100,10,0.14);color:var(--gold-bright);cursor:pointer;font-weight:800;}
-.dream-share{width:100%;margin-top:10px;padding:10px;border-radius:10px;border:1px solid rgba(255,160,40,0.45);background:var(--btn-ember);color:#1a0a00;font-weight:900;cursor:pointer;letter-spacing:.06em;}
-.dream-rank-line{font-size:10px;color:var(--muted);margin-top:10px;line-height:1.4;}
-body.dream-5m .passport-tier,body.dream-5m .pv2-tier{animation:dream-border 2s ease infinite;}
-@keyframes dream-border{50%{text-shadow:0 0 12px rgba(170,187,255,0.6);}}
 
 /* ── NUT HUB (addons) ── */
 .nut-hub{max-width:920px;margin:0 auto 24px;padding:0 16px;position:relative;z-index:1;}
@@ -2787,7 +2759,7 @@ body.genesis-mode .hero-title{text-shadow:0 0 40px rgba(255,217,125,0.35);}
     <a href="https://pump.fun" target="_blank" rel="noopener" id="footerPump">pump.fun</a> &nbsp;·&nbsp;
     <a href="https://x.com/TheNutTracker" target="_blank" rel="noopener" id="footerTwitter">@TheNutTracker</a> &nbsp;·&nbsp;
     <a href="#" onclick="shareTwitter();return false;">Post Your Nut Receipt</a><br>
-    <span style="font-size:10px;color:var(--muted);letter-spacing:.06em;">Build 20260530b · <a href="https://nutcoin-alpha.vercel.app/" style="color:var(--gold)">nutcoin-alpha.vercel.app</a></span>
+    <span style="font-size:10px;color:var(--muted);letter-spacing:.06em;">Build 20260530c · <a href="https://nutcoin-alpha.vercel.app/" style="color:var(--gold)">nutcoin-alpha.vercel.app</a></span>
   </div>
 </div>
 
@@ -5062,7 +5034,6 @@ function downloadCert() {
 <script src="./addons.js?v=20260529b"></script>
 <script src="./allocation.js?v=20260529b"></script>
 <script src="./chaos.js?v=20260529b"></script>
-<script src="./dream.js?v=20260529b"></script>
 <script src="./predictor.js?v=20260529b"></script>
 <script src="./chart.js?v=20260530a"></script>
 <script src="./drop.js?v=20260529b"></script>
@@ -5073,7 +5044,6 @@ function downloadCert() {
 <script src="./portfolio.js?v=20260530b"></script>
 
 <!-- Nut wallet — spendable balances + portfolio P&L -->
-<div id="dreamPanel"></div>
 <div id="nutWallet">
   <div class="nw-row">
     <div class="nw-stat">
@@ -5085,7 +5055,7 @@ function downloadCert() {
       <span class="nw-lbl">NUTTOKENS · spendable</span>
     </div>
   </div>
-  <div class="nw-portfolio" id="nwPortfolioBlock" title="Open Dream Machine">
+  <div class="nw-portfolio" id="nwPortfolioBlock">
     <span class="nw-pval" id="nwPortVal">$NUT 0.00</span>
     <span class="nw-pnl up" id="nwPnl">+0.0%</span>
     <span class="nw-plbl">PORTFOLIO · <span id="nwOrderCount">0</span> orders · play money, not USD</span>
@@ -5112,7 +5082,6 @@ let NUT_PRICE_USD = null; // null=not fetched, 0=no data, number=live price per 
 const PROJECT_NEWS = [
   { date: '2026-05-27', tag: 'AIRDROP', title: 'Allocation machine live', body: 'Live airdrop score on the leaderboard. Genesis bonus, tiers, Wave 2 snapshot countdown, ref links.' },
   { date: '2026-05-27', tag: 'CHAOS', title: 'Chaos Engine online', body: 'NUT PUMP, Golden Hour, Bear Trap, Liquidation Hour, and community-triggered events.' },
-  { date: '2026-05-27', tag: 'DREAM', title: 'Dream Machine', body: 'Tap NUTS USD in the float box for mcap ladder, what-if coins, holder rank, and bag share card.' },
   { date: '2026-05-27', tag: 'HUB', title: 'Nut Hub is live', body: 'Passport, duels, global pulse, daily bounties, radio ticker, crews, and oracle picks. All local-first.' },
   { date: '2026-05-27', tag: 'MARKET', title: 'Play-token predictions', body: 'Earn NUTTOKENS by logging. Full AMM market board is work in progress.' },
   { date: '2026-05-27', tag: 'RECEIPT', title: 'Receipt rarity tiers', body: 'Paper, foil, holographic, void black, and genesis overlays unlock as you grind.' },
@@ -5607,7 +5576,6 @@ if (window.NutProfiles) NutProfiles.init();
 if (window.NutAddons) NutAddons.init();
 if (window.NutAllocation) NutAllocation.init();
 if (window.NutChaos) NutChaos.init();
-if (window.NutDream) NutDream.init();
 if (window.NutOracle) NutOracle.init();
 if (window.NutChart) NutChart.init();
 if (window.NutPortfolio) NutPortfolio.init();

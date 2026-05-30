@@ -64,7 +64,7 @@ jobs:
             ### 2. Read every file in the repo
             Start with: index.html, casino-app.html, crash-live.html, poker-live.html,
             nutslope.html, nutkens.js, casino.js, casino-live.js, blackjack.js,
-            addons.js, predictor.js, dream.js, drop.js, chaos.js, quirks.js,
+            addons.js, predictor.js, drop.js, chaos.js, quirks.js,
             profiles.js, npcs.js, chart.js, buycta.js, allocation.js,
             server/index.js, vercel.json.
 
