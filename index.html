@@ -766,7 +766,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
   border-bottom-left-radius:12px;border-bottom-right-radius:12px;
   padding:8px 14px 14px;
 }
-.lb-inline-wrap .lb-list{max-height:none;overflow-y:visible;padding-right:0;}
+.lb-inline-wrap .lb-list{max-height:260px;overflow-y:auto;padding-right:2px;}
 .lb-panel-note{
   text-align:center;font-size:12px;color:var(--muted);
   font-family:'Cinzel',serif;letter-spacing:.08em;
@@ -2957,6 +2957,7 @@ const KEY_LOG     = `nut_log_${dateStr}`;
 const KEY_NICK    = 'nut_nickname_v1';
 const KEY_SELECTED_TZ = 'nut_selected_tz_v1';
 const KEY_SID     = 'nut_session_id_v1';
+const KEY_SYNCED  = 'nut_synced_v1';  // confirmed synced to Supabase
 const TEN_MIN     = 10 * 60 * 1000;
 
 let countToday   = parseInt(localStorage.getItem(KEY_TODAY)   || '0');
@@ -3333,12 +3334,46 @@ async function logToSupabase() {
       if (data.error === 'cooldown') showToast('Server cooldown active (10 min)');
       return;
     }
+    // Mark this click as synced
+    const prevSynced = parseInt(localStorage.getItem(KEY_SYNCED) || '0', 10) || 0;
+    localStorage.setItem(KEY_SYNCED, String(Math.max(prevSynced, countAllTime)));
     fetchGlobalCounts();
     fetchLeaderboard();
     fetchGlobalActivity();
   } catch (e) {
     console.warn('logToSupabase', e);
     showToast('Global sync error');
+  }
+}
+
+// Sends any nuts that were logged locally but never confirmed in Supabase.
+// Runs once at page load so historical gaps get filled in.
+async function catchUpSync() {
+  if (!db) return;
+  const lastSynced = parseInt(localStorage.getItem(KEY_SYNCED) || '0', 10) || 0;
+  const toSync = Math.max(0, countAllTime - lastSynced);
+  if (toSync <= 0) return;
+  try {
+    let { data, error } = await db.rpc('log_nut', {
+      p_session_id: sessionId,
+      p_nickname:   nickname || null,
+      p_deed_date:  dateStr,
+      p_nut_type:   'nut',
+      p_points:     toSync,
+    });
+    if (error && rpcMissing(error)) {
+      ({ data, error } = await db.rpc('log_nut', {
+        p_session_id: sessionId,
+        p_nickname:   nickname || null,
+        p_deed_date:  dateStr,
+      }));
+    }
+    if (!error && !(data && data.ok === false)) {
+      localStorage.setItem(KEY_SYNCED, String(countAllTime));
+      fetchLeaderboard();
+    }
+  } catch (e) {
+    console.warn('catchUpSync', e);
   }
 }
 
@@ -5441,6 +5476,7 @@ if (window.NutQuirks) NutQuirks.renderQuirksStrip(null);
 fetchGlobalCounts();
 fetchLeaderboard();
 fetchGlobalActivity();
+catchUpSync();
 probeSupabaseSchema();
 renderProjectNews();
 pmResolveIfNewDay();
