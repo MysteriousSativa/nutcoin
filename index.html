@@ -68,36 +68,8 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .bpt-buy{padding:4px 10px;border-radius:8px;border:1px solid rgba(255,160,40,0.45);background:rgba(200,100,10,0.2);color:var(--gold-bright);font-size:9px;font-weight:800;cursor:pointer;font-family:inherit;}
 /* spacer div matches fixed banner height so content is never hidden behind it */
 .banner-spacer{display:block;width:100%;min-height:44px;flex-shrink:0;}
-/* ── ANNOUNCEMENT TICKER (second row inside banner) ── */
-.ann-row{
-  width:100%;
-  border-top:1px solid rgba(200,169,110,0.12);
-  overflow:hidden;
-  height:28px;
-  min-height:28px;
-  display:flex;align-items:center;
-  margin-top:6px;
-  padding-top:2px;
-  position:relative;
-  isolation:isolate;
-}
-.ann-inner{
-  white-space:nowrap;
-  display:inline-flex;align-items:center;
-  animation:ann-scroll 90s linear infinite;
-  will-change:transform;
-  line-height:1.2;
-}
-.ann-inner.ann-static{
-  animation:none !important;
-  transform:none !important;
-  justify-content:center;
-  width:100%;
-}
-@keyframes ann-scroll{
-  0%{transform:translateX(0);}
-  100%{transform:translateX(-50%);}
-}
+/* ── ANNOUNCEMENT TICKER (disabled) ── */
+.ann-row,.ann-big-pin,.ann-inner{display:none !important;}
 .ann-item{
   display:inline-block;
   font-size:9px;font-weight:500;letter-spacing:.07em;
@@ -600,8 +572,10 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .lb-dual-col .lb-inline-wrap #lbContent,
 .lb-dual-col .lb-inline-wrap #ntLbContent{flex:1;display:flex;flex-direction:column;min-height:280px;}
 .lb-dual-col .lb-list{flex:1;max-height:280px;}
-.lb-dual-col .lb-row-count{min-width:54px;text-align:right;}
-.lb-dual-col .lb-row-nuts{min-width:44px;text-align:right;}
+.lb-dual-col .lb-row{display:flex;align-items:center;gap:8px;}
+.lb-dual-col .lb-row-name{flex:1;min-width:0;}
+.lb-dual-col .lb-row-count{min-width:56px;text-align:right;font-variant-numeric:tabular-nums;flex-shrink:0;}
+.lb-dual-col .lb-row-nuts{min-width:48px;text-align:right;flex-shrink:0;}
 @media(max-width:600px){.lb-dual-row{grid-template-columns:1fr;}}
 
 /* ── Compact elegant leaderboard rows ── */
@@ -1118,8 +1092,8 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
   background:var(--btn-ghost);
   border:1px solid var(--border-hi);
   border-radius:999px;
-  padding:16px 34px;font-family:'Cinzel',serif;font-size:13px;letter-spacing:.14em;color:var(--gold-bright);
-  cursor:pointer;min-width:168px;
+  padding:18px 40px;font-family:'Cinzel',serif;font-size:14px;letter-spacing:.14em;color:var(--gold-bright);
+  cursor:pointer;min-width:200px;
   box-shadow:0 0 10px rgba(0,0,0,0.3);
   transition:transform .12s,box-shadow .15s,color .15s,border-color .15s;
 }
@@ -2257,6 +2231,19 @@ body.genesis-mode .hero-title{text-shadow:0 0 40px rgba(255,217,125,0.35);}
 </style>
 </head>
 <body>
+<div id="wrongDomainBanner" hidden style="position:fixed;top:0;left:0;right:0;z-index:9999;padding:12px 16px;background:#3a1208;border-bottom:2px solid #ff6060;color:#ffe8e0;font-size:13px;text-align:center;line-height:1.4;">
+  This is not the $NUT tracker. Open the real site:
+  <a href="https://nutcoin-alpha.vercel.app/" style="color:#FFD97D;font-weight:800;">nutcoin-alpha.vercel.app</a>
+</div>
+<script>
+(function(){
+  var h=location.hostname;
+  if(h==='nutcoin.vercel.app'){
+    var b=document.getElementById('wrongDomainBanner');
+    if(b){b.hidden=false;document.body.style.paddingTop='52px';}
+  }
+})();
+</script>
 
 <svg class="svg-filters" xmlns="http://www.w3.org/2000/svg">
   <defs>
@@ -2772,7 +2759,8 @@ body.genesis-mode .hero-title{text-shadow:0 0 40px rgba(255,217,125,0.35);}
     All personal data stored locally &nbsp;·&nbsp; Global data powered by Supabase<br>
     <a href="https://pump.fun" target="_blank" rel="noopener" id="footerPump">pump.fun</a> &nbsp;·&nbsp;
     <a href="https://x.com/TheNutTracker" target="_blank" rel="noopener" id="footerTwitter">@TheNutTracker</a> &nbsp;·&nbsp;
-    <a href="#" onclick="shareTwitter();return false;">Post Your Nut Receipt</a>
+    <a href="#" onclick="shareTwitter();return false;">Post Your Nut Receipt</a><br>
+    <span style="font-size:10px;color:var(--muted);letter-spacing:.06em;">Build 20260529b · <a href="https://nutcoin-alpha.vercel.app/" style="color:var(--gold)">nutcoin-alpha.vercel.app</a></span>
   </div>
 </div>
 
@@ -3902,9 +3890,10 @@ function renderNTLeaderboard(){
     active:n.isActive,
     isUser:false,
     sessionId:'',
-  }));
-  const fullList=[...npcRows,userEntry].sort((a,b)=>b.chips-a.chips);
-  const userTrueRank=fullList.findIndex(r=>r.isUser)+1;
+  })).filter(r => !window.NutProfiles || !NutProfiles.isHiddenFromLeaderboard('', r.name));
+  const userHidden = window.NutProfiles && NutProfiles.isHiddenFromLeaderboard(userSid, userName);
+  const fullList=[...npcRows, ...(userHidden ? [] : [userEntry])].sort((a,b)=>b.chips-a.chips);
+  const userTrueRank=userHidden?0:fullList.findIndex(r=>r.isUser)+1;
   const totalPlayers=fullList.length;
 
   let display;
@@ -4959,19 +4948,19 @@ function downloadCert() {
   🥜 NUT
 </button>
 
-<script src="./quirks.js"></script>
-<script src="./profiles.js"></script>
-<script src="./addons.js"></script>
-<script src="./allocation.js"></script>
-<script src="./chaos.js"></script>
-<script src="./dream.js"></script>
-<script src="./predictor.js"></script>
-<script src="./chart.js"></script>
-<script src="./drop.js"></script>
-<script src="./npcs.js"></script>
-<script src="./casino.js"></script>
-<script src="./nutrank.js"></script>
-<script src="./nutkens.js"></script>
+<script src="./quirks.js?v=20260529b"></script>
+<script src="./profiles.js?v=20260529b"></script>
+<script src="./addons.js?v=20260529b"></script>
+<script src="./allocation.js?v=20260529b"></script>
+<script src="./chaos.js?v=20260529b"></script>
+<script src="./dream.js?v=20260529b"></script>
+<script src="./predictor.js?v=20260529b"></script>
+<script src="./chart.js?v=20260529b"></script>
+<script src="./drop.js?v=20260529b"></script>
+<script src="./npcs.js?v=20260529b"></script>
+<script src="./casino.js?v=20260529b"></script>
+<script src="./nutrank.js?v=20260529b"></script>
+<script src="./nutkens.js?v=20260529b"></script>
 <script>
 // ═══════════════════════════════
 // INIT
@@ -5485,8 +5474,6 @@ window.NutAnnounce = (function() {
     if (queue.length > 40) queue.pop();
     subs.forEach(fn => { try { fn(item); } catch(_) {} });
     if (item.big) showBigWin(item);
-    // Always refresh ticker on new event
-    setTimeout(renderAnnTicker, 0);
   }
 
   function subscribe(fn) {
@@ -5593,49 +5580,7 @@ function applyAnnScroll(el) {
   el.style.animationDuration = sec + 's';
 }
 
-function renderAnnTicker(mergedFeed) {
-  const el = document.getElementById('annInner');
-  if (!el) return;
-
-  let events = mergedFeed;
-  if (!events || !events.length) {
-    const remote = window.NutCasinoLive ? NutCasinoLive.getFeed() : [];
-    const local = window.NutAnnounce ? NutAnnounce.getRecent(16) : [];
-    const npc = window.NutNPCs && NutNPCs.getAnnouncements
-      ? NutNPCs.getAnnouncements(Date.now()) : [];
-    events = mergeFeedsForTicker(remote, local.concat(npc));
-  } else {
-    events = mergeFeedsForTicker([], events);
-  }
-
-  if (!events.length) {
-    el.className = 'ann-inner ann-static';
-    el.innerHTML = '<span class="ann-item t-stat">🥜 Be the first to log a nut today</span>';
-    updateBannerSpacer();
-    return;
-  }
-
-  if (events.length === 1) {
-    el.className = 'ann-inner ann-static';
-    el.innerHTML = `<span class="ann-item t-${events[0].type}">${events[0].text}</span>`;
-    _annTickerSig = events[0].text;
-    updateBannerSpacer();
-    return;
-  }
-
-  const sig = events.map(e => e.text).join('|');
-  const html = annTickerHtml(events);
-  if (sig === _annTickerSig && el.className === 'ann-inner' && el.innerHTML) {
-    updateBannerSpacer();
-    return;
-  }
-  _annTickerSig = sig;
-  el.className = 'ann-inner';
-  el.innerHTML = html;
-  requestAnimationFrame(() => applyAnnScroll(el));
-  updateBannerSpacer();
-}
-renderAnnTicker();
+function renderAnnTicker() { /* ticker removed */ }
 
 setInterval(()=>{ if(!document.hidden) fetchGlobalCounts(); },60000);
 setInterval(()=>{ if(!document.hidden) fetchLeaderboard(); },120000);

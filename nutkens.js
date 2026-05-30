@@ -94,9 +94,6 @@
       ` : `
       <div class="ntk-empty">Log more nuts to unlock NUTTOKENS conversion.</div>
       `}
-      <button class="ntk-casino-btn" onclick="NutKens.openCasino()">
-        🎰 OPEN CASINO
-      </button>
     `;
   }
 
