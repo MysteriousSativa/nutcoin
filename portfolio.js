@@ -51,7 +51,7 @@
     return { y: 2026, m: 0, v: 100 };
   }
 
-  function addOrders(qty, method, ts) {
+  function appendOrders(qty, method, ts) {
     const pts = window.NutChart && NutChart.getPointCount ? NutChart.getPointCount() : 120;
     const t0  = ts || Date.now();
     for (let i = 0; i < qty; i++) {
@@ -70,7 +70,26 @@
       });
     }
     save();
+  }
+
+  function addOrders(qty, method, ts) {
+    appendOrders(qty, method, ts);
     tick(true);
+  }
+
+  /** Open chart positions = spendable nuts only (converted nuts are closed). */
+  function reconcileOrdersWithSpendable() {
+    const target = spendableNuts();
+    let changed = false;
+    if (orders.length > target) {
+      orders.splice(0, orders.length - target);
+      save();
+      changed = true;
+    } else if (orders.length < target) {
+      appendOrders(target - orders.length, 'legacy', Date.now() - 86400000);
+      changed = true;
+    }
+    return changed;
   }
 
   function valuate(order) {
@@ -119,6 +138,7 @@
   }
 
   function refreshWallet() {
+    reconcileOrdersWithSpendable();
     const nuts  = spendableNuts();
     const chips = spendableChips();
     const tot   = portfolioTotals();
@@ -177,10 +197,7 @@
   }
 
   function backfillFromHistory() {
-    if (orders.length) return;
-    const all = parseInt(localStorage.getItem('nut_alltime_v1') || '0', 10) || 0;
-    if (all <= 0) return;
-    addOrders(Math.min(all, 120), 'legacy', Date.now() - 86400000);
+    reconcileOrdersWithSpendable();
   }
 
   function onNutLogged(method, points) {
@@ -204,7 +221,7 @@
 
   window.refreshNutFloat = refreshWallet;
   window.NutPortfolio = {
-    init, tick, refreshWallet, onNutLogged,
+    init, tick, refreshWallet, onNutLogged, reconcileOrdersWithSpendable,
     getOrdersForChart, spendableNuts, spendableChips,
     valuate, portfolioTotals,
   };
