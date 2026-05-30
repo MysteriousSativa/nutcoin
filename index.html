@@ -604,43 +604,61 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 #ntLbContent .lb-row-count{color:#4ec97a;font-size:11px;text-shadow:0 0 8px rgba(78,201,122,0.25);}
 #ntLbContent .lb-row-nuts{color:#2e6e4e;font-size:9px;}
 
-/* ── FLOATING TOKEN BALANCE (bottom-left) ── */
-#tokenFloat{
+/* ── NUT WALLET (portfolio float) ── */
+#nutWallet{
   position:fixed;bottom:16px;left:16px;z-index:900;
-  display:flex;align-items:center;gap:8px;
-  background:rgba(4,2,0,0.94);border:1px solid rgba(200,169,110,0.35);
-  border-radius:14px;padding:8px 12px;
-  box-shadow:0 4px 18px rgba(0,0,0,0.55);
-  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  min-width:200px;max-width:min(280px,calc(100vw - 32px));
+  background:rgba(4,2,0,0.96);border:1px solid rgba(200,169,110,0.38);
+  border-radius:16px;padding:12px 14px;
+  box-shadow:0 6px 24px rgba(0,0,0,0.55);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
 }
-.tf-bal{
-  display:flex;flex-direction:column;gap:1px;line-height:1.15;
-}
-.tf-amount{
-  font-size:15px;font-weight:800;color:var(--gold-bright);
-  letter-spacing:.02em;font-family:inherit;
-}
-.tf-label{
-  font-size:9px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;
-  color:var(--muted);
-}
-.tf-divider{width:1px;height:28px;background:rgba(200,169,110,0.2);flex-shrink:0;}
-.tf-nt-bal{cursor:pointer;}
-.tf-nt-bal:hover .tf-nt-amount{color:#00e701;}
-.tf-nt-amount{font-size:13px;font-weight:800;color:#4ec97a;letter-spacing:.02em;font-family:inherit;}
-.tf-nt-label{font-size:9px;font-weight:700;letter-spacing:.1em;color:#2e6e4e;text-transform:uppercase;}
-.tf-usd{
-  font-size:10px;font-weight:600;color:rgba(200,169,110,0.6);
-  letter-spacing:.01em;
-}
-.tf-loading{
-  display:inline-block;width:13px;height:13px;
-  border:2px solid rgba(255,217,125,0.18);
+#nutWallet.evt-shimmer{animation:tf-shimmer 2s ease infinite;}
+#nutWallet.unlock-live{box-shadow:0 0 22px rgba(78,201,122,0.35);border-color:rgba(78,201,122,0.45);}
+.nw-row{display:flex;gap:10px;margin-bottom:10px;}
+.nw-stat{flex:1;display:flex;flex-direction:column;gap:2px;}
+.nw-val{font-size:18px;font-weight:800;color:var(--gold-bright);line-height:1.1;font-family:'Space Mono',monospace;}
+.nw-val.nw-green{color:#4ec97a;}
+.nw-lbl{font-size:8px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);}
+.nw-portfolio{padding:8px 0;border-top:1px solid rgba(200,169,110,0.15);border-bottom:1px solid rgba(200,169,110,0.15);margin-bottom:10px;}
+.nw-pval{display:block;font-size:16px;font-weight:800;color:var(--cream);font-family:'Space Mono',monospace;}
+.nw-pnl{display:inline-block;font-size:11px;font-weight:700;margin-left:6px;font-family:'Space Mono',monospace;}
+.nw-pnl.up{color:#4ec97a;}
+.nw-pnl.down{color:#ff7070;}
+.nw-plbl{display:block;font-size:9px;color:var(--muted);margin-top:3px;letter-spacing:.06em;}
+.nw-actions{display:flex;gap:8px;}
+.nw-buy{flex:1;background:linear-gradient(135deg,#ffd97d 0%,#c8a96e 100%);border:none;color:#1a0f00;font-family:'Cinzel',serif;font-size:10px;font-weight:800;letter-spacing:.1em;padding:10px 8px;border-radius:10px;cursor:pointer;}
+.nw-buy:hover{filter:brightness(1.06);}
+.nw-casino{background:rgba(20,12,4,0.9);border:1px solid rgba(200,169,110,0.35);color:var(--gold-bright);border-radius:10px;padding:8px 12px;font-size:16px;cursor:pointer;line-height:1;}
+.nw-casino:active{transform:scale(0.92);}
+@keyframes tf-shimmer{0%,100%{box-shadow:0 0 12px rgba(255,217,125,0.2);}50%{box-shadow:0 0 28px rgba(255,217,125,0.55);}}
+
+/* ── Portfolio orders under chart ── */
+.nidx-portfolio{margin-top:12px;padding:12px 14px;background:rgba(8,5,2,0.85);border:1px solid rgba(200,169,110,0.2);border-radius:12px;}
+.nidx-portfolio-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;font-size:10px;font-weight:700;letter-spacing:.14em;color:var(--gold);text-transform:uppercase;}
+.nidx-portfolio-pnl{font-size:10px;font-weight:700;font-family:'Space Mono',monospace;}
+.nidx-portfolio-pnl.up{color:#4ec97a;}
+.nidx-portfolio-pnl.down{color:#ff7070;}
+.nidx-portfolio-list{display:flex;flex-direction:column;gap:4px;max-height:140px;overflow-y:auto;}
+.nidx-portfolio-empty{font-size:11px;color:var(--muted);line-height:1.45;padding:4px 0;}
+.nidx-order-row{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;padding:5px 8px;background:rgba(0,0,0,0.25);border-radius:8px;font-size:10px;border-left:3px solid #4ec97a;}
+.nidx-order-row.down{border-left-color:#ff7070;}
+.nidx-order-lbl{color:var(--muted);font-weight:600;}
+.nidx-order-val{font-weight:800;font-family:'Space Mono',monospace;color:#4ec97a;}
+.nidx-order-row.down .nidx-order-val{color:#ff7070;}
+.nidx-order-usd{color:var(--gold-bright);font-family:'Space Mono',monospace;font-weight:700;}
+.nidx-order-dot{display:none;}
+
+.stat-spinner{
+  display:inline-block;width:16px;height:16px;
+  border:2px solid rgba(255,217,125,0.15);
   border-top-color:var(--gold-bright);
   border-radius:50%;
   animation:tf-spin .7s linear infinite;
   vertical-align:middle;
 }
+.big-count .stat-spinner{width:28px;height:28px;border-width:3px;}
+.ntk-bal-pill .stat-spinner{width:12px;height:12px;}
 @keyframes tf-spin{to{transform:rotate(360deg);}}
 .tf-spin{
   background:rgba(20,12,4,0.9);border:1px solid rgba(200,169,110,0.3);
@@ -1043,6 +1061,12 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .ntk-casino-btn{width:100%;background:linear-gradient(135deg,rgba(200,169,110,0.18) 0%,rgba(120,80,0,0.22) 100%);border:1px solid var(--border-hi);color:var(--gold-bright);font-family:'Cinzel',serif;font-size:11px;font-weight:700;letter-spacing:.12em;padding:11px;border-radius:8px;cursor:pointer;transition:background .15s,border-color .15s;}
 .ntk-casino-btn:hover{background:rgba(200,169,110,0.25);border-color:var(--gold);}
 .ntk-empty{font-size:11px;color:var(--muted);text-align:center;padding:6px 0 8px;font-style:italic;}
+.ntk-divider{height:1px;margin:14px 0 12px;background:linear-gradient(90deg,transparent,rgba(200,169,110,0.35),transparent);}
+.ntk-reverse{margin-top:2px;}
+.ntk-reverse-title{font-family:'Cinzel',serif;font-size:10px;font-weight:700;letter-spacing:.18em;color:#8ec99a;text-transform:uppercase;margin-bottom:10px;}
+.ntk-preview-rev{color:#8ec99a !important;text-shadow:0 0 12px rgba(78,201,122,0.25);}
+.ntk-redeem-btn{width:100%;background:linear-gradient(135deg,rgba(30,80,45,0.85) 0%,rgba(20,50,35,0.95) 100%);border:1px solid rgba(78,201,122,0.45);color:#d4f5de;font-family:'Cinzel',serif;font-size:11px;font-weight:700;letter-spacing:.12em;padding:11px;border-radius:8px;cursor:pointer;transition:filter .12s,box-shadow .12s;}
+.ntk-redeem-btn:hover{filter:brightness(1.12);box-shadow:0 0 18px rgba(78,201,122,0.28);}
 
 /* ── Casino iframe overlay ── */
 #casinoAppOverlay{display:none;position:fixed;inset:0;z-index:2100;background:#0f1923;}
@@ -1893,15 +1917,13 @@ position:relative;overflow:hidden;
   /* Toast — above sticky trade + float box */
   .toast{bottom:calc(166px + env(safe-area-inset-bottom,0px));font-size:10.5px;padding:10px 20px;max-width:88vw;white-space:normal;text-align:center;line-height:1.4;}
 
-  /* Token float box — above sticky trade */
-  #tokenFloat{
+  /* Nut wallet — above sticky trade */
+  #nutWallet{
     bottom:calc(114px + env(safe-area-inset-bottom,0px));
-    left:10px;padding:7px 10px;gap:6px;border-radius:11px;
+    left:10px;padding:10px 12px;min-width:180px;
   }
-  .tf-amount{font-size:13px;}
-  .tf-usd{font-size:9px;}
-  .tf-buy{font-size:10px;padding:6px 10px;}
-  .tf-spin{font-size:14px;padding:5px 8px;}
+  .nw-val{font-size:15px;}
+  .nw-buy{font-size:9px;padding:8px 6px;}
 
   /* Hub tabs — compact so all 6 fit one row */
   .hub-card{padding:12px;}
@@ -2111,11 +2133,8 @@ body.chaos-active.evt-red::before{opacity:0.9;background:radial-gradient(ellipse
 body.chaos-invert-lb .lb-list{transform:scaleY(-1);}
 body.chaos-invert-lb .lb-row{transform:scaleY(-1);}
 .liq-flash{color:#ff6060 !important;animation:liq-pulse .8s ease infinite;}
+#nutWallet.liq-flash .nw-pval{color:#ff6060 !important;animation:liq-pulse .8s ease infinite;}
 @keyframes liq-pulse{50%{opacity:.5;}}
-#tokenFloat.unlock-live{box-shadow:0 0 20px rgba(78,201,122,0.35);border-color:rgba(78,201,122,0.45);}
-#tokenFloat.evt-shimmer{animation:tf-shimmer 2s ease infinite;}
-@keyframes tf-shimmer{50%{box-shadow:0 0 24px rgba(255,217,125,0.45);}}
-.tf-usd{cursor:pointer;}
 #dreamPanel{display:none;position:fixed;bottom:70px;left:16px;z-index:895;width:min(340px,calc(100vw - 32px));max-height:min(70vh,520px);overflow:auto;background:rgba(4,2,0,0.97);border:1px solid rgba(200,169,110,0.4);border-radius:16px;padding:14px;box-shadow:0 12px 40px rgba(0,0,0,0.6);}
 #dreamPanel.open{display:block;}
 .dream-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);}
@@ -2460,6 +2479,13 @@ body.genesis-mode .hero-title{text-shadow:0 0 40px rgba(255,217,125,0.35);}
     <span class="nidx-leg meta" style="margin-left:2px"><span id="nidxPts">150</span> monthly data points</span>
   </div>
   <div id="nutChartWrap" class="nidx-chart-wrap"></div>
+  <div class="nidx-portfolio" id="nutPortfolioStrip">
+    <div class="nidx-portfolio-hdr">
+      <span>Your Nut Portfolio</span>
+      <span class="nidx-portfolio-pnl" id="nwStripPnl">Log nuts to open positions</span>
+    </div>
+    <div id="nutPortfolioOrders" class="nidx-portfolio-list"></div>
+  </div>
   <div class="nidx-legend">
     <span class="nidx-leg bear">■ NNN Suppression</span>
     <span class="nidx-leg bull">■ Dec Rebound</span>
@@ -2760,7 +2786,7 @@ body.genesis-mode .hero-title{text-shadow:0 0 40px rgba(255,217,125,0.35);}
     <a href="https://pump.fun" target="_blank" rel="noopener" id="footerPump">pump.fun</a> &nbsp;·&nbsp;
     <a href="https://x.com/TheNutTracker" target="_blank" rel="noopener" id="footerTwitter">@TheNutTracker</a> &nbsp;·&nbsp;
     <a href="#" onclick="shareTwitter();return false;">Post Your Nut Receipt</a><br>
-    <span style="font-size:10px;color:var(--muted);letter-spacing:.06em;">Build 20260529c · <a href="https://nutcoin-alpha.vercel.app/" style="color:var(--gold)">nutcoin-alpha.vercel.app</a></span>
+    <span style="font-size:10px;color:var(--muted);letter-spacing:.06em;">Build 20260530a · <a href="https://nutcoin-alpha.vercel.app/" style="color:var(--gold)">nutcoin-alpha.vercel.app</a></span>
   </div>
 </div>
 
@@ -2942,6 +2968,23 @@ let bestDay      = parseInt(localStorage.getItem(KEY_BEST)    || '0');
 let daysTracked  = parseInt(localStorage.getItem(KEY_DAYS)    || '0');
 let todayLogRaw  = JSON.parse(localStorage.getItem(KEY_LOG)   || '[]');
 let selectedNutType = localStorage.getItem('nut_method_selected_v1') || 'solo';
+
+/** Nuts still available (logged all-time minus already converted to chips). */
+function getAvailableNutCount() {
+  const all = Math.max(0, Number(countAllTime) || 0);
+  if (window.NutKens && typeof NutKens.getConvertible === 'function') {
+    return NutKens.getConvertible(all);
+  }
+  const converted = parseInt(localStorage.getItem('nut_kens_converted_v1') || '0', 10) || 0;
+  return Math.max(0, all - converted);
+}
+
+/** @deprecated use NutPortfolio.refreshWallet */
+function refreshNutFloat() {
+  if (window.NutPortfolio) NutPortfolio.refreshWallet();
+}
+window.refreshNutFloat = refreshNutFloat;
+window.getAvailableNutCount = getAvailableNutCount;
 
 const NUT_TYPES = {
   solo:        { em:'✊', label:'Solo',        verb:'solo mission' },
@@ -3206,7 +3249,7 @@ function setupBuyButtons() {
     if (badge) { badge.textContent = 'LIVE ON SOLANA'; badge.classList.add('live'); }
     if (addr) addr.textContent = CONTRACT_ADDR;
     document.getElementById('bannerCA').textContent = CONTRACT_ADDR.slice(0,8)+'...'+CONTRACT_ADDR.slice(-6);
-    document.querySelectorAll('.buy-btn-hero,.buy-btn-sm,.st-st-buy,.tf-buy').forEach(b => { b.classList.remove('tba'); b.classList.add('has-ca'); });
+    document.querySelectorAll('.buy-btn-hero,.buy-btn-sm,.st-st-buy,.nw-buy').forEach(b => { b.classList.remove('tba'); b.classList.add('has-ca'); });
   } else {
     if (addr) addr.textContent = 'Mint not live yet, follow @TheNutTracker on X';
     if (badge) badge.textContent = 'FOLLOW @TheNutTracker FOR LAUNCH';
@@ -3456,6 +3499,7 @@ async function fetchLeaderboard() {
     if (!nickname) document.getElementById('lbJoin').style.display='block';
     return;
   }
+  try {
   // Server-side aggregation via leaderboard() RPC, returns top rows pre-sorted
   const {data, error} = await db.rpc('leaderboard');
 
@@ -3480,11 +3524,23 @@ async function fetchLeaderboard() {
     isYou: row.session_id === sessionId,
   })).filter(row => !window.NutProfiles || !NutProfiles.isHiddenFromLeaderboard(row.session_id, row.nickname));
 
+  const youRow = lbCache.find(r => r.isYou || r.session_id === sessionId);
+  if (youRow) {
+    const serverDeeds = Number(youRow.deeds || 0);
+    if (serverDeeds > countAllTime) {
+      countAllTime = serverDeeds;
+      localStorage.setItem(KEY_ALLTIME, countAllTime);
+    }
+  }
+
   renderLeaderboard(lbCache);
   updateNickRank(lbCache);
   if (window.NutQuirks) NutQuirks.renderLbGhost(lbCache);
   if (window.NutAllocation) NutAllocation.onLeaderboard(lbCache);
   if (window.NutChaos) NutChaos.renderHistory();
+  } finally {
+    StatLoad.afterLeaderboard();
+  }
 }
 
 function renderLeaderboard(rows) {
@@ -3648,6 +3704,7 @@ function nut() {
   if (window.NutAllocation) NutAllocation.onNutLogged();
   if (window.NutChaos) NutChaos.onNutLogged();
   if (window.NutBuyCta) NutBuyCta.onNutLogged(points);
+  if (window.NutPortfolio) NutPortfolio.onNutLogged(method, points);
 
   document.getElementById('bigCount').classList.add('bump');
   setTimeout(()=>document.getElementById('bigCount').classList.remove('bump'),100);
@@ -3695,23 +3752,77 @@ function nut() {
 }
 
 // ═══════════════════════════════
+// STAT DISPLAY (nuts: instant from storage · chips: spinner until ready)
+// ═══════════════════════════════
+window.StatLoad = (function () {
+  const SPIN = '<span class="stat-spinner" aria-hidden="true"></span>';
+  let chipsReady = false;
+
+  function paintNuts(el, value) {
+    if (!el) return;
+    el.textContent = (Number(value) || 0).toLocaleString();
+  }
+
+  function paintChips(el, value, ready) {
+    if (!el) return;
+    const n = Number(value) || 0;
+    if (n === 0) { el.textContent = '0'; return; }
+    if (!ready) { el.innerHTML = SPIN; return; }
+    el.textContent = n >= 1000 ? Math.round(n / 1000) + 'K' : n.toLocaleString();
+  }
+
+  function paintChipsFull(el, value, ready) {
+    if (!el) return;
+    const n = Number(value) || 0;
+    if (n === 0) { el.textContent = '0'; return; }
+    if (!ready) { el.innerHTML = SPIN; return; }
+    el.textContent = n.toLocaleString();
+  }
+
+  function init() {
+    chipsReady = false;
+  }
+
+  function afterLeaderboard() {
+    if (typeof updateUI === 'function') updateUI();
+    if (typeof refreshNutFloat === 'function') refreshNutFloat();
+  }
+
+  function setChipsReady() {
+    if (chipsReady) return;
+    chipsReady = true;
+    if (typeof updateNTFloat === 'function') updateNTFloat();
+    if (typeof pmSetBalance === 'function') pmSetBalance(pmGetBalance());
+    if (window.NutKens && typeof countAllTime !== 'undefined') NutKens.renderPanel(countAllTime);
+    if (typeof refreshNutFloat === 'function') refreshNutFloat();
+  }
+
+  return {
+    init, afterLeaderboard, setChipsReady,
+    paintNuts, paintChips, paintChipsFull,
+    isChipsReady: () => chipsReady,
+    SPIN,
+  };
+})();
+
+// ═══════════════════════════════
 // UI UPDATE
 // ═══════════════════════════════
 function updateUI() {
   const avg = daysTracked>0 ? (countAllTime/daysTracked).toFixed(1) : '-';
   const pct = bestDay>0 ? Math.round((countToday/bestDay)*100)+'%' : '-';
-  document.getElementById('bigCount').textContent=countToday.toLocaleString();
-  document.getElementById('myAllTime').textContent=countAllTime.toLocaleString();
+  StatLoad.paintNuts(document.getElementById('bigCount'), countToday);
+  StatLoad.paintNuts(document.getElementById('myAllTime'), countAllTime);
   document.getElementById('mySession').textContent=countSession.toLocaleString();
   const pt = document.getElementById('partnerToday');
   if (pt) pt.textContent = countPartneredToday().toLocaleString();
   document.getElementById('p0-today').textContent=countToday.toLocaleString();
-  document.getElementById('p0-alltime').textContent=countAllTime.toLocaleString();
+  StatLoad.paintNuts(document.getElementById('p0-alltime'), countAllTime);
   document.getElementById('p0-best').textContent=bestDay.toLocaleString();
   document.getElementById('p0-days').textContent=daysTracked.toLocaleString();
   document.getElementById('p0-session').textContent=countSession.toLocaleString();
   document.getElementById('p0-avg').textContent=avg;
-  document.getElementById('p4-alltime').textContent=countAllTime.toLocaleString();
+  StatLoad.paintNuts(document.getElementById('p4-alltime'), countAllTime);
   document.getElementById('p4-best').textContent=bestDay.toLocaleString();
   document.getElementById('p4-days').textContent=daysTracked.toLocaleString();
   document.getElementById('p4-avg').textContent=avg;
@@ -3719,19 +3830,14 @@ function updateUI() {
   document.getElementById('p4-sesh').textContent=countSession.toLocaleString();
   updateCooldown();
   if (window.NutKens) NutKens.renderPanel(countAllTime);
-  // Float box: left side = real nut count, right side = NUTTOKENS
-  const pmBF = document.getElementById('pmBalFloat');
-  if (pmBF) pmBF.textContent = countAllTime.toLocaleString();
+  refreshNutFloat();
   updateNTFloat();
   renderNTLeaderboard();
 }
 
 // ── NUTTOKEN float box updater ──
 function updateNTFloat() {
-  const el = document.getElementById('ntBalFloat');
-  if (!el) return;
-  const bal = window.NutKens ? NutKens.getBalance() : parseInt(localStorage.getItem('nut_pm_bal_v1')||'0',10)||0;
-  el.textContent = bal >= 1000 ? (bal/1000).toFixed(1)+'K' : bal.toLocaleString();
+  if (window.NutPortfolio) NutPortfolio.refreshWallet();
 }
 
 // ══════════════════════════════════════════════════════════════════
@@ -3953,6 +4059,8 @@ window.addEventListener('storage',e=>{
       renderNTLeaderboard();
     }
   }
+  if (e.key === 'nut_kens_converted_v1' && typeof refreshNutFloat === 'function') refreshNutFloat();
+  if (e.key === 'nut_pm_bal_v1' && window.NutPortfolio) NutPortfolio.refreshWallet();
 });
 window.addEventListener('focus',()=>{
   const fresh=Math.max(0,parseInt(localStorage.getItem('nut_alltime_v1')||'0',10)||0);
@@ -4955,12 +5063,38 @@ function downloadCert() {
 <script src="./chaos.js?v=20260529b"></script>
 <script src="./dream.js?v=20260529b"></script>
 <script src="./predictor.js?v=20260529b"></script>
-<script src="./chart.js?v=20260529b"></script>
+<script src="./chart.js?v=20260530a"></script>
 <script src="./drop.js?v=20260529b"></script>
 <script src="./npcs.js?v=20260529b"></script>
 <script src="./casino.js?v=20260529b"></script>
 <script src="./nutrank.js?v=20260529b"></script>
-<script src="./nutkens.js?v=20260529c"></script>
+<script src="./nutkens.js?v=20260529g"></script>
+<script src="./portfolio.js?v=20260530a"></script>
+
+<!-- Nut wallet — spendable balances + portfolio P&L -->
+<div id="dreamPanel"></div>
+<div id="nutWallet">
+  <div class="nw-row">
+    <div class="nw-stat">
+      <span class="nw-val" id="nwNuts">0</span>
+      <span class="nw-lbl">Nuts · spendable</span>
+    </div>
+    <div class="nw-stat">
+      <span class="nw-val nw-green" id="nwChips">0</span>
+      <span class="nw-lbl">NUTTOKENS · spendable</span>
+    </div>
+  </div>
+  <div class="nw-portfolio" id="nwPortfolioBlock" title="Open Dream Machine">
+    <span class="nw-pval" id="nwPortVal">$0.00</span>
+    <span class="nw-pnl up" id="nwPnl">+0.0%</span>
+    <span class="nw-plbl">PORTFOLIO · <span id="nwOrderCount">0</span> live orders on chart</span>
+  </div>
+  <div class="nw-actions">
+    <button type="button" class="nw-buy tba" onclick="openBuy()">BUY $NUT</button>
+    <button type="button" class="nw-casino" onclick="openNutWheel()" title="Casino">🎰</button>
+  </div>
+</div>
+
 <script>
 // ═══════════════════════════════
 // INIT
@@ -5028,12 +5162,9 @@ async function fetchNutPrice() {
 function pmSetBalance(v) {
   localStorage.setItem(KEY_PM_BAL, String(Math.max(0, Math.floor(v))));
   const bal = pmGetBalance();
-  const balStr = bal.toLocaleString();
-  // pmBal = play-token display in the market section
   const el = document.getElementById('pmBal');
-  if (el) el.textContent = balStr;
-  // pmBalFloat shows real nut count — do NOT overwrite it with token balance
-  // ntBalFloat is updated separately by updateNTFloat()
+  if (el && window.StatLoad) StatLoad.paintChipsFull(el, bal, StatLoad.isChipsReady());
+  else if (el) el.textContent = bal.toLocaleString();
   updateNTFloat();
 }
 function pmEarnTokens(n) {
@@ -5442,8 +5573,9 @@ showPanel(0);
 buildTicker();
 seedLogs();
 renderNickBar();
+StatLoad.init();
 updateUI();
-updateNTFloat();
+requestAnimationFrame(() => StatLoad.setChipsReady());
 setTimeout(renderNTLeaderboard, 800); // wait for NutNPCs to be ready
 // Streak vars must be defined before initClock() → updateClock() → NutQuirks.renderQuirksStrip()
 const KEY_STREAK      = 'nut_streak_v1';
@@ -5477,6 +5609,7 @@ if (window.NutChaos) NutChaos.init();
 if (window.NutDream) NutDream.init();
 if (window.NutOracle) NutOracle.init();
 if (window.NutChart) NutChart.init();
+if (window.NutPortfolio) NutPortfolio.init();
 if (window.NutDrop) NutDrop.init();
 if (window.NutNPCs) NutNPCs.init(db);
 if (window.NutCasinoLive) NutCasinoLive.init();
@@ -5877,33 +6010,6 @@ scrollNutBtn.addEventListener('click', () => {
 });
 </script>
 
-<!-- FLOATING TOKEN BALANCE BOX (bottom-left) -->
-<div id="dreamPanel"></div>
-<div id="tokenFloat">
-  <div class="tf-bal">
-    <span class="tf-amount" id="pmBalFloat">0</span>
-    <span class="tf-label">NUTS</span>
-    <span class="tf-usd" id="pmBalFloatUSD">TBA</span>
-  </div>
-  <div class="tf-divider"></div>
-  <div class="tf-bal tf-nt-bal" onclick="openNutWheel()" title="NUTTOKENS casino chips" style="cursor:pointer">
-    <span class="tf-amount tf-nt-amount" id="ntBalFloat">0</span>
-    <span class="tf-label tf-nt-label">💎 CHIPS</span>
-  </div>
-  <button type="button" class="tf-spin" onclick="openNutWheel()" title="Open Casino">🎰</button>
-  <button type="button" class="tf-buy tba" onclick="openBuy()">BUY $NUT</button>
-</div>
-<script>
-(function(){
-  var nuts  = parseInt(localStorage.getItem('nut_alltime_v1')||'0',10)||0;
-  var chips = parseInt(localStorage.getItem('nut_pm_bal_v1') ||'0',10)||0;
-  var pmBF  = document.getElementById('pmBalFloat');
-  var ntBF  = document.getElementById('ntBalFloat');
-  if (pmBF && nuts  > 0) pmBF.innerHTML = '<span class="tf-loading"></span>';
-  if (ntBF && chips > 0) ntBF.innerHTML = '<span class="tf-loading"></span>';
-})();
-</script>
-
 <!-- Old casino modal removed. Casino runs via #casinoAppOverlay iframe. -->
 
 <div class="sticky-trade" id="stickyTrade">
@@ -5949,6 +6055,11 @@ window.addEventListener('nutkens:balance', () => { renderNTLeaderboard(); });
   <button id="casinoOverlayClose" onclick="if(window.NutKens)NutKens.closeCasino()" title="Close casino">✕</button>
   <iframe id="casinoAppFrame" src="" title="NUT CASINO"></iframe>
 </div>
+
+<script>
+if (typeof refreshNutFloat === 'function') refreshNutFloat();
+if (typeof updateNTFloat === 'function') updateNTFloat();
+</script>
 
 </body>
 </html>

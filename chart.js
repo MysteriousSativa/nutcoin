@@ -319,6 +319,9 @@
       });
     });
 
+    // ── Portfolio orders (each nut = position on chart)
+    drawPortfolioOrders(vMin, vMax, PAD.t, CH);
+
     // ── Hover crosshair
     if (hoverIdx >= 0 && hoverIdx < DATA.length) {
       const p = DATA[hoverIdx];
@@ -430,6 +433,55 @@
     ctx.closePath();
   }
 
+  const ORACLE_LIVE_AVG = 0.86;
+
+  function getLiveValue() {
+    const pt = ALL_DATA[ALL_DATA.length - 1];
+    const base = pt ? pt.v : LATEST;
+    if (!window.NutOracle || !NutOracle.predictHourly) return base;
+    const norm = NutOracle.predictHourly(new Date()) / (NutOracle.GLOBAL_HOURLY_BASELINE || 1);
+    const drift = Math.max(0.88, Math.min(1.12, norm / ORACLE_LIVE_AVG));
+    const wiggle = 1 + Math.sin(Date.now() / 3200) * 0.008;
+    return parseFloat((base * drift * wiggle).toFixed(2));
+  }
+
+  function getPointCount() { return ALL_DATA.length; }
+
+  function getPointMeta(idx) {
+    const p = ALL_DATA[Math.max(0, Math.min(ALL_DATA.length - 1, idx))];
+    return p ? { y: p.y, m: p.m, v: p.v } : { y: 2026, m: 0, v: LATEST };
+  }
+
+  function drawPortfolioOrders(vMin, vMax, top, height) {
+    const ords = window.NutPortfolio && NutPortfolio.getOrdersForChart
+      ? NutPortfolio.getOrdersForChart() : [];
+    if (!ords.length) return;
+
+    ords.forEach(o => {
+      const di = DATA.findIndex(p => p.y === o.chartY && p.m === o.chartM);
+      if (di < 0) return;
+      const p = DATA[di];
+      const x = xAt(di);
+      const y = yAt(p.v, vMin, vMax, top, height);
+      const up = (o.pnlPct || 0) >= 0;
+      const col = up ? '#4EC97A' : '#ff7070';
+
+      ctx.beginPath();
+      ctx.moveTo(x, y - 5);
+      ctx.lineTo(x + 4.5, y);
+      ctx.lineTo(x, y + 5);
+      ctx.lineTo(x - 4.5, y);
+      ctx.closePath();
+      ctx.fillStyle = col;
+      ctx.globalAlpha = 0.92;
+      ctx.fill();
+      ctx.globalAlpha = 1;
+      ctx.strokeStyle = 'rgba(0,0,0,0.45)';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    });
+  }
+
   function nearestIdx(mx) {
     let best = -1, bestD = Infinity;
     DATA.forEach((_, i) => {
@@ -536,5 +588,8 @@
     resize();
   }
 
-  window.NutChart = { init, draw, selectPeriod };
+  window.NutChart = {
+    init, draw, selectPeriod,
+    getLiveValue, getPointCount, getPointMeta, getAllData: () => ALL_DATA,
+  };
 })();

@@ -68,7 +68,7 @@
 
   function applyUnlocks() {
     const u = getUnlocks();
-    document.getElementById('tokenFloat')?.classList.toggle('unlock-live', !!u['500k']);
+    document.getElementById('nutWallet')?.classList.toggle('unlock-live', !!u['500k']);
     document.body.classList.toggle('dream-1m', !!u['1m']);
     document.body.classList.toggle('dream-5m', !!u['5m']);
     document.body.classList.toggle('dream-10m', !!u['10m']);
@@ -220,13 +220,13 @@
 
   function init() {
     applyUnlocks();
-    const usd = document.getElementById('pmBalFloatUSD');
-    if (usd) {
-      usd.style.cursor = 'pointer';
-      usd.title = 'Open Dream Machine';
-      usd.addEventListener('click', toggle);
+    const block = document.getElementById('nwPortfolioBlock');
+    if (block) {
+      block.style.cursor = 'pointer';
+      block.title = 'Open Dream Machine';
+      block.addEventListener('click', toggle);
     }
-    document.getElementById('tokenFloat')?.addEventListener('dblclick', toggle);
+    document.getElementById('nutWallet')?.addEventListener('dblclick', toggle);
   }
 
   window.NutDream = { init, toggle, render, saveTarget, shareBags };

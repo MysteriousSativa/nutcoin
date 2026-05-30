@@ -37,7 +37,7 @@
     current = { type, started: now, ends: now + cfg.ms, source: source || 'auto' };
     document.body.classList.add('chaos-active', cfg.cls);
     if (cfg.invertLb) document.body.classList.add('chaos-invert-lb');
-    if (type === 'nut_pump') document.getElementById('tokenFloat')?.classList.add('evt-shimmer');
+    if (type === 'nut_pump') document.getElementById('nutWallet')?.classList.add('evt-shimmer');
     if (cfg.liq) applyLiquidationDisplay();
     if (cfg.crash) applyCrash();
     renderBanner();
@@ -54,7 +54,7 @@
     const cfg = EVENTS[current.type];
     if (cfg?.liq) clearLiquidationDisplay();
     if (cfg?.crash) maybeRecoverCrash();
-    document.getElementById('tokenFloat')?.classList.remove('evt-shimmer');
+    document.getElementById('nutWallet')?.classList.remove('evt-shimmer');
     document.body.classList.remove('chaos-active', 'evt-green', 'evt-red', 'chaos-invert-lb');
     current = null;
     renderBanner();
@@ -72,9 +72,9 @@
     const fake = Math.floor(bal * (1 - pct));
     localStorage.setItem(KEY_LIQ, JSON.stringify({ real: bal, fake, until: Date.now() + EVENTS.liquidation.ms }));
     if (typeof pmSetBalance === 'function') {
-      const el = document.getElementById('pmBalFloat');
-      if (el) el.textContent = fake.toLocaleString();
-      el?.classList.add('liq-flash');
+      const el = document.getElementById('nwPortVal');
+      if (el) el.textContent = '$' + fake.toLocaleString();
+      document.getElementById('nutWallet')?.classList.add('liq-flash');
     }
   }
 
@@ -83,7 +83,7 @@
     if (!raw) return;
     localStorage.removeItem(KEY_LIQ);
     if (typeof pmSetBalance === 'function') pmSetBalance(typeof pmGetBalance === 'function' ? pmGetBalance() : 0);
-    document.getElementById('pmBalFloat')?.classList.remove('liq-flash');
+    document.getElementById('nutWallet')?.classList.remove('liq-flash');
     if (typeof showToast === 'function') showToast('RECOVERED ✦');
   }
 
