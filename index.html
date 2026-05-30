@@ -2512,10 +2512,10 @@ body.genesis-mode .hero-title{text-shadow:0 0 40px rgba(255,217,125,0.35);}
       <div class="lb-inline-wrap" id="ntLbWrap">
         <div class="nick-bar" style="cursor:default">
           <div class="nick-left">
-            <span style="color:var(--muted)">NUT Casino</span>
-            <span class="nick-name" style="color:#f6c90e">🎡 WHEEL BOARD</span>
+            <span style="color:var(--muted)">Casino</span>
+            <span class="nick-name" style="color:#f6c90e">💎 NUTTOKENS</span>
           </div>
-          <span style="font-size:9px;color:var(--muted);letter-spacing:.08em" id="ntLbMeta">LIVE</span>
+          <span style="font-size:9px;color:var(--muted);letter-spacing:.08em" id="ntLbMeta">CHIPS BOARD</span>
         </div>
         <div id="ntLbContent">
           <div class="lb-empty">Convert nuts to get on the board.</div>
@@ -3891,14 +3891,18 @@ function renderNTLeaderboard(){
   const el=document.getElementById('ntLbContent');
   if(!el) return;
 
+  // User's casino balance is NUTTOKENS (nut_pm_bal_v1); NPCs are ranked by nut count
+  const userChips=window.NutKens?NutKens.getBalance():parseInt(localStorage.getItem('nut_pm_bal_v1')||'0',10)||0;
   const userNuts=typeof countAllTime!=='undefined'?countAllTime
                 :parseInt(localStorage.getItem('nut_alltime_v1')||'0',10)||0;
   const userName=(typeof nickname!=='undefined'&&nickname)?nickname
                 :(typeof genUserName==='function'&&typeof sessionId!=='undefined')?genUserName(sessionId):'You';
   const userSid=typeof sessionId!=='undefined'?sessionId:'';
-  const userEntry={name:userName,sessionId:userSid,nuts:userNuts,isUser:true,active:true};
+  // Use NUTTOKENS / 1000 for user ranking (1 nut = 1000 NUTTOKENS) so it's comparable to NPC nuts
+  const userNutEquiv=Math.floor(userChips/1000)||userNuts;
+  const userEntry={name:userName,sessionId:userSid,nuts:userNutEquiv,chips:userChips,isUser:true,active:true};
 
-  const npcRows=nutNpcs.map(n=>({name:n.name,nuts:n.nuts,active:n.isActive,isUser:false,sessionId:''}));
+  const npcRows=nutNpcs.map(n=>({name:n.name,nuts:n.nuts,chips:null,active:n.isActive,isUser:false,sessionId:''}));
   const fullList=[...npcRows,userEntry].sort((a,b)=>b.nuts-a.nuts);
   const userTrueRank=fullList.findIndex(r=>r.isUser)+1;
   const totalPlayers=fullList.length;
@@ -3923,23 +3927,26 @@ function renderNTLeaderboard(){
     const rankEl=ri
       ?`<span class="lb-row-rank ${ri.cls}">${ri.txt}</span>`
       :`<span class="lb-row-rank plain">${trueRank}</span>`;
-    const nutsStr=r.nuts>=1000000?(r.nuts/1000000).toFixed(1)+'M'
-                 :r.nuts>=1000?Math.round(r.nuts/1000)+'K'
-                 :r.nuts.toLocaleString();
+    // Display: user shows NUTTOKENS chips; NPCs show their nut count
+    const displayVal=isYou?(r.chips||0):r.nuts;
+    const displayLabel=isYou?'CHIPS':'NUTS';
+    const valStr=displayVal>=1000000?(displayVal/1000000).toFixed(1)+'M'
+                :displayVal>=1000?Math.round(displayVal/1000)+'K'
+                :displayVal.toLocaleString();
     const nameHtml=window.NutProfiles&&r.sessionId
       ?NutProfiles.nameHtml(r.sessionId,r.name,'')
       :escHtml(r.name);
     const profileHref=window.NutProfiles&&r.sessionId?NutProfiles.profileUrl(r.sessionId):'#';
     const activeDot=!isYou&&r.active?'<span style="color:#4EC97A;font-size:8px;margin-left:2px">●</span>':'';
-    const avatarSid=r.sessionId||r.name; // use name as seed for NPCs without a real sessionId
+    const avatarSid=r.sessionId||r.name;
     html+=`<div class="lb-row ${trueRank===1?'top1':trueRank===2?'top2':trueRank===3?'top3':''} ${isYou?'you':''}" onclick="if(event.target.tagName!=='A')window.location='${profileHref}'">
       ${rankEl}
       ${nutAvatarHtml(avatarSid,'nut-avatar-sm')}
       <span class="lb-row-name">${nameHtml}${activeDot}</span>
       ${window.NutRank?NutRank.getBadgeHTML(r.nuts,true):''}
       ${isYou?'<span class="lb-you-badge">YOU</span>':''}
-      <span class="lb-row-count">${nutsStr}</span>
-      <span class="lb-row-nuts">NUTS</span>
+      <span class="lb-row-count">${valStr}</span>
+      <span class="lb-row-nuts">${displayLabel}</span>
     </div>`;
   });
 
@@ -5920,6 +5927,10 @@ scrollNutBtn.addEventListener('click', () => {
     <span class="tf-usd" id="pmBalFloatUSD">TBA</span>
   </div>
   <div class="tf-divider"></div>
+  <div class="tf-bal tf-nt-bal" onclick="NutKens ? NutKens.openCasino() : null" title="NUTTOKENS casino chips" style="cursor:pointer">
+    <span class="tf-amount tf-nt-amount" id="ntBalFloat">0</span>
+    <span class="tf-label tf-nt-label">💎 CHIPS</span>
+  </div>
   <button type="button" class="tf-spin" onclick="NutKens ? NutKens.openCasino() : null" title="Open Casino">🎰</button>
   <button type="button" class="tf-buy tba" onclick="openBuy()">BUY $NUT</button>
 </div>
