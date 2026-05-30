@@ -2373,7 +2373,7 @@ body.genesis-mode .hero-title{text-shadow:0 0 40px rgba(255,217,125,0.35);}
     <div id="ntkConvertPanel"></div>
 
     <div class="game-grid">
-      <button type="button" class="game-tile" onclick="NutKens ? NutKens.openCasino() : null"><span class="game-tile-ico">🎡</span><span class="game-tile-lbl">WHEEL</span><span class="game-tile-sub">spin to win</span></button>
+      <button type="button" class="game-tile" onclick="openNutWheel()"><span class="game-tile-ico">🎡</span><span class="game-tile-lbl">WHEEL</span><span class="game-tile-sub">spin to win</span></button>
     </div>
 
     <!-- DUAL LEADERBOARD ROW (under casino convert) -->
@@ -2760,7 +2760,7 @@ body.genesis-mode .hero-title{text-shadow:0 0 40px rgba(255,217,125,0.35);}
     <a href="https://pump.fun" target="_blank" rel="noopener" id="footerPump">pump.fun</a> &nbsp;·&nbsp;
     <a href="https://x.com/TheNutTracker" target="_blank" rel="noopener" id="footerTwitter">@TheNutTracker</a> &nbsp;·&nbsp;
     <a href="#" onclick="shareTwitter();return false;">Post Your Nut Receipt</a><br>
-    <span style="font-size:10px;color:var(--muted);letter-spacing:.06em;">Build 20260529b · <a href="https://nutcoin-alpha.vercel.app/" style="color:var(--gold)">nutcoin-alpha.vercel.app</a></span>
+    <span style="font-size:10px;color:var(--muted);letter-spacing:.06em;">Build 20260529c · <a href="https://nutcoin-alpha.vercel.app/" style="color:var(--gold)">nutcoin-alpha.vercel.app</a></span>
   </div>
 </div>
 
@@ -4960,7 +4960,7 @@ function downloadCert() {
 <script src="./npcs.js?v=20260529b"></script>
 <script src="./casino.js?v=20260529b"></script>
 <script src="./nutrank.js?v=20260529b"></script>
-<script src="./nutkens.js?v=20260529b"></script>
+<script src="./nutkens.js?v=20260529c"></script>
 <script>
 // ═══════════════════════════════
 // INIT
@@ -5295,6 +5295,22 @@ function rouletteBetHalf() {
   if (bd) bd.textContent = rouletteBet.toLocaleString();
 }
 
+function openNutWheel() {
+  if (window.NutKens) {
+    NutKens.openCasino('wheel');
+    return;
+  }
+  const overlay = document.getElementById('casinoAppOverlay');
+  const frame = document.getElementById('casinoAppFrame');
+  if (overlay && frame) {
+    overlay.style.display = 'block';
+    document.body.style.overflow = 'hidden';
+    frame.src = './casino-app.html#wheel';
+    return;
+  }
+  if (typeof showToast === 'function') showToast('Casino unavailable');
+}
+
 function rouletteBetDouble() {
   const bal = pmGetBalance();
   rouletteBet = Math.min(bal, rouletteBet * 2);
@@ -5303,8 +5319,15 @@ function rouletteBetDouble() {
 }
 
 function openRoulette(tab) {
+  if (window.NutKens) {
+    NutKens.openCasino(tab || 'wheel');
+    return;
+  }
   const modal = document.getElementById('rouletteModal');
-  if (!modal) return;
+  if (!modal) {
+    openNutWheel();
+    return;
+  }
   modal.classList.add('show');
   const bal = pmGetBalance();
   rouletteBet = Math.min(10, Math.max(1, bal));
@@ -5863,11 +5886,11 @@ scrollNutBtn.addEventListener('click', () => {
     <span class="tf-usd" id="pmBalFloatUSD">TBA</span>
   </div>
   <div class="tf-divider"></div>
-  <div class="tf-bal tf-nt-bal" onclick="NutKens ? NutKens.openCasino() : null" title="NUTTOKENS casino chips" style="cursor:pointer">
+  <div class="tf-bal tf-nt-bal" onclick="openNutWheel()" title="NUTTOKENS casino chips" style="cursor:pointer">
     <span class="tf-amount tf-nt-amount" id="ntBalFloat">0</span>
     <span class="tf-label tf-nt-label">💎 CHIPS</span>
   </div>
-  <button type="button" class="tf-spin" onclick="NutKens ? NutKens.openCasino() : null" title="Open Casino">🎰</button>
+  <button type="button" class="tf-spin" onclick="openNutWheel()" title="Open Casino">🎰</button>
   <button type="button" class="tf-buy tba" onclick="openBuy()">BUY $NUT</button>
 </div>
 <script>

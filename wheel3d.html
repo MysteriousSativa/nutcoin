@@ -288,8 +288,11 @@ function setBal(n) {
   return v
 }
 function closeGame() {
-  window.parent && window.parent.postMessage({ type:'casino:close' }, '*')
-  window.location.href = './index.html'
+  if (window.parent && window.parent !== window) {
+    window.parent.postMessage({ type:'casino:close' }, '*');
+    return;
+  }
+  window.location.href = './index.html';
 }
 
 let nutCount = getAllTime()

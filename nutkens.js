@@ -132,23 +132,44 @@
   }
 
   // ── Open casino ───────────────────────────────────────────────────
+  function _casinoFrameUrl(tab) {
+    return './casino-app.html' + (tab ? '#' + tab : '');
+  }
+
+  function _iframeHasCasino(frame) {
+    try {
+      const src = frame.getAttribute('src') || frame.src || '';
+      return /casino-app\.html/i.test(src);
+    } catch (_) {
+      return false;
+    }
+  }
+
   function openCasino(tab) {
     const overlay = document.getElementById('casinoAppOverlay');
-    if (!overlay) return;
-    overlay.style.display = 'flex';
     const frame = document.getElementById('casinoAppFrame');
-    const url = './casino-app.html' + (tab ? '#' + tab : '');
-    if (!frame.src || frame.src === '' || frame.src === window.location.href) {
+    if (!overlay || !frame) {
+      if (typeof showToast === 'function') showToast('Casino unavailable');
+      return;
+    }
+
+    overlay.style.display = 'block';
+    document.body.style.overflow = 'hidden';
+
+    const url = _casinoFrameUrl(tab);
+    if (!_iframeHasCasino(frame)) {
       frame.src = url;
-    } else if (tab) {
-      // Already loaded — just tell it to switch tabs
-      frame.contentWindow && frame.contentWindow.postMessage({ type: 'casino:goto', tab }, '*');
+      return;
+    }
+    if (tab && frame.contentWindow) {
+      frame.contentWindow.postMessage({ type: 'casino:goto', tab }, '*');
     }
   }
 
   function closeCasino() {
     const overlay = document.getElementById('casinoAppOverlay');
     if (overlay) overlay.style.display = 'none';
+    document.body.style.overflow = '';
     // Refresh balance display after casino session
     if (typeof pmSetBalance === 'function') pmSetBalance(getBalance());
     if (typeof countAllTime !== 'undefined') renderPanel(countAllTime);
