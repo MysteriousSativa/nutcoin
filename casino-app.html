@@ -12,11 +12,19 @@ iframe{display:block;width:100%;height:100%;border:none;}
 <body>
 <iframe id="wf" src="./wheel3d.html"></iframe>
 <script>
-// Forward all postMessages from wheel3d up to the parent (index.html overlay)
+// Forward messages between parent ↔ wheel iframe
 window.addEventListener('message', e => {
   if (!e.data) return
+  const wf = document.getElementById('wf')
+  if (window.parent !== window && e.source === window.parent) {
+    if (wf && wf.contentWindow) wf.contentWindow.postMessage(e.data, '*')
+    return
+  }
   if (window.parent !== window) window.parent.postMessage(e.data, '*')
 })
+
+const tut = new URLSearchParams(location.search).get('tutorial') === '1'
+document.getElementById('wf').src = './wheel3d.html' + (tut ? '?tutorial=1' : '')
 </script>
 </body>
 </html>

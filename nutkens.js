@@ -263,6 +263,10 @@
   }
 
   function closeCasino() {
+    if (window.NutTutorial && NutTutorial.blockCasinoClose()) {
+      if (typeof showToast === 'function') showToast('Spin once to finish the tutorial');
+      return;
+    }
     const overlay = document.getElementById('casinoAppOverlay');
     if (overlay) overlay.style.display = 'none';
     document.body.style.overflow = '';

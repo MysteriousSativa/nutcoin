@@ -2759,7 +2759,7 @@ body.genesis-mode .hero-title{text-shadow:0 0 40px rgba(255,217,125,0.35);}
     <a href="https://pump.fun" target="_blank" rel="noopener" id="footerPump">pump.fun</a> &nbsp;·&nbsp;
     <a href="https://x.com/TheNutTracker" target="_blank" rel="noopener" id="footerTwitter">@TheNutTracker</a> &nbsp;·&nbsp;
     <a href="#" onclick="shareTwitter();return false;">Post Your Nut Receipt</a><br>
-    <span style="font-size:10px;color:var(--muted);letter-spacing:.06em;">Build 20260530d · <a href="https://nutcoin-alpha.vercel.app/" style="color:var(--gold)">nutcoin-alpha.vercel.app</a></span>
+    <span style="font-size:10px;color:var(--muted);letter-spacing:.06em;">Build 20260531b · <a href="https://nutcoin-alpha.vercel.app/" style="color:var(--gold)">nutcoin-alpha.vercel.app</a></span>
   </div>
 </div>
 
@@ -3678,6 +3678,7 @@ function nut() {
   if (window.NutChaos) NutChaos.onNutLogged();
   if (window.NutBuyCta) NutBuyCta.onNutLogged(points);
   if (window.NutPortfolio) NutPortfolio.onNutLogged(method, points);
+  if (window.NutTutorial) NutTutorial.onNutLogged(method, points);
 
   document.getElementById('bigCount').classList.add('bump');
   setTimeout(()=>document.getElementById('bigCount').classList.remove('bump'),100);
@@ -3718,7 +3719,7 @@ function nut() {
   renderChronometer();
   checkBadges();
   generateProphecy();
-  setTimeout(showMoodOverlay, 1200);
+  setTimeout(() => { if (!window.NutTutorial || !NutTutorial.deferOverlays()) showMoodOverlay(); }, 1200);
   // Re-render cert cache in background after count changes
   _certCache = null;
   setTimeout(prerenderCert, 2000);
@@ -5040,8 +5041,9 @@ function downloadCert() {
 <script src="./npcs.js?v=20260529b"></script>
 <script src="./casino.js?v=20260529b"></script>
 <script src="./nutrank.js?v=20260529b"></script>
-<script src="./nutkens.js?v=20260529g"></script>
+<script src="./nutkens.js?v=20260531a"></script>
 <script src="./portfolio.js?v=20260530d"></script>
+<script src="./tutorial.js?v=20260531b"></script>
 
 <!-- Nut wallet — spendable balances + portfolio P&L -->
 <div id="nutWallet">
@@ -5579,6 +5581,7 @@ if (window.NutChaos) NutChaos.init();
 if (window.NutOracle) NutOracle.init();
 if (window.NutChart) NutChart.init();
 if (window.NutPortfolio) NutPortfolio.init();
+if (window.NutTutorial) NutTutorial.init();
 if (window.NutDrop) NutDrop.init();
 if (window.NutNPCs) NutNPCs.init(db);
 if (window.NutCasinoLive) NutCasinoLive.init();

@@ -288,6 +288,7 @@ function setBal(n) {
   return v
 }
 function closeGame() {
+  if (tutorialForced) return
   if (window.parent && window.parent !== window) {
     window.parent.postMessage({ type:'casino:close' }, '*');
     return;
@@ -295,6 +296,7 @@ function closeGame() {
   window.location.href = './index.html';
 }
 
+let tutorialForced = new URLSearchParams(location.search).get('tutorial') === '1'
 let nutCount = getAllTime()
 let rank     = window.NutRank ? NutRank.getRank(nutCount) : { level:0 }
 let segments = window.NutRank ? NutRank.getWheelSegments(rank.level) : []
@@ -548,6 +550,7 @@ function startSpin() {
       drawWheel(segments,-1,rot)
       document.getElementById('spinBtn').disabled=false
       setStatus('SPIN AGAIN')
+      if (window.parent) window.parent.postMessage({ type:'casino:spinDone' }, '*')
       if (getBal()<1) setTimeout(()=>document.getElementById('brokeMsg').classList.add('show'),400)
     }, mult>=25?4500:2800)
   }, SPIN_DUR+100)
@@ -621,6 +624,16 @@ window.addEventListener('storage', e=>{
   if (e.key===KEY_BAL)     { setBal(getBal()); }          // NUTTOKENS changed externally
   if (e.key===KEY_ALLTIME) { refreshRankDisplay() }       // nut count changed (rank update)
 })
+window.addEventListener('message', e=>{
+  if (!e.data || e.data.type !== 'tutorial:mode') return
+  tutorialForced = !!e.data.on
+  const closeBtn = document.getElementById('hdrClose')
+  if (closeBtn) closeBtn.style.display = tutorialForced ? 'none' : ''
+})
+if (tutorialForced) {
+  const closeBtn = document.getElementById('hdrClose')
+  if (closeBtn) closeBtn.style.display = 'none'
+}
 </script>
 </body>
 </html>
