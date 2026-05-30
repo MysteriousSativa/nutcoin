@@ -26,8 +26,12 @@
     return false;
   }
 
+  function isHiddenFromLeaderboard(sessionId, displayName) {
+    return isDevAccount(sessionId, displayName);
+  }
+
   function devTagHtml() {
-    return '<span class="nut-profile-tag dev" title="Site developer">DEVELOPER</span>';
+    return '<span class="nut-profile-tag dev" title="Site developer">DEV</span>';
   }
 
   function esc(s) {
@@ -107,6 +111,7 @@
     ensureSlug,
     anonName,
     isDevAccount,
+    isHiddenFromLeaderboard,
     devTagHtml,
     nameHtml,
     shareProfile,

@@ -10,6 +10,7 @@
   }
 
   let globalTodayPrev = null;
+  let globalUsersToday = 0;
   let globalSurgeUntil = 0;
   let lastActivityRows = [];
   let sessionMethodStreak = 0;
@@ -154,12 +155,36 @@
       .map(([t, c]) => ({ type: t, count: c }));
   }
 
-  function renderQuirksStrip(globalToday) {
+  function usersTodayFromActivity(rows) {
+    const day = typeof dateStr === 'string' ? dateStr : '';
+    const ids = new Set();
+    (rows || []).forEach((r) => {
+      if (!r?.session_id || !r?.created_at) return;
+      const d = new Date(r.created_at);
+      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+      if (!day || key === day) ids.add(r.session_id);
+    });
+    return ids.size;
+  }
+
+  function renderQuirksStrip(globalToday, usersToday) {
     const compare = document.getElementById('quirksCompare');
     const live = document.getElementById('quirksLive');
     if (compare) {
-      const avg = globalToday && globalToday > 0 ? (globalToday / Math.max(1, 50)).toFixed(1) : '—';
-      compare.innerHTML = `<span>You <strong>${countToday}</strong> today</span><span>Global ~<strong>${avg}</strong>/user</span><span>Methods <strong>${uniqueMethodsToday()}</strong></span>`;
+      const gt = globalToday == null ? null : Number(globalToday) || 0;
+      let users = usersToday != null ? Number(usersToday) || 0 : globalUsersToday;
+      if (!users && gt > 0) users = usersTodayFromActivity(lastActivityRows);
+      let globalSpan;
+      if (gt === null) {
+        globalSpan = 'Global <strong>…</strong> pts · loading';
+      } else if (gt === 0) {
+        globalSpan = 'Global <strong>0</strong> pts today';
+      } else {
+        const denom = Math.max(1, users);
+        const avg = (gt / denom).toFixed(1);
+        globalSpan = `Global <strong>${gt.toLocaleString()}</strong> pts · <strong>${avg}</strong> avg/user`;
+      }
+      compare.innerHTML = `<span class="qc-you">You <strong>${countToday}</strong> today</span><span class="qc-sep">·</span><span class="qc-global">${globalSpan}</span><span class="qc-sep">·</span><span class="qc-methods">Methods <strong>${uniqueMethodsToday()}</strong></span>`;
     }
     if (!live) return;
     const bits = [];
@@ -200,17 +225,20 @@
     el.textContent = `${need} pt${need > 1 ? 's' : ''} to pass ${above.nickname}`;
   }
 
-  function onGlobalCounts(today) {
+  function onGlobalCounts(today, usersToday) {
     if (globalTodayPrev !== null && today - globalTodayPrev >= 5) {
       globalSurgeUntil = Date.now() + 10 * 60 * 1000;
     }
     globalTodayPrev = today;
-    renderQuirksStrip(today);
+    if (usersToday != null) globalUsersToday = Number(usersToday) || 0;
+    renderQuirksStrip(today, globalUsersToday);
   }
 
   function onGlobalActivity(data) {
     lastActivityRows = data || [];
-    renderQuirksStrip(globalTodayPrev);
+    const fromFeed = usersTodayFromActivity(lastActivityRows);
+    if (fromFeed > globalUsersToday) globalUsersToday = fromFeed;
+    renderQuirksStrip(globalTodayPrev, globalUsersToday);
   }
 
   function onNutLogged(method, pts) {

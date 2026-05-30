@@ -59,16 +59,20 @@ begin
     v_type := left(v_type, 32);
   end if;
 
-  select max(created_at) into last_at
-  from public.nut_logs
-  where session_id = p_session_id;
+  -- NPC bots + casino win rows bypass the 10-minute log cooldown
+  if trim(p_session_id) not like 'npcbot%' and v_type not like 'casino%' then
+    select max(created_at) into last_at
+    from public.nut_logs
+    where session_id = p_session_id
+      and nut_type not like 'casino%';
 
-  if last_at is not null and last_at > now() - cooldown then
-    return jsonb_build_object(
-      'ok', false,
-      'error', 'cooldown',
-      'retry_after_seconds', greatest(0, extract(epoch from (last_at + cooldown - now()))::int)
-    );
+    if last_at is not null and last_at > now() - cooldown then
+      return jsonb_build_object(
+        'ok', false,
+        'error', 'cooldown',
+        'retry_after_seconds', greatest(0, extract(epoch from (last_at + cooldown - now()))::int)
+      );
+    end if;
   end if;
 
   insert into public.nut_logs (session_id, nickname, deed_date, nut_type, points)
@@ -80,7 +84,7 @@ $$;
 
 -- ── Global counts ───────────────────────────────────────────────────────
 create or replace function public.global_counts(p_deed_date date default current_date)
-returns table(today_count bigint, all_time_count bigint)
+returns table(today_count bigint, all_time_count bigint, today_users bigint)
 language sql
 security definer
 set search_path = public
@@ -88,7 +92,8 @@ stable
 as $$
   select
     (select coalesce(sum(points), 0)::bigint from public.nut_logs where deed_date = p_deed_date),
-    (select coalesce(sum(points), 0)::bigint from public.nut_logs);
+    (select coalesce(sum(points), 0)::bigint from public.nut_logs),
+    (select count(distinct session_id)::bigint from public.nut_logs where deed_date = p_deed_date);
 $$;
 
 -- ── Leaderboard top 20 ──────────────────────────────────────────────────

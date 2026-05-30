@@ -67,7 +67,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .buy-price-ticker strong{color:var(--gold-bright);}
 .bpt-buy{padding:4px 10px;border-radius:8px;border:1px solid rgba(255,160,40,0.45);background:rgba(200,100,10,0.2);color:var(--gold-bright);font-size:9px;font-weight:800;cursor:pointer;font-family:inherit;}
 /* spacer div matches fixed banner height so content is never hidden behind it */
-.banner-spacer{display:block;width:100%;min-height:58px;flex-shrink:0;}
+.banner-spacer{display:block;width:100%;min-height:44px;flex-shrink:0;}
 /* ── ANNOUNCEMENT TICKER (second row inside banner) ── */
 .ann-row{
   width:100%;
@@ -594,8 +594,14 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 
 /* ── Dual leaderboard side-by-side ── */
 /* ── Dual leaderboard layout ── */
-.lb-dual-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start;margin-top:18px;}
-.lb-dual-col{min-width:0;}
+.lb-dual-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:stretch;margin-top:18px;}
+.lb-dual-col{min-width:0;display:flex;flex-direction:column;}
+.lb-dual-col .lb-inline-wrap{flex:1;display:flex;flex-direction:column;margin-bottom:0;}
+.lb-dual-col .lb-inline-wrap #lbContent,
+.lb-dual-col .lb-inline-wrap #ntLbContent{flex:1;display:flex;flex-direction:column;min-height:280px;}
+.lb-dual-col .lb-list{flex:1;max-height:280px;}
+.lb-dual-col .lb-row-count{min-width:54px;text-align:right;}
+.lb-dual-col .lb-row-nuts{min-width:44px;text-align:right;}
 @media(max-width:600px){.lb-dual-row{grid-template-columns:1fr;}}
 
 /* ── Compact elegant leaderboard rows ── */
@@ -617,12 +623,12 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
   border-bottom-left-radius:12px;border-bottom-right-radius:12px;
   padding:6px 10px 12px;
 }
-#ntLbContent .lb-list{max-height:260px;overflow-y:auto;padding-right:0;}
+#ntLbContent .lb-list{max-height:280px;overflow-y:auto;padding-right:0;}
 #ntLbContent .lb-list::-webkit-scrollbar{width:3px;}
 #ntLbContent .lb-list::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
 #ntLbContent .lb-row{padding:6px 10px;gap:7px;}
-#ntLbContent .lb-row-count{color:var(--gold-bright);font-size:11px;}
-#ntLbContent .lb-row-nuts{color:var(--muted);font-size:9px;}
+#ntLbContent .lb-row-count{color:#4ec97a;font-size:11px;text-shadow:0 0 8px rgba(78,201,122,0.25);}
+#ntLbContent .lb-row-nuts{color:#2e6e4e;font-size:9px;}
 
 /* ── FLOATING TOKEN BALANCE (bottom-left) ── */
 #tokenFloat{
@@ -1107,13 +1113,13 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .ann-item.t-blackjack{color:rgba(120,200,255,0.95);font-weight:700;}
 .my-row{margin-top:18px;font-family:'Cinzel',serif;font-size:12px;letter-spacing:.15em;color:var(--muted);position:relative;z-index:1;}
 .my-row span{color:var(--gold);font-family:'Space Mono',monospace;}
-.card-actions{display:flex;gap:10px;justify-content:center;margin-top:18px;flex-wrap:wrap;position:relative;z-index:1;}
+.card-actions{display:flex;gap:14px;justify-content:center;margin-top:22px;flex-wrap:wrap;position:relative;z-index:1;}
 .cert-btn,.share-btn{
   background:var(--btn-ghost);
   border:1px solid var(--border-hi);
   border-radius:999px;
-  padding:11px 26px;font-family:'Cinzel',serif;font-size:11px;letter-spacing:.15em;color:var(--gold-bright);
-  cursor:pointer;
+  padding:16px 34px;font-family:'Cinzel',serif;font-size:13px;letter-spacing:.14em;color:var(--gold-bright);
+  cursor:pointer;min-width:168px;
   box-shadow:0 0 10px rgba(0,0,0,0.3);
   transition:transform .12s,box-shadow .15s,color .15s,border-color .15s;
 }
@@ -1816,8 +1822,8 @@ position:relative;overflow:hidden;
     width:100%;padding:28px 16px;font-size:22px;border-radius:18px;letter-spacing:.1em;
   }
   .my-row{font-size:10.5px;margin-top:14px;}
-  .card-actions{gap:8px;margin-top:12px;}
-  .cert-btn,.share-btn{padding:9px 14px;font-size:9.5px;letter-spacing:.12em;}
+  .card-actions{gap:12px;margin-top:16px;}
+  .cert-btn,.share-btn{padding:14px 24px;font-size:12px;min-width:148px;}
 
   /* Cooldown */
   .cd-header{font-size:8.5px;}
@@ -2262,7 +2268,7 @@ body.genesis-mode .hero-title{text-shadow:0 0 40px rgba(255,217,125,0.35);}
   </defs>
 </svg>
 
-<!-- BUY BANNER + ANNOUNCEMENT TICKER -->
+<!-- BUY BANNER (no ticker — community pump below) -->
 <div class="buy-banner" id="buyBanner">
   <div class="buy-banner-top">
     <span style="color:var(--gold);font-weight:700;">🚀 $NUT</span>
@@ -2270,12 +2276,7 @@ body.genesis-mode .hero-title{text-shadow:0 0 40px rgba(255,217,125,0.35);}
     <div class="buy-price-ticker" id="buyPriceTicker" style="display:none"></div>
     <button class="buy-btn-sm tba" id="bannerBuyBtn" onclick="openBuy()">BUY $NUT</button>
   </div>
-  <div class="ann-big-pin" id="annBigPin"></div>
-  <div class="ann-row">
-    <div class="ann-inner" id="annInner">
-      <span class="ann-item t-stat">🥜 Live feed · Supabase</span>
-    </div>
-  </div>
+  <div class="ann-big-pin" id="annBigPin" style="display:none !important" hidden></div>
 </div>
 <!-- Spacer that auto-matches the fixed banner height so nothing hides behind it -->
 <div class="banner-spacer" id="bannerSpacer"></div>
@@ -2344,7 +2345,6 @@ body.genesis-mode .hero-title{text-shadow:0 0 40px rgba(255,217,125,0.35);}
     <div class="reset-sub">2× methods rotate each hour · any climax counts</div>
     <div class="bonus-hour" id="bonusHour" aria-live="polite"></div>
     <button class="nut-btn" onclick="nut()">LOG NUT</button>
-    <button class="games-btn" type="button" onclick="NutKens ? NutKens.openCasino() : openRoulette()">OPEN GAMES</button>
     <div class="nut-methods" id="nutMethods">
       <div class="method-picker-head">
         <span>How did you nut?</span>
@@ -3490,7 +3490,7 @@ async function fetchLeaderboard() {
     deeds: row.deeds,
     isAnon: !row.nickname,
     isYou: row.session_id === sessionId,
-  }));
+  })).filter(row => !window.NutProfiles || !NutProfiles.isHiddenFromLeaderboard(row.session_id, row.nickname));
 
   renderLeaderboard(lbCache);
   updateNickRank(lbCache);
@@ -3889,19 +3889,21 @@ function renderNTLeaderboard(){
   const el=document.getElementById('ntLbContent');
   if(!el) return;
 
-  // User's casino balance is NUTTOKENS (nut_pm_bal_v1); NPCs are ranked by nut count
+  const NUT_TO_CHIPS = 1000;
   const userChips=window.NutKens?NutKens.getBalance():parseInt(localStorage.getItem('nut_pm_bal_v1')||'0',10)||0;
-  const userNuts=typeof countAllTime!=='undefined'?countAllTime
-                :parseInt(localStorage.getItem('nut_alltime_v1')||'0',10)||0;
   const userName=(typeof nickname!=='undefined'&&nickname)?nickname
                 :(typeof genUserName==='function'&&typeof sessionId!=='undefined')?genUserName(sessionId):'You';
   const userSid=typeof sessionId!=='undefined'?sessionId:'';
-  // Use NUTTOKENS / 1000 for user ranking (1 nut = 1000 NUTTOKENS) so it's comparable to NPC nuts
-  const userNutEquiv=Math.floor(userChips/1000)||userNuts;
-  const userEntry={name:userName,sessionId:userSid,nuts:userNutEquiv,chips:userChips,isUser:true,active:true};
+  const userEntry={name:userName,sessionId:userSid,chips:userChips,isUser:true,active:true};
 
-  const npcRows=nutNpcs.map(n=>({name:n.name,nuts:n.nuts,chips:null,active:n.isActive,isUser:false,sessionId:''}));
-  const fullList=[...npcRows,userEntry].sort((a,b)=>b.nuts-a.nuts);
+  const npcRows=nutNpcs.map(n=>({
+    name:n.name,
+    chips:Math.max(0, (n.nuts || 0) * NUT_TO_CHIPS),
+    active:n.isActive,
+    isUser:false,
+    sessionId:'',
+  }));
+  const fullList=[...npcRows,userEntry].sort((a,b)=>b.chips-a.chips);
   const userTrueRank=fullList.findIndex(r=>r.isUser)+1;
   const totalPlayers=fullList.length;
 
@@ -3925,9 +3927,7 @@ function renderNTLeaderboard(){
     const rankEl=ri
       ?`<span class="lb-row-rank ${ri.cls}">${ri.txt}</span>`
       :`<span class="lb-row-rank plain">${trueRank}</span>`;
-    // Display: user shows NUTTOKENS chips; NPCs show their nut count
-    const displayVal=isYou?(r.chips||0):r.nuts;
-    const displayLabel=isYou?'CHIPS':'NUTS';
+    const displayVal=r.chips||0;
     const valStr=displayVal>=1000000?(displayVal/1000000).toFixed(1)+'M'
                 :displayVal>=1000?Math.round(displayVal/1000)+'K'
                 :displayVal.toLocaleString();
@@ -3941,10 +3941,9 @@ function renderNTLeaderboard(){
       ${rankEl}
       ${nutAvatarHtml(avatarSid,'nut-avatar-sm')}
       <span class="lb-row-name">${nameHtml}${activeDot}</span>
-      ${window.NutRank?NutRank.getBadgeHTML(r.nuts,true):''}
       ${isYou?'<span class="lb-you-badge">YOU</span>':''}
       <span class="lb-row-count">${valStr}</span>
-      <span class="lb-row-nuts">${displayLabel}</span>
+      <span class="lb-row-nuts">CHIPS</span>
     </div>`;
   });
 

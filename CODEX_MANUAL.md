@@ -50,5 +50,5 @@ The site shows **POKER · SOON**. To add later:
 
 - **NUTTOKENS balance** — localStorage on device
 - **Nut logs** — Supabase `log_nut` (global)
-- **Casino wins** — Supabase `record_casino_event` when profit &gt; 0
+- **Casino wins** — Supabase `record_casino_event` when profit &gt; 0; also adds **leaderboard points** in `nut_logs` (re-run `schema-casino.sql` + `log_nut` in `schema.sql` after updates)
 - **Ticker** — merges Supabase `live_community_feed` + your session’s recent events

@@ -141,6 +141,7 @@
       <div class="pump-track"><div class="pump-fill" style="width:${pct}%"></div></div>
       <span class="pump-count">${capped}/20</span>
       <span class="pump-hint">logs in 5 min fill the bar · triggers NUT PUMP</span>`;
+    if (typeof updatePageHeaderHeight === 'function') updatePageHeaderHeight();
   }
 
   function initPumpBar() {

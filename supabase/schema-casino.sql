@@ -34,8 +34,10 @@ set search_path = public
 as $$
 declare
   v_game text := lower(trim(coalesce(p_game, 'spin')));
+  v_sid  text := trim(p_session_id);
+  v_pts  int  := 0;
 begin
-  if p_session_id is null or length(trim(p_session_id)) < 8 then
+  if p_session_id is null or length(v_sid) < 8 then
     return jsonb_build_object('ok', false, 'error', 'invalid_session');
   end if;
   if v_game not in ('spin', 'flip', 'crash', 'blackjack', 'poker') then
@@ -43,14 +45,28 @@ begin
   end if;
   insert into public.casino_events (session_id, nickname, game, bet, profit, mult)
   values (
-    trim(p_session_id),
+    v_sid,
     nullif(trim(p_nickname), ''),
     v_game,
     greatest(0, coalesce(p_bet, 0)),
     coalesce(p_profit, 0),
     p_mult
   );
-  return jsonb_build_object('ok', true);
+
+  -- Casino wins award leaderboard points (nut_logs sum)
+  if coalesce(p_profit, 0) > 0 then
+    v_pts := least(10, greatest(1, (coalesce(p_profit, 0) + 9) / 10));
+    insert into public.nut_logs (session_id, nickname, deed_date, nut_type, points)
+    values (
+      v_sid,
+      nullif(trim(p_nickname), ''),
+      current_date,
+      left('casino_' || v_game, 32),
+      v_pts
+    );
+  end if;
+
+  return jsonb_build_object('ok', true, 'points_awarded', v_pts);
 end;
 $$;
 
