@@ -593,23 +593,36 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .st-st-chart{background:rgba(12,8,4,0.9);color:var(--gold-bright);}
 
 /* ── Dual leaderboard side-by-side ── */
-.lb-dual-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:start;}
+/* ── Dual leaderboard layout ── */
+.lb-dual-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start;margin-top:18px;}
 .lb-dual-col{min-width:0;}
 @media(max-width:600px){.lb-dual-row{grid-template-columns:1fr;}}
 
-/* ── Casino NUTTOKEN leaderboard (reuses lb-row styles — only the wrapper is custom) ── */
-.nt-lb-av{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;}
-/* content box mirrors #lbContent inside lb-inline-wrap */
+/* ── Compact elegant leaderboard rows ── */
+.lb-inline-wrap .nick-bar{padding:9px 12px;}
+.lb-inline-wrap .lb-list{max-height:260px;overflow-y:auto;padding-right:2px;}
+.lb-inline-wrap .lb-list::-webkit-scrollbar{width:3px;}
+.lb-inline-wrap .lb-list::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+.lb-inline-wrap .lb-row{padding:6px 10px;border-radius:8px;gap:7px;}
+.lb-inline-wrap .lb-row-name{font-size:11px;}
+.lb-inline-wrap .lb-row-count{font-size:11px;}
+.lb-inline-wrap .lb-row-rank{font-size:10px;width:18px;}
+.lb-inline-wrap .nut-avatar-sm{width:20px;height:20px;border-radius:4px;}
+
+/* ── Casino NUTTOKEN leaderboard ── */
+.nt-lb-av{width:20px;height:20px;border-radius:4px;flex-shrink:0;}
 #ntLbContent{
-  background:rgba(18,13,6,0.78);
+  background:rgba(12,8,4,0.88);
   border:1px solid var(--border-hi);border-top:none;
   border-bottom-left-radius:12px;border-bottom-right-radius:12px;
-  padding:8px 14px 14px;
+  padding:6px 10px 12px;
 }
-#ntLbContent .lb-list{max-height:none;overflow-y:visible;padding-right:0;}
-/* highlight CHIPS unit label in Stake green instead of gold */
-#ntLbContent .lb-row-count{color:#00e701;text-shadow:0 0 9px rgba(0,231,1,0.25);}
-#ntLbContent .lb-row-nuts{color:#2e6e4e;}
+#ntLbContent .lb-list{max-height:260px;overflow-y:auto;padding-right:0;}
+#ntLbContent .lb-list::-webkit-scrollbar{width:3px;}
+#ntLbContent .lb-list::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+#ntLbContent .lb-row{padding:6px 10px;gap:7px;}
+#ntLbContent .lb-row-count{color:var(--gold-bright);font-size:11px;}
+#ntLbContent .lb-row-nuts{color:var(--muted);font-size:9px;}
 
 /* ── FLOATING TOKEN BALANCE (bottom-left) ── */
 #tokenFloat{
@@ -1022,28 +1035,34 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .game-tile-lbl{font-size:10px;font-weight:800;letter-spacing:.1em;color:#e8f0f6;}
 .game-tile-sub{font-size:8px;color:#6f8798;margin-top:4px;letter-spacing:.06em;}
 
-/* ── NUTTOKEN conversion panel ── */
-#ntkConvertPanel{background:#0d1b26;border:1px solid #1f3a50;border-radius:14px;padding:14px 14px 12px;margin-bottom:12px;}
-.ntk-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
-.ntk-title{font-size:11px;font-weight:800;letter-spacing:.12em;color:#f6c90e;text-transform:uppercase;}
-.ntk-bal-pill{background:#1a2c38;border:1px solid #2e4d62;border-radius:20px;padding:3px 10px;font-size:10px;font-weight:700;color:#00e701;font-family:'Space Mono',monospace;}
+/* ── NUTTOKEN conversion panel (site theme) ── */
+#ntkConvertPanel{
+  background:radial-gradient(ellipse 100% 60% at 50% 0%,rgba(160,60,0,0.1) 0%,transparent 55%),rgba(12,8,4,0.92);
+  border:1px solid var(--border-hi);border-radius:14px;padding:16px 16px 14px;margin-bottom:14px;
+  box-shadow:0 0 20px rgba(200,140,0,0.06),0 8px 28px rgba(0,0,0,0.28);
+  position:relative;
+}
+#ntkConvertPanel::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);border-radius:14px 14px 0 0;}
+.ntk-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.ntk-title{font-family:'Cinzel',serif;font-size:10px;font-weight:700;letter-spacing:.2em;color:var(--gold);text-transform:uppercase;}
+.ntk-bal-pill{background:rgba(200,169,110,0.1);border:1px solid var(--border-hi);border-radius:20px;padding:3px 10px;font-size:10px;font-weight:700;color:var(--gold-bright);font-family:'Space Mono',monospace;}
 .ntk-meta{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
-.ntk-meta span{font-size:10px;color:#6e8fa5;}
-.ntk-rate{color:#f6c90e !important;font-weight:700;}
-.ntk-convert-row{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
-.ntk-input-wrap{display:flex;align-items:center;gap:0;flex:1;background:#1a2c38;border:1px solid #2e4d62;border-radius:8px;overflow:hidden;}
-.ntk-adj{background:none;border:none;color:#a0bdd0;font-size:15px;padding:6px 10px;cursor:pointer;line-height:1;}
-.ntk-adj:hover{color:#00e701;}
-.ntk-input{background:none;border:none;outline:none;color:#f6c90e;font-family:'Space Mono',monospace;font-size:14px;font-weight:700;text-align:center;width:60px;padding:6px 4px;}
+.ntk-meta span{font-size:10px;color:var(--muted);}
+.ntk-rate{color:var(--gold) !important;font-weight:700;}
+.ntk-convert-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.ntk-input-wrap{display:flex;align-items:center;gap:0;flex:1;background:rgba(20,14,6,0.9);border:1px solid var(--border-hi);border-radius:8px;overflow:hidden;}
+.ntk-adj{background:none;border:none;color:var(--muted);font-size:15px;padding:6px 10px;cursor:pointer;line-height:1;transition:color .12s;}
+.ntk-adj:hover{color:var(--gold);}
+.ntk-input{background:none;border:none;outline:none;color:var(--gold-bright);font-family:'Space Mono',monospace;font-size:14px;font-weight:700;text-align:center;width:60px;padding:6px 4px;}
 .ntk-input::-webkit-outer-spin-button,.ntk-input::-webkit-inner-spin-button{-webkit-appearance:none;}
-.ntk-max-btn{background:#1a2c38;border:1px solid #2e4d62;border-radius:8px;padding:6px 12px;font-size:10px;font-weight:800;color:#a0bdd0;cursor:pointer;letter-spacing:.08em;}
-.ntk-max-btn:hover{border-color:#00e701;color:#00e701;}
-.ntk-preview{font-size:12px;font-weight:700;color:#00e701;font-family:'Space Mono',monospace;text-align:center;margin-bottom:8px;}
-.ntk-convert-btn{width:100%;background:linear-gradient(180deg,#f6c90e,#d4a800);border:none;color:#1a1000;font-size:12px;font-weight:900;letter-spacing:.1em;padding:11px;border-radius:8px;cursor:pointer;margin-bottom:8px;}
-.ntk-convert-btn:hover{filter:brightness(1.08);}
-.ntk-casino-btn{width:100%;background:linear-gradient(180deg,#00e701,#00b800);border:none;color:#041208;font-size:12px;font-weight:900;letter-spacing:.1em;padding:11px;border-radius:8px;cursor:pointer;}
-.ntk-casino-btn:hover{filter:brightness(1.08);}
-.ntk-empty{font-size:11px;color:#5c7a8c;text-align:center;padding:6px 0 8px;}
+.ntk-max-btn{background:rgba(20,14,6,0.9);border:1px solid var(--border-hi);border-radius:8px;padding:6px 12px;font-size:10px;font-weight:800;color:var(--muted);cursor:pointer;letter-spacing:.08em;transition:border-color .12s,color .12s;}
+.ntk-max-btn:hover{border-color:var(--gold);color:var(--gold);}
+.ntk-preview{font-size:12px;font-weight:700;color:var(--gold-bright);font-family:'Space Mono',monospace;text-align:center;margin-bottom:10px;text-shadow:0 0 12px rgba(255,210,100,0.35);}
+.ntk-convert-btn{width:100%;background:var(--btn-ember);border:1px solid rgba(200,100,10,0.4);color:var(--cream);font-family:'Cinzel',serif;font-size:11px;font-weight:700;letter-spacing:.12em;padding:11px;border-radius:8px;cursor:pointer;margin-bottom:8px;transition:filter .12s,box-shadow .12s;}
+.ntk-convert-btn:hover{filter:brightness(1.1);box-shadow:0 0 18px rgba(200,80,0,0.35);}
+.ntk-casino-btn{width:100%;background:linear-gradient(135deg,rgba(200,169,110,0.18) 0%,rgba(120,80,0,0.22) 100%);border:1px solid var(--border-hi);color:var(--gold-bright);font-family:'Cinzel',serif;font-size:11px;font-weight:700;letter-spacing:.12em;padding:11px;border-radius:8px;cursor:pointer;transition:background .15s,border-color .15s;}
+.ntk-casino-btn:hover{background:rgba(200,169,110,0.25);border-color:var(--gold);}
+.ntk-empty{font-size:11px;color:var(--muted);text-align:center;padding:6px 0 8px;font-style:italic;}
 
 /* ── Casino iframe overlay ── */
 #casinoAppOverlay{display:none;position:fixed;inset:0;z-index:2100;background:#0f1923;}
@@ -2383,36 +2402,51 @@ body.genesis-mode .hero-title{text-shadow:0 0 40px rgba(255,217,125,0.35);}
     <div class="game-grid">
       <button type="button" class="game-tile" onclick="NutKens ? NutKens.openCasino() : null"><span class="game-tile-ico">🎡</span><span class="game-tile-lbl">WHEEL</span><span class="game-tile-sub">spin to win</span></button>
     </div>
+
+    <!-- DUAL LEADERBOARD ROW (under casino convert) -->
+    <div class="lb-dual-row">
+
+      <!-- NUT LEADERBOARD -->
+      <div class="lb-dual-col">
+        <div class="lb-inline-wrap">
+          <div class="nick-bar" id="nickBar">
+            <div class="nick-left">
+              <span style="color:var(--muted)">Leaderboard</span>
+              <span class="nick-name" id="nickDisplay">Loading…</span>
+              <span class="nick-rank" id="nickRankDisplay"></span>
+            </div>
+            <button class="nick-btn" onclick="openNickModal()">Set Name</button>
+          </div>
+          <div id="lbContent">
+            <div class="lb-empty">Connecting to the ledger...</div>
+          </div>
+          <div class="lb-join" id="lbJoin" style="display:none">
+            <button class="lb-join-btn" onclick="openNickModal()">Set Your Name →</button>
+          </div>
+        </div>
+        <div class="lb-ghost" id="lbGhost"></div>
+      </div>
+
+      <!-- CASINO CHIPS LEADERBOARD -->
+      <div class="lb-dual-col">
+        <div class="lb-inline-wrap" id="ntLbWrap">
+          <div class="nick-bar" style="cursor:default">
+            <div class="nick-left">
+              <span style="color:var(--muted)">Casino</span>
+              <span class="nick-name" style="color:var(--gold)">💎 NUTTOKENS</span>
+            </div>
+            <span style="font-size:9px;color:var(--muted);letter-spacing:.08em" id="ntLbMeta">CHIPS BOARD</span>
+          </div>
+          <div id="ntLbContent">
+            <div class="lb-empty">Convert nuts to get on the board.</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
   </div>
 </section>
 
-<!-- AIRDROP DROP BANNER -->
-<div class="drop-banner" id="dropBanner">
-  <div class="drop-inner">
-    <div class="drop-kicker">🚀 $NUT LAUNCHES ON PUMP.FUN</div>
-    <div class="drop-heading">SUNDAY MAY 31 · 12:00 AM</div>
-    <div class="drop-cd" id="dropCountdown">
-      <div class="drop-unit"><div class="drop-n">03</div><div class="drop-l">DAYS</div></div>
-      <div class="drop-col">:</div>
-      <div class="drop-unit"><div class="drop-n">11</div><div class="drop-l">HRS</div></div>
-      <div class="drop-col">:</div>
-      <div class="drop-unit"><div class="drop-n">42</div><div class="drop-l">MIN</div></div>
-      <div class="drop-col">:</div>
-      <div class="drop-unit"><div class="drop-n">07</div><div class="drop-l">SEC</div></div>
-    </div>
-    <div class="drop-details">
-      <span>Token goes live on pump.fun</span>
-      <span>·</span>
-      <span>Get your SOL ready</span>
-      <span>·</span>
-      <span>Not financial advice · WAGMI</span>
-    </div>
-    <div class="drop-actions">
-      <button class="drop-notify-btn" id="dropNotifyBtn" onclick="if(window.NutDrop)NutDrop.toggleNotify()">🔔 REMIND ME</button>
-      <a href="https://pump.fun" target="_blank" rel="noopener" class="drop-cta-link">PUMP.FUN →</a>
-    </div>
-  </div>
-</div>
 
 <!-- TAM COUNTER — Research-derived global activity vs $NUT capture -->
 <div class="tam-section" id="tamSection">
@@ -2483,47 +2517,6 @@ body.genesis-mode .hero-title{text-shadow:0 0 40px rgba(255,217,125,0.35);}
     <div class="quirks-live" id="quirksLive"></div>
   </div>
 
-  <!-- DUAL LEADERBOARD ROW -->
-  <div class="lb-dual-row">
-
-    <!-- NUT LEADERBOARD -->
-    <div class="lb-dual-col">
-      <div class="lb-inline-wrap">
-        <div class="nick-bar" id="nickBar">
-          <div class="nick-left">
-            <span style="color:var(--muted)">Leaderboard</span>
-            <span class="nick-name" id="nickDisplay">Loading…</span>
-            <span class="nick-rank" id="nickRankDisplay"></span>
-          </div>
-          <button class="nick-btn" onclick="openNickModal()">Set Name</button>
-        </div>
-        <div id="lbContent">
-          <div class="lb-empty">Connecting to the ledger...</div>
-        </div>
-        <div class="lb-join" id="lbJoin" style="display:none">
-          <button class="lb-join-btn" onclick="openNickModal()">Set Your Name →</button>
-        </div>
-      </div>
-      <div class="lb-ghost" id="lbGhost"></div>
-    </div>
-
-    <!-- CASINO CHIPS LEADERBOARD -->
-    <div class="lb-dual-col">
-      <div class="lb-inline-wrap" id="ntLbWrap">
-        <div class="nick-bar" style="cursor:default">
-          <div class="nick-left">
-            <span style="color:var(--muted)">Casino</span>
-            <span class="nick-name" style="color:#f6c90e">💎 NUTTOKENS</span>
-          </div>
-          <span style="font-size:9px;color:var(--muted);letter-spacing:.08em" id="ntLbMeta">CHIPS BOARD</span>
-        </div>
-        <div id="ntLbContent">
-          <div class="lb-empty">Convert nuts to get on the board.</div>
-        </div>
-      </div>
-    </div>
-
-  </div>
 
   <div class="clock-bar" id="clockBar">
     <button type="button" class="clock-head" id="clockToggle" onclick="toggleClockPanel()" aria-expanded="false" aria-controls="clockPanel">
@@ -3639,8 +3632,7 @@ function nut() {
   typeStatsAll[method] = (typeStatsAll[method] || 0) + points;
   localStorage.setItem(KEY_TYPE_ALL, JSON.stringify(typeStatsAll));
   save();
-  // Earn play tokens for predictions (no money, no cashout)
-  if (typeof pmEarnTokens === 'function') pmEarnTokens(points);
+  // NOTE: pmEarnTokens removed. NUTTOKENS are earned only via manual conversion (1 nut = 1000 NUTTOKENS).
   showNutVerdict(method);
   if (window.NutQuirks) NutQuirks.onNutLogged(method, points);
   if (window.NutAddons) NutAddons.onNutLogged(method, points);
@@ -5454,16 +5446,9 @@ renderProjectNews();
 pmResolveIfNewDay();
 pmResolveNow();
 pmRender();
-// Seed NUTS balance from all-time nut count on first load + catch-up for missed logs
+// Sync NUTTOKENS display on load (no auto-seeding; NUTTOKENS only come from manual conversion)
 (function seedNutsBalance() {
-  const seed  = parseInt(localStorage.getItem(KEY_PM_SEED) || '0', 10);
-  const delta = Math.max(0, countAllTime - seed);
-  if (delta > 0) {
-    pmSetBalance(pmGetBalance() + delta);
-    localStorage.setItem(KEY_PM_SEED, String(countAllTime));
-  } else {
-    pmSetBalance(pmGetBalance()); // sync display even if no delta
-  }
+  pmSetBalance(pmGetBalance()); // refresh display only, never auto-add chips from nut count
 })();
 fetchNutPrice();
 setInterval(fetchNutPrice, 60000);
